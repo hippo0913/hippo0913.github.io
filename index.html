@@ -306,7 +306,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-12-17 12:12:28 / 修改时间：20:55:13" itemprop="dateCreated datePublished" datetime="2023-12-17T12:12:28+08:00">2023-12-17</time>
+      <time title="创建时间：2023-12-17 12:12:28 / 修改时间：20:56:25" itemprop="dateCreated datePublished" datetime="2023-12-17T12:12:28+08:00">2023-12-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -345,7 +345,7 @@
 <p>虽然使用了git lfs，但从gitlab或者github拉取项目的时候，还是默认会拉取lfs文件，需要修改环境变量才能默认不拉取lfs文件，并不友好。因此我们的做法是，在仓库根目录下新建一个文件.lfsconfig，用来排除拉取lfs大文件，比如排除onnx和engine文件，.lfsconfig内容为</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[lfs]</span><br><span class="line">        fetchexclude = *.onnx, *.engine,</span><br></pre></td></tr></table></figure>
 <p>然后进入到有lfs的子目录中，track对应的后缀名文件。<br>这样如果正常clone仓库到本地是不会拉取lfs大文件，如果需要下载lfs文件</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git lfs pull -I <span class="string">&quot;*&quot;</span> -X <span class="string">&quot;&quot;</span> <span class="comment"># 或者 git lfs pull --include &quot;*&quot; -exclude &quot;&quot; include 所有.lfsconfig 里面exclude的文件</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git lfs pull -I <span class="string">&quot;*&quot;</span> -X <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="comment"># 或者 git lfs pull --include &quot;*&quot; -exclude &quot;&quot; include 所有.lfsconfig 里面exclude的文件</span></span><br></pre></td></tr></table></figure>
 <p>注意：当git pull新的commit后，最好也git lfs pull，保证新上传的模型也拉取下来</p>
 
       
