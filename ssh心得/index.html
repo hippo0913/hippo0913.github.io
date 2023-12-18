@@ -20,29 +20,30 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="远程连接命令安装12sudo apt-get install openssh-server # 被连接方安装sudo apt-get install sshpass ssh命令参数解释1234-p 指定登录端口号，默认22-o 指定ssh配置选项-J 用于在多个SSH跳转之间建立连接 例如ssh -J userA@ipA userB@ipB 注意，各主机节点需要跳转，必须是线性连接-T 用于测试连">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/hexo/hello-world/index.html">
+<meta property="og:title" content="ssh心得">
+<meta property="og:url" content="http://example.com/ssh%E5%BF%83%E5%BE%97/index.html">
 <meta property="og:site_name" content="铁臂IT狗">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="远程连接命令安装12sudo apt-get install openssh-server # 被连接方安装sudo apt-get install sshpass ssh命令参数解释1234-p 指定登录端口号，默认22-o 指定ssh配置选项-J 用于在多个SSH跳转之间建立连接 例如ssh -J userA@ipA userB@ipB 注意，各主机节点需要跳转，必须是线性连接-T 用于测试连">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-12-17T06:45:17.332Z">
-<meta property="article:modified_time" content="2023-12-17T11:17:02.817Z">
+<meta property="article:published_time" content="2023-12-18T01:34:06.000Z">
+<meta property="article:modified_time" content="2023-12-18T02:13:40.085Z">
 <meta property="article:author" content="铁臂IT狗">
-<meta property="article:tag" content="hexo学习">
+<meta property="article:tag" content="TOOLS">
+<meta property="article:tag" content="SSH">
 <meta property="article:tag" content="GO">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/hexo/hello-world/">
+<link rel="canonical" href="http://example.com/ssh%E5%BF%83%E5%BE%97/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/hexo/hello-world/","path":"hexo/hello-world/","title":"Hello World"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/ssh%E5%BF%83%E5%BE%97/","path":"ssh心得/","title":"ssh心得"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Hello World | 铁臂IT狗</title>
+<title>ssh心得 | 铁臂IT狗</title>
   
 
 
@@ -138,7 +139,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E5%91%BD%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">远程连接命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A"><span class="nav-number">1.2.</span> <span class="nav-text">ssh命令参数解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#scp%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A"><span class="nav-number">1.3.</span> <span class="nav-text">scp命令参数解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sshpass%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A"><span class="nav-number">1.4.</span> <span class="nav-text">sshpass命令参数解释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AF%94%E5%A6%82%E9%9C%80%E8%A6%81%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86ls-%E8%BF%9C%E7%A8%8B%E4%B8%8A%E7%9A%84%E7%94%A8%E6%88%B7%E7%9B%AE%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">比如需要命令实现免密ls 远程上的用户目录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh%E8%8A%B1%E9%87%8C%E8%83%A1%E5%93%A8%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.</span> <span class="nav-text">ssh花里胡哨操作</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -189,7 +190,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/hexo/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/ssh%E5%BF%83%E5%BE%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -202,12 +203,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Hello World | 铁臂IT狗">
+      <meta itemprop="name" content="ssh心得 | 铁臂IT狗">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello World
+          ssh心得
         </h1>
 
         <div class="post-meta-container">
@@ -219,7 +220,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-12-17 14:45:17 / 修改时间：19:17:02" itemprop="dateCreated datePublished" datetime="2023-12-17T14:45:17+08:00">2023-12-17</time>
+      <time title="创建时间：2023-12-18 09:34:06 / 修改时间：10:13:40" itemprop="dateCreated datePublished" datetime="2023-12-18T09:34:06+08:00">2023-12-18</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -227,11 +228,11 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/hexo%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">hexo学习</span></a>
+          <a href="/categories/TOOLS/" itemprop="url" rel="index"><span itemprop="name">TOOLS</span></a>
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/hexo%E5%AD%A6%E4%B9%A0/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a>
+          <a href="/categories/TOOLS/SSH/" itemprop="url" rel="index"><span itemprop="name">SSH</span></a>
         </span>
     </span>
 
@@ -244,21 +245,14 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><p>Hexo教程：<br>中文网址<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/configuration">链接</a></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><h1 id="远程连接命令"><a href="#远程连接命令" class="headerlink" title="远程连接命令"></a>远程连接命令</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install openssh-server <span class="comment"># 被连接方安装</span></span><br><span class="line">sudo apt-get install sshpass</span><br></pre></td></tr></table></figure>
+<h2 id="ssh命令参数解释"><a href="#ssh命令参数解释" class="headerlink" title="ssh命令参数解释"></a>ssh命令参数解释</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-p 指定登录端口号，默认22</span><br><span class="line">-o 指定ssh配置选项</span><br><span class="line">-J 用于在多个SSH跳转之间建立连接 例如ssh -J userA@ipA userB@ipB 注意，各主机节点需要跳转，必须是线性连接</span><br><span class="line">-T 用于测试连接 例如配好github的公钥之后，使用 ssh -T git@github.com可测试</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<h2 id="scp命令参数解释"><a href="#scp命令参数解释" class="headerlink" title="scp命令参数解释"></a>scp命令参数解释</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-r:传输目录时，必选 递归scp整个目录</span><br><span class="line">-P:可选参数，默认22</span><br><span class="line">-q:可选参数 不显示传输进度条</span><br><span class="line">-o:可选参数 指定跳板机</span><br><span class="line"></span><br><span class="line">比如 要通过userA的跳板机，拉取userB的/data目录到本地 前提是你不能连接orin，否则scp这二货会优先读取本地的orin连接，直接跳转到本地直连的orin</span><br><span class="line">scp -r -o <span class="string">&quot;ProxyJump userA@ipA&quot;</span> &lt;username&gt;@&lt;ip&gt;:<span class="string">&quot;/data/&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
+<h2 id="sshpass命令参数解释"><a href="#sshpass命令参数解释" class="headerlink" title="sshpass命令参数解释"></a>sshpass命令参数解释</h2><p>sshpass<br>参数说明：<br>-p 远程服务器密码<br>更多命令参数请参考 sshpass –help</p>
+<h1 id="比如需要命令实现免密ls-远程上的用户目录"><a href="#比如需要命令实现免密ls-远程上的用户目录" class="headerlink" title="比如需要命令实现免密ls 远程上的用户目录"></a>比如需要命令实现免密ls 远程上的用户目录</h1><p>sshpass -p <password> ssh <username>@<ip> “ls ~”</p>
+<h2 id="ssh花里胡哨操作"><a href="#ssh花里胡哨操作" class="headerlink" title="ssh花里胡哨操作"></a>ssh花里胡哨操作</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建ssh的key</span></span><br><span class="line">ssh-keygen -t rsa -f ~/.ssh/id_rsa.github -C <span class="string">&quot;&lt;your-email&gt;&quot;</span></span><br><span class="line"><span class="comment"># 一路回车，把id_rsa.github.pub拷贝到 https://github.com/settings/ssh/new 的Key里，这样你就可以免密操作github的仓库</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用config来管理ssh连接</span></span><br><span class="line">vim ~/.ssh/config</span><br><span class="line">Host hostname</span><br><span class="line">User root</span><br><span class="line">HostName 192.168.1.1</span><br><span class="line">:wq</span><br><span class="line">ssh hostname 就可以对192.168.1.1发起ssh连接</span><br><span class="line"></span><br><span class="line">Port为端口号，默认22</span><br><span class="line">IdentityFile为:ssh私钥文件的地址，刚才的例子中为~/.ssh/id_rsa.github文件</span><br><span class="line">以上两个参数都是默认的</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -267,7 +261,8 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/hexo%E5%AD%A6%E4%B9%A0/" rel="tag"># hexo学习</a>
+              <a href="/tags/TOOLS/" rel="tag"># TOOLS</a>
+              <a href="/tags/SSH/" rel="tag"># SSH</a>
               <a href="/tags/GO/" rel="tag"># GO</a>
           </div>
 
@@ -275,14 +270,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/git%E5%BF%83%E5%BE%97/" rel="prev" title="git心得">
-                  <i class="fa fa-angle-left"></i> git心得
+                <a href="/hexo/hello-world/" rel="prev" title="Hello World">
+                  <i class="fa fa-angle-left"></i> Hello World
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/ssh%E5%BF%83%E5%BE%97/" rel="next" title="ssh心得">
-                  ssh心得 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
