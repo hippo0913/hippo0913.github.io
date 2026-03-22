@@ -28,6 +28,8 @@ source_url: https://code.claude.com/docs/zh-CN/best-practices
 
 ---
 
+<!-- more -->
+
 ## 核心原则
 
 ### 1. 明确目标，而非步骤

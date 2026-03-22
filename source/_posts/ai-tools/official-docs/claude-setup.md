@@ -1,8 +1,8 @@
 ---
 title: 精读官方文档：设置 Claude Code
 date: 2026-03-12 20:02:00
-updated: 2026-03-12 20:02:00
-tags: [Claude Code, AI 工具，官方文档精读]
+updated: 2026-03-22 14:00:00
+tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 4
@@ -25,9 +25,13 @@ source_url: https://code.claude.com/docs/zh-CN/setup
 
 **正确的姿势**：先理解核心配置项，再根据实际需求渐进式添加。
 
+<!-- more -->
+
 ---
 
-## 配置文件位置
+## 核心概念：配置文件结构
+
+### 配置文件的优先级
 
 Claude Code 的配置是分层的：
 
@@ -48,29 +52,52 @@ Claude Code 的配置是分层的：
 
 > 💬 hippo：记住这个优先级：**项目级 > 用户级**。大多数时候你只需要关心项目级的 `CLAUDE.md` 和 `.claude/settings.json`。
 
+### 配置文件的作用
+
+| 配置文件 | 作用 | 使用频率 |
+|-----------|------|---------|
+| `CLAUDE.md` | 项目级记忆和指引 | ⭐⭐⭐⭐⭐⭐ |
+| `.claude/settings.json` | 项目级设置（模型、Hooks 等） | ⭐⭐⭐⭐⭐ |
+| `.claude/hooks/` | Hooks 脚本 | ⭐⭐⭐ |
+| `~/.claude/settings.json` | 用户级全局设置 | ⭐⭐⭐ |
+| `~/.claude/skills/` | 全局 Skills | ⭐⭐⭐ |
+
 ---
 
-## 核心配置项
+## 实战指南：配置你的 Claude Code
 
-### 1. 模型选择
+### 场景 1：选择合适的模型
 
+**问题背景**：
+Claude Code 支持多个模型，不同模型在速度、质量、成本上有所差异。
+
+**可用的模型**：
+- `claude-opus-4-6` - 最强，适合复杂推理任务
+- `claude-sonnet-4-6` - 默认，速度和质量平衡
+- `claude-haiku-4-5` - 最快最便宜，适合简单任务
+
+**配置方式**（项目级）：
+在 `.claude/settings.json` 中配置：
 ```json
 {
   "model": {
-    "default": "claude-sonnet-4-6-20250929"
+    "default": "claude-sonnet-4-6"
   }
 }
 ```
 
-可用模型：
-- `claude-opus-4-6` - 最强，适合复杂任务
-- `claude-sonnet-4-6` - 默认，速度和质量平衡
-- `claude-haiku-4-5` - 最快最便宜，适合简单任务
-
 > 💬 hippo：默认用 Sonnet 就好。遇到特别复杂的任务（比如重构整个模块），可以临时切换到 Opus。
+> 但要注意：Opus 的成本是 Sonnet 的 3-4 倍，不要一直用。
 
-### 2. MCP 服务器
+### 场景 2：配置 MCP 服务器
 
+**问题背景**：
+你希望 Claude Code 能访问外部服务，比如实时网页搜索、数据库查询等。
+
+**什么是 MCP**：
+MCP（Model Context Protocol）是连接外部服务的标准协议。
+
+**配置方式**（项目级）：
 ```json
 {
   "mcpServers": {
@@ -82,10 +109,18 @@ Claude Code 的配置是分层的：
 }
 ```
 
-> 💬 hippo：MCP 是连接外部服务的接口。最常用的是 Web Search，让 Claude 能查实时信息。其他如 Notion、GitHub 也可以接入。
+> 💬 hippo：MCP 是连接外部服务的接口。最常用的是 Web Search，让 Claude 能查实时信息。
+> 其他如 Notion、GitHub 也可以接入，让 Claude 能直接操作这些服务。
 
-### 3. Hooks 配置
+### 场景 3：配置 Hooks 提升安全性
 
+**问题背景**：
+你担心 Claude Code 可能执行危险操作（比如删除整个项目）。
+
+**配置 Hooks**（项目级）：
+在 `.claude/hooks/` 目录下创建脚本，然后在 `.claude/settings.json` 中引用。
+
+**示例：拦截危险命令**：
 ```json
 {
   "hooks": {
@@ -102,7 +137,26 @@ Claude Code 的配置是分层的：
 }
 ```
 
-> 💬 hippo：Hooks 是确定性执行的脚本，用于安全拦截、提交前测试等。我强烈建议配置"危险命令拦截"，防止 `rm -rf` 这种操作。
+**拦截脚本示例**：
+```bash
+# .claude/hooks/block-dangerous.sh
+#!/bin/bash
+
+# 检查命令中是否包含危险关键词
+DANGEROUS_COMMANDS=("rm -rf" "rm -r /" "dd if=" "mkfs")
+
+for cmd in "${DANGEROUS_COMMANDS[@]}"; do
+  if [[ "$*" == *"$cmd"* ]]; then
+    echo "❌ 阻止了危险命令: $*"
+    exit 1
+  fi
+done
+
+echo "✓ 命令安全检查通过"
+```
+
+> 💬 hippo：Hooks 是确定性执行的脚本，用于安全拦截、提交前测试等。
+> 我强烈建议配置"危险命令拦截"，防止 `rm -rf` 这种操作。
 
 ---
 
@@ -113,7 +167,7 @@ Claude Code 的配置是分层的：
 ### 标准结构
 
 ```markdown
-# 项目名 - Claude 指引
+# 项目名 - Claude 指南
 
 ## Critical Rules（必须遵守）
 - 所有主题修改写在 _config.butterfly.yml，不要动 node_modules
@@ -130,52 +184,104 @@ Claude Code 的配置是分层的：
 
 ## Claude 常犯的错误
 - 错误：修改 node_modules 里的文件
-  正确：所有配置改 _config.butterfly.yml
+- 正确：所有配置改 _config.butterfly.yml
 ```
 
-> 💬 hippo：CLAUDE.md 的核心就三层——地图（项目结构）、意图（为什么这样设计）、操作手册（怎么做事）。保持 200 行以内，细节放 `.claude/docs/`。
+> 💬 hippo：CLAUDE.md 的核心就三层——地图（项目结构）、意图（为什么这样设计）、操作手册（怎么做事）。
+> 保持 200 行以内，细节放 `.claude/docs/`。
+
+### 最佳实践
+
+1. **只写必要的信息**：CLAUDE.md 不是项目文档，是给 AI 看的指引
+2. **保持简洁**：200 行以内，突出关键点
+3. **分层组织**：用标题分隔不同类型的信息
+4. **及时更新**：项目变化时同步更新
 
 ---
 
-## 原文精读：关键段落
+## hippo 的踩坑实录
 
-### 关于配置优先级
+### 坑点 1：配置不生效
 
-> 项目级配置优先于用户级配置，子目录级配置优先于项目级配置。
+**表现**：
+在 `.claude/settings.json` 中配置了模型，但 Claude Code 还是使用默认模型。
 
-> 💬 hippo：这意味着你可以在 `CLAUDE.md` 里写项目特定的规则，在 `~/.claude/CLAUDE.md` 里写个人偏好，两者不会冲突。
+**原因**：
+配置文件格式错误，或者 JSON 语法有问题。
 
-### 关于模型选择
+**解决**：
+```bash
+# 验证 JSON 格式
+cat .claude/settings.json | python -m json.tool
 
-> 默认模型是 Claude Sonnet 4.6，它在速度和质量之间取得平衡。Opus 4.6 适合复杂推理任务，Haiku 4.5 适合快速简单任务。
+# 或者用 jq
+jq . .claude/settings.json
+```
 
-> 💬 hippo：大多数时候默认就好。如果你发现 Claude 在复杂任务上表现不佳，试试切换到 Opus——有时候不是它笨，是任务真的复杂。
+> 💬 hippo：JSON 格式非常严格，少个逗号、多个引号都会导致整个文件失效。
+> 配置后最好验证一下 JSON 格式。
+
+### 坑点 2：Hooks 脚本没有执行权限
+
+**表现**：
+配置了 Hooks，但脚本没有被调用。
+
+**原因**：
+脚本文件没有执行权限。
+
+**解决**：
+```bash
+# 添加执行权限
+chmod +x .claude/hooks/*.sh
+
+# 验证权限
+ls -la .claude/hooks/
+```
+
+> 💬 hippo：这是 Hooks 配置中最常见的坑。
+> 建议在添加新 Hooks 后，立即测试是否能正常工作。
+
+### 最佳实践总结
+
+1. **先理解再配置**：不要盲目复制配置
+2. **小步迭代**：每次只改一个配置项，验证后再继续
+3. **保留默认值**：不需要的配置项就不要写，保持简单
+4. **文档化你的配置**：在 `.claude/docs/` 中写清楚每个配置的作用
 
 ---
 
-## 我的建议配置清单
+## 常见问题解答
 
-### 第一天（必须）
-- [ ] 配置 `CLAUDE.md` 核心规则（≤200 行）
-- [ ] 配置危险命令拦截 Hook
+**Q: 配置文件在哪里？**
 
-### 第一周（推荐）
-- [ ] 配置提交前测试 Hook
-- [ ] 配置 MCP（Web Search）
-- [ ] 创建第一个 Skill（如发布流程）
+A: 用户级在 `~/.claude/`，项目级在项目根的 `.claude/` 目录。
 
-### 第一个月（按需）
-- [ ] 配置 Subagents（有并行任务需求时）
-- [ ] 配置更多 MCP 服务器
-- [ ] 创建 Plugins（跨项目复用）
+**Q: CLAUDE.md 会被提交到 Git 吗？**
+
+A: 不会，`.claude/` 目录在 `.gitignore` 中。但如果你把它放在项目根目录，需要手动添加到 `.gitignore`。
+
+**Q: 如何在不同项目中用不同的模型？**
+
+A: 在每个项目的 `.claude/settings.json` 中配置，没有配置则使用全局默认值。
+
+**Q: MCP 服务器配置了但没有用？**
+
+A: 检查 MCP 服务器是否能正常运行，命令路径是否正确。可以先手动执行命令测试。
+
+---
+
+## 延伸阅读
+
+- 相关文档：[如何工作](https://code.claude.com/docs/zh-CN/how-claude-code-works)
+- 参考资料：[MCP 规范](https://modelcontextprotocol.io/)
 
 ---
 
 ## 一句话总结
 
-设置不是填空题，而是渐进式配置——先搞定 CLAUDE.md 和危险拦截，再根据实际需求慢慢加。
+设置不是填空题，而是渐进式配置——先搞定 CLAUDE.md 和危险拦截，再根据实际需求慢慢加。配置的目标是让 Claude Code 更懂你的项目，而不是限制它的能力。
 
-**下一篇**：[Claude Code 如何工作](/2026/03/12/ai-tools/official-docs/claude-how-it-works/)，理解底层原理。
+**下一篇**：[精读官方文档：Claude Code 如何工作](/2026/03/12/ai-tools/official-docs/how-claude-code-works/)
 
 ---
 

@@ -28,6 +28,8 @@ source_url: https://code.claude.com/docs/zh-CN/vs-code
 
 ---
 
+<!-- more -->
+
 ## 核心内容
 
 ### 主要概念

@@ -5,15 +5,15 @@
 # Site
 title: 小河马的博客
 subtitle: ''
-description: ''
-keywords:
+description: 小河马的技术博客，记录 Claude Code 使用心得、前端开发实践和技术探索
+keywords: Claude Code, AI 工具, Hexo, Butterfly, 技术博客, 前端开发
 author: hippo0913
 language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://hippo0913.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:

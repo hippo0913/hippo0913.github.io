@@ -28,6 +28,8 @@ source_url: https://code.claude.com/docs/zh-CN/cli-reference
 
 ---
 
+<!-- more -->
+
 ## 核心内容
 
 ### 主要概念

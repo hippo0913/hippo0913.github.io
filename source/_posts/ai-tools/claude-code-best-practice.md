@@ -29,6 +29,8 @@ cover: https://picsum.photos/seed/claude-code/1920/1080
 
 ---
 
+<!-- more -->
+
 ## 一、先建立正确的心智模型
 
 很多人第一次用 Claude Code，会把它当成"更聪明的代码补全工具"。

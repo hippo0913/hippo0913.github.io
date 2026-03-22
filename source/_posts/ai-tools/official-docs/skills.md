@@ -28,6 +28,8 @@ source_url: https://code.claude.com/docs/zh-CN/skills
 
 ---
 
+<!-- more -->
+
 ## 核心内容
 
 ### 主要概念

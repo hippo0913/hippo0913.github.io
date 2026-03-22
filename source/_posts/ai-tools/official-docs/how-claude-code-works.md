@@ -28,6 +28,8 @@ source_url: https://code.claude.com/docs/zh-CN/how-claude-code-works
 
 ---
 
+<!-- more -->
+
 ## 核心概念：Claude Code 的工作流程
 
 ### 1. 读取上下文

@@ -30,6 +30,8 @@ cover: https://picsum.photos/seed/ai-tools-claude/1920/1080
 
 **这个系列就是我这些实践的记录。**
 
+<!-- more -->
+
 ---
 
 ## 这个系列适合谁
