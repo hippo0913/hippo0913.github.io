@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：在 VS Code 中使用 Claude Code
-date: 2026-03-12 20:17:00
+date: 2026-03-14 23:00:00
 updated: 2026-03-12 20:17:00
 tags: [Claude Code, AI 工具，官方文档精读]
 categories: [AI 工具系列]

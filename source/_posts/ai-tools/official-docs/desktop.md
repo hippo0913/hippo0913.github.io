@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：使用 Claude Code Desktop
-date: 2026-03-12 20:15:00
+date: 2026-03-16 23:00:00
 updated: 2026-03-12 20:15:00
 tags: [Claude Code, AI 工具，官方文档精读]
 categories: [AI 工具系列]
