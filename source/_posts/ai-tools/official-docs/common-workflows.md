@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：常见工作流程
-date: 2026-03-12 20:08:00
+date: 2026-03-12 08:00:00
 updated: 2026-03-22 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
