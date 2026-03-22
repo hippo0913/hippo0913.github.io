@@ -1,1 +1,7 @@
 node_modules
+db.json
+.claude/
+logs/
+state/
+TASKS.md
+TASKS (1).md
