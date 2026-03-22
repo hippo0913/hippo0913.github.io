@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：在 VS Code 中使用 Claude Code
-date: 2026-03-12 14:00:00
+date: 2026-03-22 08:00:00
 updated: 2026-03-22 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
@@ -9,223 +9,124 @@ series_index: 17
 description: 精读 Claude Code VS Code 集成文档，了解在 VS Code 中使用 Claude Code 的方法。
 cover: https://picsum.photos/seed/claude-vscode/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/vs-code
----
 
 # 精读官方文档：在 VS Code 中使用 Claude Code
-
 > 💬 hippo：这是系列的第十七篇。很多开发者问：既然有 CLI，为什么还需要 VS Code 扩展？答案很简单——视觉化交互能让你看到"计划"、对比"差异"、追踪"历史"，这是纯终端做不到的。
-
----
-
 ## 开篇：为什么 VS Code 扩展很重要
-
 我见过两种使用方式：
 1. **纯 CLI 派**——死磕命令行，拒绝 GUI，效率反而不高
 2. **全 GUI 派**——只会点按钮，不知道背后的能力
-
 **正确的姿势**：VS Code 扩展 + CLI 组合使用——图形界面处理复杂任务，CLI 处理快速操作。
-
 <!-- more -->
-
----
-
 ## 核心概念：VS Code 扩展能做什么
-
 ### 三大核心能力
-
 | 能力 | CLI | VS Code 扩展 | 实际价值 |
 |------|-----|------------|---------|
 | 计划审查 | ❌ | ✅ | 在 Claude 执行前修改计划，避免返工 |
 | 内联差异 | ⚠️ | ✅ | 直接在编辑器中看到代码变更，一键接受/拒绝 |
 | 历史回溯 | ⚠️ | ✅ | checkpoints 让你能回退到对话的任何节点 |
-
 > 💬 hippo：这些能力不是锦上添花，而是改变工作流的核心。比如"计划审查"——你能看到 Claude 打算做什么，在它动手前调整思路，避免它跑偏了还要改回。
-
 ### 权限模式
-
 Claude Code 在 VS Code 中支持三种权限模式：
-
 | 模式 | 行为 | 适用场景 |
 |------|------|---------|
 | **正常模式** | 每个操作前请求许可 | 日常使用，安全第一 |
 | **Plan 模式** | 描述计划，等待批准 | 复杂任务，需要审阅 Claude 的思路 |
 | **自动接受** | 直接执行，不询问 | 高度信任的重复性任务 |
-
 > 💬 hippo：默认用正常模式。遇到复杂重构（比如"帮我重构整个用户模块"），先切换到 Plan 模式看它打算怎么做，避免瞎改。
-
----
-
 ## 实战指南：手把手教你用
-
 ### 场景 1：使用 @-提及精准定位代码
-
 **问题背景**：
 你说"修复登录功能的 bug"，但项目里有 `login.tsx`、`auth.ts`、`LoginButton.tsx`，Claude 不知道你说哪个。
-
 **正确做法**：
 ```bash
 > 修复 @src/auth.ts 中的 token 验证逻辑
 > 检查 @components/Login/ 下的所有文件
 ```
-
 **高级技巧**：
 - 选中文本后按 `Option+K`（Mac）或 `Alt+K`（Windows），插入引用：`@app.ts#5-10`
 - 模糊匹配：输入 `@auth` 会匹配 `auth.js`、`AuthService.ts` 等
-
 > 💬 hippo：@-提及是提升准确率的神器。一开始我懒得用，后来发现 30% 的回答偏差都来自"上下文不清"，现在能 @ 就 @。
-
 ### 场景 2：用计划模式避免"瞎改"
-
-**问题背景**：
 你让 Claude"优化性能"，结果它把整个代码库都重构了，而你只是想优化一个 API。
-
-**正确做法**：
 1. 切换到 Plan 模式
 2. 提交任务：`优化用户列表页面的加载性能`
 3. Claude 会生成一个 Markdown 计划，比如：
    ```markdown
    ## 性能优化计划
-
    ### 1. 虚拟滚动
    - 实现 react-window 虚拟滚动
    - 减少渲染节点从 1000+ 到 20
-
    ### 2. 请求合并
    - 合并 /api/users 和 /api/user-stats 的请求
    - 使用 Promise.all() 并行加载
-
    ### 3. 缓存策略
    - 添加 SWR 缓存层
    - 缓存时间 5 分钟
    ```
 4. 你可以在这个计划上直接修改注释：
-   ```markdown
-   ### 1. 虚拟滚动
    + 先只优化虚拟滚动，其他的下次再做
-   - 实现 react-window 虚拟滚动
-   - 减少渲染节点从 1000+ 到 20
-   ```
 5. 批准后 Claude 按你的计划执行
-
 > 💬 hippo：这个功能救了我好几次。之前 Claude 说要"重构整个路由系统"，我一看计划，发现它要删掉很多功能，赶紧在计划里画了道红线。
-
 ### 场景 3：多会话并行处理不同任务
-
-**问题背景**：
 你在写功能 A，突然发现有个 bug 需要修复，但不想打断当前对话。
-
-**正确做法**：
 1. 按 `Cmd+Shift+Esc`（Mac）或 `Ctrl+Shift+Esc`（Windows）打开新会话
 2. 在新会话中修复 bug
 3. 切回原会话继续写功能
-
 **会话状态指示**：
 - 蓝色点：有权限请求待处理
 - 橙色点：Claude 在标签页隐藏时完成了任务
-
 > 💬 hippo：这和浏览器的"多个标签页"一样自然。我现在习惯同时开 3-4 个会话：一个写功能、一个修 bug、一个跑测试。
-
 ### 场景 4：Checkpoints 回滚到任意节点
-
-**问题背景**：
 你让 Claude 重构代码，改到一半发现方向错了，想回到某个之前的版本。
-
-**正确做法**：
 1. 鼠标悬停在任意消息上
 2. 点击 rewind 按钮
 3. 选择三个选项之一：
    - **从此处分叉对话**：保留代码更改，开个新对话分支
    - **将代码回滚到此处**：代码回到这个节点，对话历史保留
    - **分叉并回滚代码**：新对话 + 旧代码，最干净的起点
-
 > 💬 hippo：Checkpoints 是 VS Code 独有的超能力。CLI 也有，但图形化操作更直观。我现在改代码敢让 Claude 大胆尝试，因为随时能回滚。
-
----
-
 ## hippo 的踩坑实录
-
 ### 坑点 1：Spark 图标找不到
-
 **表现**：
 安装扩展后，看不到编辑器右上角的 spark 图标（闪电图标）。
-
 **原因**：
 - 只打开了文件夹，没打开具体文件
 - VS Code 版本太旧（需要 1.98.0+）
 - 工作区受限模式
-
 **解决**：
 1. 确保打开文件，而不只是文件夹
 2. 检查版本：`帮助 → 关于`，需要 ≥ 1.98.0
 3. 如果是受限模式，点击信任工作区
 4. 备选方案：点击状态栏右下角的"✱ Claude Code"或按 `Cmd+Shift+P` 输入"Claude Code"
-
 > 💬 hippo：这个坑浪费了我 20 分钟。后来发现——打开文件夹不等于打开文件，图标只在打开文件后出现。
-
 ### 坑点 2：权限模式切换不生效
-
-**表现**：
 在 VS Code 设置里改了 `initialPermissionMode`，但 Claude 还是每次都问。
-
-**原因**：
 - 只修改了扩展设置，没有重启 VS Code
 - 用 `/` 命令菜单手动改过模型，这会覆盖默认设置
-
-**解决**：
 1. 确认设置路径：`Cmd+,` → 扩展 → Claude Code → initialPermissionMode
 2. 重启 VS Code（不是重新加载窗口）
 3. 如果在当前会话中用 `/model` 改过模式，新对话才会生效
-
 > 💬 hippo：记住一个原则——设置改全局，`/` 命令改当前会话。想让设置生效，必须开新对话。
-
 ### 最佳实践总结
-
 1. **复杂任务用 Plan 模式**：重构、迁移、大规模改代码
 2. **精准定位用 @-提及**：文件、函数、代码块
 3. **多任务并行开新会话**：不要在一个会话里塞太多事
 4. **频繁改动用 Checkpoints**：随时可回滚，敢于尝试
-
----
-
 ## 常见问题解答
-
 **Q: VS Code 扩展和 CLI 功能有什么区别？**
-
 A: VS Code 扩展是 CLI 的超集——核心能力一样，但扩展多了计划审查、内联差异、Checkpoints 回滚等功能。大部分日常任务用扩展就够了，只有某些 CLI 独有命令（如 `!` bash 快捷方式）才需要切到终端。
-
 **Q: 可以同时使用扩展和 CLI 吗？**
-
 A: 可以，而且推荐这样用。它们共享对话历史——你在扩展中开的对话，用 `claude --resume` 能在 CLI 里继续。
-
 **Q: 扩展会影响性能吗？**
-
 A: 会，但通常可以忽略。Claude 进程是独立的，扩展只负责 UI 交互。如果你在扩展中运行长时间的命令（如 `npm run build`），建议切换到 CLI 执行，这样进度更直观。
-
 **Q: 如何配置第三方提供商（如 Amazon Bedrock）？**
-
 A: 在 VS Code 设置中找到 `Claude Code`，配置 `claudeProcessWrapper` 或环境变量。具体参考官方文档的"使用第三方提供商"章节。
-
 **Q: 扩展支持多用户协作吗？**
-
 A: 扩展本身是单用户工具。但项目级的配置（如 `.claude/settings.json`）可以提交到 Git，团队共享 MCP 服务器配置和 Hooks。对话历史是私密的，不会被共享。
-
----
-
 ## 延伸阅读
-
-- 相关文档：[Claude Code 快速开始](/2026/03/12/ai-tools/official-docs/claude-quickstart/)
-- 参考资料：[常见工作流](/2026/03/12/ai-tools/official-docs/common-workflows/)
-
----
-
-## 一句话总结
-
-VS Code 扩展不是 CLI 的替代品，而是增强版——它能让你看到"计划"、对比"差异"、追踪"历史"，把 Claude 从"命令行工具"变成"智能 IDE 助手"。
-
-**上一篇**：[精读官方文档：Claude Code 设置](/2026/03/12/ai-tools/official-docs/settings/)
-
-**下一篇**：请继续阅读本文档系列的其他文章。
-
----
-
-*本文精读自 [在 VS Code 中使用 Claude Code](https://code.claude.com/docs/zh-CN/vs-code)*
+- 相关文档：[Claude Code 快速开始](/ai-tools/official-docs/claude-quickstart/)
+- 参考资料：[常见工作流](/ai-tools/official-docs/common-workflows/)
+**上一篇**：[精读官方文档：Desktop 快速开始](/ai-tools/official-docs/desktop-quickstart/)
+**下一篇**：[精读官方文档：在 Chrome 中使用 Claude Code（测试版）](/ai-tools/official-docs/chrome/)
+*本文精读自 [精读官方文档：在 VS Code 中使用 Claude Code - Claude Code Docs](https://code.claude.com/docs/zh-CN/vs-code)*

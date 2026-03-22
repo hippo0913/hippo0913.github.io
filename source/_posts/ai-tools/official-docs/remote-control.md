@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：使用远程控制从任何设备继续本地会话
-date: 2026-03-12 10:00:00
+date: 2026-03-21 04:00:00
 updated: 2026-03-22 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
@@ -9,167 +9,96 @@ series_index: 21
 description: 精读 Claude Code 远程控制文档，了解如何在不同设备间继续会话。
 cover: https://picsum.photos/seed/claude-remote/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/remote-control
----
 
 你是不是也有过这样的经历：在电脑前用 Claude Code 写代码写得正开心，结果得出门办事，或者想躺平刷手机了，但那个会话还在电脑上跑着，心里痒痒的？
-
 Remote Control 就是来解决这个问题的！它能让你的电脑、手机、平板电脑共享同一个 Claude Code 会话，你在哪儿都能继续干活。
-
 <!-- more -->
-
 ## 核心概念：这是什么神仙功能？
-
 简单说，Remote Control 是个"远程控制"功能，把你在电脑上跑的 Claude Code 会话"投射"到手机或平板上。
-
 **关键点**：
 - Claude 依然在**你的本地机器上运行**，不会把代码或文件上传到云端
 - 只是多了一个"窗口"，让你能在手机上看、跟它对话
 - 所有设备上的对话是**同步的**，你在手机发消息，电脑上也能看到
-
 **为什么这么酷**：
 - 你的 MCP servers（那些连接外部工具的插件）、工具、项目配置都能照常使用
 - 能同时从多个设备工作：终端、浏览器、手机一起发消息
 - 电脑断网或进入睡眠状态？没关系，重连后自动恢复
-
 > 💡 **hippo 的理解**：想象一下，你在电脑上开了一个虚拟办公室，Remote Control 就是给你配了个"手机分身"，你在手机上看到的是办公室里实时发生的一切，但办公室本身还在电脑上。
-
 ## 前置要求：先确认这些
-
 在玩这个功能之前，先检查：
-
 1. **订阅等级**：需要 Pro、Max、Team 或 Enterprise 计划，API 密钥不行
 2. **登录状态**：先在终端跑 `claude`，然后用 `/login` 登录
 3. **工作区信任**：至少在你的项目目录里跑过一次 `claude`，接受那个信任对话框
-
 ## 实战指南：手把手教你玩
-
 ### 场景一：直接启动新的远程控制会话
-
 在项目目录里，终端跑：
-
 ```bash
 claude remote-control
 ```
-
 终端会显示一个会话 URL，你可以在任何浏览器打开这个 URL。按空格键还能显示二维码，用手机扫一下就能连上了。
-
 **高级参数**：
-```bash
 # 给会话起个名，方便找
 claude remote-control "我的博客项目"
-
 # 显示详细日志（调试时用）
 claude remote-control --verbose
-
 # 启用沙箱（隔离文件系统和网络，默认关闭）
 claude remote-control --sandbox
-```
-
 ### 场景二：从正在进行的会话中启动
-
 如果你已经在一个 Claude Code 会话里了，想突然转战手机，直接输入：
-
-```
 /remote-control 我的博客项目
-```
-
 或者简写：
-```
 /rc 我的博客项目
-```
-
 这个命令会继承你当前的对话历史，然后显示 URL 和二维码。
-
 ### 从另一个设备连接
-
 当远程控制会话启动后，你有三种方式从另一个设备连接：
-
 1. **直接打开会话 URL**：在任何浏览器打开终端里显示的 URL
 2. **扫描二维码**：用手机上的 Claude App 直接扫二维码
 3. **在应用列表里找**：打开 claude.ai/code 或 Claude App，在会话列表里找你的会话（有个绿色的电脑图标标识）
-
 > 💡 **hipo 的小技巧**：如果你还没装 Claude App，在 Claude Code 里输入 `/mobile` 就能看到下载二维码。
-
 ### 为所有会话自动启用远程控制
-
 不想每次都手动输入命令？设置一下：
-
-```bash
 /config
-```
-
 把"为所有会话启用 Remote Control"设为 `true`，之后每个会话都会自动开启远程控制。想关闭就设回 `false`。
-
 ## 💬 hippo 的踩坑实录
-
 ### 坑点 1：忘记会话名称找不到了
-
 **场景**：我同时开了好几个项目，每个都跑了 `claude remote-control`，结果在手机上打开 claude.ai/code，发现会话列表里一堆"Remote Control session"，根本分不清哪个是哪个。
-
 **解决方法**：一定要用 `--name` 参数或 `/remote-control "项目名"` 给每个会话起个明确的名字，比如"我的博客"、"代码审查"、"实验项目"。
-
 ### 坑点 2：网络断开后会话挂了
-
 **场景**：我带着手机出门，家里的电脑突然网络不稳定，断了一会儿网，结果远程控制会话直接结束了。
-
 **解决方法**：
 - 如果电脑网络只是短暂中断（几分钟），通常能自动重连
 - 如果断网超过 10 分钟左右，会话就会超时，重新跑 `claude remote-control` 启动新会话
 - 建议在有稳定网络的环境下使用这个功能
-
 ## 安全性：数据会不会泄露？
-
 官方文档明确说：
-
 - 你的本地 Claude Code 会话**只发送出站 HTTPS 请求**，不会在机器上打开入站端口
 - 所有流量都通过 Anthropic API 传输，使用 TLS 加密
 - 连接使用多个短期凭证，每个凭证作用范围单一且独立过期
-
 简单说：和普通 Claude Code 会话的安全性一样，没有额外风险。
-
 ## Remote Control vs Claude Code on the web
-
 这两个容易搞混，区别很重要：
-
 | 特性 | Remote Control | Claude Code on the web |
 |------|----------------|----------------------|
 | 运行位置 | 你的机器 | Anthropic 的云端 |
 | 文件系统 | 本地文件可用 | 需要上传或在云端克隆仓库 |
 | MCP servers | 本地配置的都能用 | 受限 |
 | 适合场景 | 继续本地工作、使用本地工具 | 快速开始、并行任务、处理没克隆的仓库 |
-
 **一句话总结**：想在本地环境继续干活，用 Remote Control；想从零开始或云端干活，用 Claude Code on the web。
-
 ## 限制：不是万能的
-
 - 一次只能一个远程会话（每个 Claude Code 实例）
 - 终端必须保持打开，关了就没了
 - 网络断开太久（10 分钟+）会超时
-
 ## 常见问题解答
-
 **Q：我能在电脑和手机同时发消息吗？**
-
 A：可以！对话在所有连接的设备上同步，你可以轮流发消息。
-
 **Q：如果电脑进入睡眠状态怎么办？**
-
 A：会话会暂时断开，等电脑唤醒并重新连接网络后会自动恢复。
-
 **Q：远程控制会占用我电脑多少资源？**
-
 A：主要就是个网络连接的开销，基本可以忽略不计。
-
 **Q：我能在公司电脑上用远程控制，回家后用手机继续吗？**
-
 A：可以，只要你的公司电脑开着、连着网，且 Remote Control 会话还在运行。
-
 ## 一句话总结
-
 Remote Control 让你的 Claude Code 会话能在多个设备间无缝切换，本地环境全保留，随时随地继续干活。
-
----
-
-上一篇：[精读官方文档：Claude Code 安全模型与隐私保护](/2026/03/12/official-docs-security-model/)
-
-下一篇：[精读官方文档：Claude Code 数据使用详解](/2026/03/12/official-docs-data-usage/)
+**上一篇**：[精读官方文档：Claude Code 网页版](/ai-tools/official-docs/claude-code-on-the-web/)
+**下一篇**：[精读官方文档：Claude Code GitHub Actions](/ai-tools/official-docs/github-actions/)
+*本文精读自 [精读官方文档：使用远程控制从任何设备继续本地会话 - Claude Code Docs](https://code.claude.com/docs/zh-CN/remote-control)*

@@ -1,0 +1,369 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>小河马的博客 | 小河马的博客</title><meta name="author" content="hippo0913"><meta name="copyright" content="hippo0913"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="title: 精读官方文档：在 Chrome 中使用 Claude Code（测试版）date: 2026-03-18 07:00:00updated: 2026-03-22 15:00:00tags: [Claude Code, AI 工具, 官方文档精读]categories: [AI 工具系列]series: claude-codeseries_index: 18description:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小河马的博客">
+<meta property="og:url" content="https://hippo0913.github.io/2026/03/22/ai-tools/official-docs/chrome/index.html">
+<meta property="og:site_name" content="小河马的博客">
+<meta property="og:description" content="title: 精读官方文档：在 Chrome 中使用 Claude Code（测试版）date: 2026-03-18 07:00:00updated: 2026-03-22 15:00:00tags: [Claude Code, AI 工具, 官方文档精读]categories: [AI 工具系列]series: claude-codeseries_index: 18description:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hippo0913.github.io/img/butterfly-icon.svg">
+<meta property="article:published_time" content="2026-03-22T08:50:09.626Z">
+<meta property="article:modified_time" content="2026-03-22T08:50:09.628Z">
+<meta property="article:author" content="hippo0913">
+<meta property="article:tag" content="Claude Code, AI 工具, Hexo, Butterfly, 技术博客, 前端开发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hippo0913.github.io/img/butterfly-icon.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "",
+  "url": "https://hippo0913.github.io/2026/03/22/ai-tools/official-docs/chrome/",
+  "image": "https://hippo0913.github.io/img/butterfly-icon.svg",
+  "datePublished": "2026-03-22T08:50:09.626Z",
+  "dateModified": "2026-03-22T08:50:09.628Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "hippo0913",
+      "url": "https://hippo0913.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.svg"><link rel="canonical" href="https://hippo0913.github.io/2026/03/22/ai-tools/official-docs/chrome/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '小河马的博客',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+btf.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/butterfly-icon.svg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">30</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(https://picsum.photos/1920/600?random=2);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">小河马的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">小河马的博客</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">无标题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-22T08:50:09.626Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-22T08:50:09.628Z" title="更新于 2026-03-22 16:50:09">2026-03-22</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;这篇文章已经&quot;,&quot;messageNext&quot;:&quot;天没有更新了，内容可能已经过时，请注意甄别。&quot;,&quot;postUpdate&quot;:&quot;2026-03-22 16:50:09&quot;}" hidden></div><hr>
+<p>title: 精读官方文档：在 Chrome 中使用 Claude Code（测试版）<br>date: 2026-03-18 07:00:00<br>updated: 2026-03-22 15:00:00<br>tags: [Claude Code, AI 工具, 官方文档精读]<br>categories: [AI 工具系列]<br>series: claude-code<br>series_index: 18<br>description: 精读 Claude Code Chrome 扩展文档，了解在浏览器中使用 Claude Code 的方法和技巧。<br>cover: <a target="_blank" rel="noopener" href="https://picsum.photos/seed/claude-chrome/1920/1080">https://picsum.photos/seed/claude-chrome/1920/1080</a><br>source_url: <a target="_blank" rel="noopener" href="https://code.claude.com/docs/zh-CN/chrome">https://code.claude.com/docs/zh-CN/chrome</a></p>
+<h1 id="精读官方文档：在-Chrome-中使用-Claude-Code（测试版）"><a href="#精读官方文档：在-Chrome-中使用-Claude-Code（测试版）" class="headerlink" title="精读官方文档：在 Chrome 中使用 Claude Code（测试版）"></a>精读官方文档：在 Chrome 中使用 Claude Code（测试版）</h1><blockquote>
+<p>💬 hippo：这是 Claude Code 官方文档精读系列的第 18 篇，讲的是如何把 Claude Code 连接到 Chrome 浏览器，让 AI 直接在网页上干活。</p>
+</blockquote>
+<h2 id="开篇：为什么要在浏览器里用-Claude-Code？"><a href="#开篇：为什么要在浏览器里用-Claude-Code？" class="headerlink" title="开篇：为什么要在浏览器里用 Claude Code？"></a>开篇：为什么要在浏览器里用 Claude Code？</h2><p>想想这个场景：你在开发一个网页应用，需要测试表单填写、检查控制台日志、甚至要从网页抓取数据。传统做法是什么？手动点点点，打开开发者工具，复制粘贴，反反复复。<br>Chrome 扩展版的 Claude Code 解决的就是这个问题——<strong>把 Claude Code 的 AI 能力直接带进浏览器</strong>。<br>根据官方文档，它能帮你做四件事：</p>
+<ul>
+<li>测试网络应用</li>
+<li>使用控制台日志进行调试</li>
+<li>自动填充表单</li>
+<li>从网页中提取数据<br>简单说，就是让 Claude 帮你操作网页，省去大量重复劳动。<span id="more"></span></li>
+</ul>
+<h2 id="核心概念：大白话讲-Chrome-扩展"><a href="#核心概念：大白话讲-Chrome-扩展" class="headerlink" title="核心概念：大白话讲 Chrome 扩展"></a>核心概念：大白话讲 Chrome 扩展</h2><h3 id="什么是-Chrome-扩展？"><a href="#什么是-Chrome-扩展？" class="headerlink" title="什么是 Chrome 扩展？"></a>什么是 Chrome 扩展？</h3><p>Chrome 扩展（Extension）就是给浏览器装的小插件，能扩展浏览器的功能。比如你装过的广告拦截器、翻译插件都是扩展。<br>Claude Code 的 Chrome 扩展本质上是一个<strong>桥梁</strong>：</p>
+<ul>
+<li>一头连着 Claude AI（通过命令行或 VS Code）</li>
+<li>一头连着你的 Chrome 浏览器</li>
+<li>中间通过一种叫 CDP（Chrome DevTools Protocol，Chrome 开发者工具协议）的标准来通信</li>
+</ul>
+<h3 id="工作原理（用通俗的话说）"><a href="#工作原理（用通俗的话说）" class="headerlink" title="工作原理（用通俗的话说）"></a>工作原理（用通俗的话说）</h3><ol>
+<li><strong>安装扩展</strong>：在 Chrome 网上应用店安装 Claude Code 扩展</li>
+<li><strong>建立连接</strong>：扩展监听特定端口，等待 Claude Code 命令行来连接</li>
+<li><strong>执行指令</strong>：Claude AI 发送命令，扩展通过 CDP 协议操控浏览器</li>
+<li><strong>返回结果</strong>：浏览器执行结果（截图、日志、元素信息）传回给 AI<blockquote>
+<p>💬 hippo：想象一下，你的浏览器成了 Claude 的”手”和”眼睛”。它能看到网页长啥样（截图），能操作网页元素（点击、填表），还能读取浏览器内部信息（控制台、网络请求）。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="实战指南：手把手教你用"><a href="#实战指南：手把手教你用" class="headerlink" title="实战指南：手把手教你用"></a>实战指南：手把手教你用</h2><h3 id="场景一：自动填写表单并提交"><a href="#场景一：自动填写表单并提交" class="headerlink" title="场景一：自动填写表单并提交"></a>场景一：自动填写表单并提交</h3><p>假设你要测试一个登录表单，需要输入用户名密码并点击登录。<br><strong>第一步：准备环境</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确保你的 Claude Code 版本支持 Chrome 扩展</span></span><br><span class="line">claude --version</span><br></pre></td></tr></table></figure>
+<p><strong>第二步：安装扩展</strong></p>
+<ol>
+<li>打开 Chrome 浏览器</li>
+<li>访问 Chrome 网上应用店</li>
+<li>搜索 “Claude Code” 或使用官方提供的安装链接</li>
+<li>点击”添加到 Chrome”按钮<br><strong>第三步：让 Claude 帮你填表</strong></li>
+</ol>
+<h1 id="在终端里打开-Claude-Code"><a href="#在终端里打开-Claude-Code" class="headerlink" title="在终端里打开 Claude Code"></a>在终端里打开 Claude Code</h1><p>claude</p>
+<h1 id="输入提示词"><a href="#输入提示词" class="headerlink" title="输入提示词"></a>输入提示词</h1><p>“帮我打开 <a target="_blank" rel="noopener" href="http://example.com/login%EF%BC%8C%E5%A1%AB%E5%86%99%E7%94%A8%E6%88%B7%E5%90%8D">http://example.com/login，填写用户名</a> ‘testuser’，密码 ‘password123’，然后点击登录按钮，截图给我看看结果”<br>Claude 会自动：</p>
+<ol>
+<li>控制浏览器打开指定网址</li>
+<li>找到用户名和密码输入框</li>
+<li>填入对应值</li>
+<li>找到登录按钮并点击</li>
+<li>截取页面截图反馈给你<br><strong>第四步：验证结果</strong><br>你可以看到：</li>
+</ol>
+<ul>
+<li>浏览器自动操作的过程（如果启用了可视化）</li>
+<li>最终的页面截图</li>
+<li>如果有错误，Claude 会分析控制台日志<blockquote>
+<p>💬 hippo：这个功能对测试表单特别有用，尤其是那些需要反复填写、测试不同数据的场景。我以前手动填个 50 条测试数据，现在让 Claude 几分钟搞定。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="场景二：调试网页问题"><a href="#场景二：调试网页问题" class="headerlink" title="场景二：调试网页问题"></a>场景二：调试网页问题</h3><p>你的网页有个 bug，报错信息不清楚，需要查看控制台日志和网络请求。<br><strong>让 Claude 帮你调试：</strong><br>“打开 <a target="_blank" rel="noopener" href="http://example.com/problem-page%EF%BC%8C%E6%A3%80%E6%9F%A5%E6%8E%A7%E5%88%B6%E5%8F%B0%E6%9C%89%E4%BB%80%E4%B9%88%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF%EF%BC%8C%E5%88%86%E6%9E%90%E5%8F%AF%E8%83%BD%E7%9A%84%E5%8E%9F%E5%9B%A0%EF%BC%8C%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E6%9C%89%E6%B2%A1%E6%9C%89%E5%A4%B1%E8%B4%A5">http://example.com/problem-page，检查控制台有什么错误信息，分析可能的原因，网络请求有没有失败</a>“<br>Claude 会：</p>
+<ol>
+<li>打开页面</li>
+<li>读取控制台日志（Console logs）</li>
+<li>检查网络请求（Network requests）</li>
+<li>分析错误原因</li>
+<li>给出修复建议<br><strong>常见问题的处理：</strong></li>
+</ol>
+<h1 id="场景：某个-API-返回-404"><a href="#场景：某个-API-返回-404" class="headerlink" title="场景：某个 API 返回 404"></a>场景：某个 API 返回 404</h1><p>“帮我检查 <a target="_blank" rel="noopener" href="http://example.com/api/data">http://example.com/api/data</a> 为什么返回 404，查看请求的 URL 和参数是否正确”</p>
+<h1 id="场景：页面样式错乱"><a href="#场景：页面样式错乱" class="headerlink" title="场景：页面样式错乱"></a>场景：页面样式错乱</h1><p>“打开 <a target="_blank" rel="noopener" href="http://example.com,截图看看样式是否正常,检查控制台有没有/">http://example.com，截图看看样式是否正常，检查控制台有没有</a> CSS 加载错误”</p>
+<h3 id="场景三：批量提取网页数据"><a href="#场景三：批量提取网页数据" class="headerlink" title="场景三：批量提取网页数据"></a>场景三：批量提取网页数据</h3><p>你要从多个网页抓取商品信息、文章内容或其他数据。<br><strong>让 Claude 帮你抓取：</strong><br>“帮我访问 <a target="_blank" rel="noopener" href="http://example.com/products%EF%BC%8C%E6%8F%90%E5%8F%96%E6%89%80%E6%9C%89%E5%95%86%E5%93%81%E7%9A%84%E6%A0%87%E9%A2%98%E3%80%81%E4%BB%B7%E6%A0%BC%E5%92%8C%E5%9B%BE%E7%89%87%E9%93%BE%E6%8E%A5%EF%BC%8C%E6%95%B4%E7%90%86%E6%88%90%E8%A1%A8%E6%A0%BC%E8%BE%93%E5%87%BA">http://example.com/products，提取所有商品的标题、价格和图片链接，整理成表格输出</a>“</p>
+<h1 id="或者抓取列表页"><a href="#或者抓取列表页" class="headerlink" title="或者抓取列表页"></a>或者抓取列表页</h1><p>“打开 <a target="_blank" rel="noopener" href="http://example.com/news%EF%BC%8C%E6%8F%90%E5%8F%96%E5%89%8D">http://example.com/news，提取前</a> 10 篇新闻的标题和链接，然后依次打开每篇新闻，提取正文内容”</p>
+<ol>
+<li>访问页面</li>
+<li>解析 HTML 结构</li>
+<li>提取你需要的数据</li>
+<li>整理成格式化的结果（JSON、表格等）<blockquote>
+<p>💬 hippo：这个功能特别适合做竞品分析、数据采集。不过要注意遵守网站的 robots.txt 和使用条款，不要过度爬取。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="hippo-的踩坑实录"><a href="#hippo-的踩坑实录" class="headerlink" title="hippo 的踩坑实录"></a>hippo 的踩坑实录</h2><h3 id="坑点一：扩展连接失败"><a href="#坑点一：扩展连接失败" class="headerlink" title="坑点一：扩展连接失败"></a>坑点一：扩展连接失败</h3><p><strong>问题现象：</strong><br>“帮我打开 <a target="_blank" rel="noopener" href="http://example.com/">http://example.com</a>“</p>
+<h1 id="报错：无法连接到-Chrome-扩展"><a href="#报错：无法连接到-Chrome-扩展" class="headerlink" title="报错：无法连接到 Chrome 扩展"></a>报错：无法连接到 Chrome 扩展</h1><p><strong>原因分析：</strong></p>
+<ol>
+<li>Chrome 浏览器没有打开</li>
+<li>扩展没有安装或被禁用</li>
+<li>端口被占用</li>
+<li>扩展版本和 Claude Code 版本不匹配<br><strong>解决方案：</strong></li>
+</ol>
+<h1 id="1-确认-Chrome-已打开"><a href="#1-确认-Chrome-已打开" class="headerlink" title="1. 确认 Chrome 已打开"></a>1. 确认 Chrome 已打开</h1><h1 id="启动-Chrome-浏览器"><a href="#启动-Chrome-浏览器" class="headerlink" title="启动 Chrome 浏览器"></a>启动 Chrome 浏览器</h1><h1 id="2-检查扩展是否启用"><a href="#2-检查扩展是否启用" class="headerlink" title="2. 检查扩展是否启用"></a>2. 检查扩展是否启用</h1><h1 id="在-Chrome-地址栏输入：chrome-extensions"><a href="#在-Chrome-地址栏输入：chrome-extensions" class="headerlink" title="在 Chrome 地址栏输入：chrome:&#x2F;&#x2F;extensions&#x2F;"></a>在 Chrome 地址栏输入：chrome:&#x2F;&#x2F;extensions&#x2F;</h1><h1 id="确保-Claude-Code-扩展已启用（开关是打开状态）"><a href="#确保-Claude-Code-扩展已启用（开关是打开状态）" class="headerlink" title="确保 Claude Code 扩展已启用（开关是打开状态）"></a>确保 Claude Code 扩展已启用（开关是打开状态）</h1><h1 id="3-重启扩展"><a href="#3-重启扩展" class="headerlink" title="3. 重启扩展"></a>3. 重启扩展</h1><h1 id="点击扩展的”重新加载”按钮"><a href="#点击扩展的”重新加载”按钮" class="headerlink" title="点击扩展的”重新加载”按钮"></a>点击扩展的”重新加载”按钮</h1><h1 id="4-检查版本匹配"><a href="#4-检查版本匹配" class="headerlink" title="4. 检查版本匹配"></a>4. 检查版本匹配</h1><h1 id="在扩展设置里查看扩展版本，确保一致"><a href="#在扩展设置里查看扩展版本，确保一致" class="headerlink" title="在扩展设置里查看扩展版本，确保一致"></a>在扩展设置里查看扩展版本，确保一致</h1><blockquote>
+<p>💬 hippo：最常见的是忘记开浏览器，或者扩展被禁用了。现在我有了一个检查清单：浏览器开着？扩展开着？版本匹配？三步走一遍基本能解决。</p>
+</blockquote>
+<h3 id="坑点二：网页元素定位不准"><a href="#坑点二：网页元素定位不准" class="headerlink" title="坑点二：网页元素定位不准"></a>坑点二：网页元素定位不准</h3><p>“帮我点击登录按钮”</p>
+<h1 id="Claude-找不到按钮，或者点错了地方"><a href="#Claude-找不到按钮，或者点错了地方" class="headerlink" title="Claude 找不到按钮，或者点错了地方"></a>Claude 找不到按钮，或者点错了地方</h1><ol>
+<li>页面使用了动态加载（AJAX、React、Vue 等）</li>
+<li>元素没有明确的标识（没有 id、class 等属性）</li>
+<li>页面有多个相似的按钮</li>
+<li>需要滚动才能看到目标元素</li>
+</ol>
+<h1 id="1-明确指定元素"><a href="#1-明确指定元素" class="headerlink" title="1. 明确指定元素"></a>1. 明确指定元素</h1><p>“点击 id 为 ‘submit-btn’ 的登录按钮”<br>“点击 class 为 ‘btn-primary’ 的按钮”<br>“点击文本内容为’登录’的按钮”</p>
+<h1 id="2-指定位置"><a href="#2-指定位置" class="headerlink" title="2. 指定位置"></a>2. 指定位置</h1><p>“滚动到页面底部，点击’加载更多’按钮”<br>“找到第一个文章卡片的标题链接并点击”</p>
+<h1 id="3-先截图确认"><a href="#3-先截图确认" class="headerlink" title="3. 先截图确认"></a>3. 先截图确认</h1><p>“截个图，帮我确认登录按钮在哪里”</p>
+<h1 id="4-分步操作"><a href="#4-分步操作" class="headerlink" title="4. 分步操作"></a>4. 分步操作</h1><p>“先滚动到登录表单，截图看看，然后填写表单”</p>
+<blockquote>
+<p>💬 hippo：复杂页面我从来不给模糊指令。我会让 Claude 先截图，我确认一下位置，再让它精确操作。多一步截图，少一步踩坑。</p>
+</blockquote>
+<h3 id="坑点三：跨域和安全限制"><a href="#坑点三：跨域和安全限制" class="headerlink" title="坑点三：跨域和安全限制"></a>坑点三：跨域和安全限制</h3><h1 id="提示：由于跨域策略，无法读取页面内容"><a href="#提示：由于跨域策略，无法读取页面内容" class="headerlink" title="提示：由于跨域策略，无法读取页面内容"></a>提示：由于跨域策略，无法读取页面内容</h1><ol>
+<li>网站有 CORS（跨域资源共享）限制</li>
+<li>网站使用了内容安全策略（CSP）</li>
+<li>网站检测到了自动化工具并拦截</li>
+</ol>
+<h1 id="1-先截图试试"><a href="#1-先截图试试" class="headerlink" title="1. 先截图试试"></a>1. 先截图试试</h1><p>“截个图看看页面长什么样”</p>
+<h1 id="2-使用代理或-VPN（如果网站有地区限制）"><a href="#2-使用代理或-VPN（如果网站有地区限制）" class="headerlink" title="2. 使用代理或 VPN（如果网站有地区限制）"></a>2. 使用代理或 VPN（如果网站有地区限制）</h1><h1 id="3-模拟正常用户行为"><a href="#3-模拟正常用户行为" class="headerlink" title="3. 模拟正常用户行为"></a>3. 模拟正常用户行为</h1><p>“像正常用户一样访问页面，等待页面加载完成再操作”</p>
+<h1 id="4-检查是否需要登录"><a href="#4-检查是否需要登录" class="headerlink" title="4. 检查是否需要登录"></a>4. 检查是否需要登录</h1><p>“这个页面需要登录吗？如果需要，先帮我登录”</p>
+<blockquote>
+<p>💬 hippo：有些网站反爬虫做得比较好，遇到这种情况我就手动操作一下，截图给 Claude 看，让它帮我分析页面内容，而不是让 AI 直接操作。</p>
+</blockquote>
+<h2 id="常见问题解答"><a href="#常见问题解答" class="headerlink" title="常见问题解答"></a>常见问题解答</h2><h3 id="Q：这个功能免费吗？"><a href="#Q：这个功能免费吗？" class="headerlink" title="Q：这个功能免费吗？"></a>Q：这个功能免费吗？</h3><p>A：Chrome 扩展本身是免费的，但它需要配合 Claude Code 命令行使用，而 Claude Code 的高级功能可能需要 Anthropic 的 API 或订阅。具体看你的使用场景。</p>
+<h3 id="Q：除了-Chrome，支持其他浏览器吗？"><a href="#Q：除了-Chrome，支持其他浏览器吗？" class="headerlink" title="Q：除了 Chrome，支持其他浏览器吗？"></a>Q：除了 Chrome，支持其他浏览器吗？</h3><p>A：目前官方只提到 Chrome 浏览器。理论上支持 Chromium 内核的浏览器（如 Edge、Brave）也可能兼容，但未官方保证。</p>
+<h3 id="Q：能看到-Claude-操作浏览器的过程吗？"><a href="#Q：能看到-Claude-操作浏览器的过程吗？" class="headerlink" title="Q：能看到 Claude 操作浏览器的过程吗？"></a>Q：能看到 Claude 操作浏览器的过程吗？</h3><p>A：取决于扩展的具体实现。有些扩展可以实时展示操作过程，有些则是静默执行。你可以通过截图命令来查看操作结果。</p>
+<h3 id="Q：可以同时操作多个标签页吗？"><a href="#Q：可以同时操作多个标签页吗？" class="headerlink" title="Q：可以同时操作多个标签页吗？"></a>Q：可以同时操作多个标签页吗？</h3><p>A：可以。Claude 可以在指令中指定打开新标签页、切换标签页、关闭标签页等操作。</p>
+<h3 id="Q：数据安全吗？扩展会记录我的浏览历史吗？"><a href="#Q：数据安全吗？扩展会记录我的浏览历史吗？" class="headerlink" title="Q：数据安全吗？扩展会记录我的浏览历史吗？"></a>Q：数据安全吗？扩展会记录我的浏览历史吗？</h3><p>A：这取决于扩展的隐私政策。建议：</p>
+<ol>
+<li>只从官方渠道安装扩展</li>
+<li>查看扩展的权限请求（是否需要访问所有网站数据）</li>
+<li>在处理敏感信息时谨慎使用</li>
+<li>定期检查扩展的更新和权限</li>
+</ol>
+<h3 id="Q：可以用在移动浏览器上吗？"><a href="#Q：可以用在移动浏览器上吗？" class="headerlink" title="Q：可以用在移动浏览器上吗？"></a>Q：可以用在移动浏览器上吗？</h3><p>A：移动端浏览器的扩展生态和桌面端不同，目前这个功能主要针对桌面端 Chrome。</p>
+<h2 id="一句话总结"><a href="#一句话总结" class="headerlink" title="一句话总结"></a>一句话总结</h2><p>Chrome 扩展让 Claude Code 直接操作浏览器，实现网页自动化、调试和数据抓取，是前端开发和测试的效率利器。<br><strong>上一篇</strong>：<a href="/ai-tools/official-docs/vs-code/">精读官方文档：在 VS Code 中使用 Claude Code</a><br><strong>下一篇</strong>：<a href="/ai-tools/official-docs/jetbrains/">精读官方文档：JetBrains IDEs</a><br><em>本文精读自 <a target="_blank" rel="noopener" href="https://code.claude.com/docs/zh-CN/chrome">精读官方文档：在 Chrome 中使用 Claude Code（测试版） - Claude Code Docs</a></em></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hippo0913.github.io">hippo0913</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hippo0913.github.io/2026/03/22/ai-tools/official-docs/chrome/">https://hippo0913.github.io/2026/03/22/ai-tools/official-docs/chrome/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://hippo0913.github.io" target="_blank">小河马的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/22/ai-tools/official-docs/claude-code-on-the-web/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2"></div></div><div class="info-2"><div class="info-item-1"> title: 精读官方文档：Claude Code 网页版date: 2026-03-18 05:00:00updated: 2026-03-22 15:00:00tags: [Claude Code, AI 工具, 官方文档精读]categories: [AI 工具系列]series: claude-codeseries_index: 20description: 精读 Claude Code 网页版文档，了解在浏览器中使用 Claude Code 的方法。cover: https://picsum.photos/seed/claude-web/1920/1080source_url: https://code.claude.com/docs/zh-CN/claude-code-on-the-web 精读官方文档：Claude Code 网页版 💬 hippo：本文档精读系列带你系统学习 Claude Code，避免踩坑，提升效率。  开篇：为什么需要网页版想象一下，你的电脑正在跑一个耗时的构建任务，突然有个紧急的 bug 需要修复。这时候，Claude Code 网页版就...</div></div></div></a><a class="pagination-related" href="/2026/03/22/ai-tools/official-docs/best-practices/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2"></div></div><div class="info-2"><div class="info-item-1"> title: 精读官方文档：Claude Code 最佳实践date: 2026-03-18 18:00:00updated: 2026-03-12 20:07:00tags: [Claude Code, AI 工具，官方文档精读]categories: [AI 工具系列]series: claude-codeseries_index: 7description: 精读 Claude Code 官方文档《Claude Code 最佳实践》，结合官方最佳实践和 hippo 的真实踩坑经验。cover: https://picsum.photos/seed/claude-best-practices/1920/1080source_url: https://code.claude.com/docs/zh-CN/best-practices 精读官方文档：Claude Code 最佳实践 💬 hippo：这是系列的第六篇。最佳实践不是”必读”，而是”速查手册”——先通读一遍，遇到问题时回来查。  开篇：最佳实践的正确读法很多人看最佳实践，像看小说一样从头读到尾。这样读效率很低。我的...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/butterfly-icon.svg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">hippo0913</div><div class="author-info-description">小河马的技术博客，记录 Claude Code 使用心得、前端开发实践和技术探索</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">30</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hippo0913"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/hippo0913" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:hippo0913@github.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">🦛 欢迎来到小河马的博客！<br>记录技术与生活，欢迎交流~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B2%BE%E8%AF%BB%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%EF%BC%9A%E5%9C%A8-Chrome-%E4%B8%AD%E4%BD%BF%E7%94%A8-Claude-Code%EF%BC%88%E6%B5%8B%E8%AF%95%E7%89%88%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">精读官方文档：在 Chrome 中使用 Claude Code（测试版）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E7%AF%87%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E7%94%A8-Claude-Code%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">开篇：为什么要在浏览器里用 Claude Code？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%EF%BC%9A%E5%A4%A7%E7%99%BD%E8%AF%9D%E8%AE%B2-Chrome-%E6%89%A9%E5%B1%95"><span class="toc-number">1.2.</span> <span class="toc-text">核心概念：大白话讲 Chrome 扩展</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Chrome-%E6%89%A9%E5%B1%95%EF%BC%9F"><span class="toc-number">1.2.1.</span> <span class="toc-text">什么是 Chrome 扩展？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%EF%BC%88%E7%94%A8%E9%80%9A%E4%BF%97%E7%9A%84%E8%AF%9D%E8%AF%B4%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">工作原理（用通俗的话说）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97%EF%BC%9A%E6%89%8B%E6%8A%8A%E6%89%8B%E6%95%99%E4%BD%A0%E7%94%A8"><span class="toc-number">1.3.</span> <span class="toc-text">实战指南：手把手教你用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80%EF%BC%9A%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%86%99%E8%A1%A8%E5%8D%95%E5%B9%B6%E6%8F%90%E4%BA%A4"><span class="toc-number">1.3.1.</span> <span class="toc-text">场景一：自动填写表单并提交</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8%E7%BB%88%E7%AB%AF%E9%87%8C%E6%89%93%E5%BC%80-Claude-Code"><span class="toc-number">2.</span> <span class="toc-text">在终端里打开 Claude Code</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BE%93%E5%85%A5%E6%8F%90%E7%A4%BA%E8%AF%8D"><span class="toc-number">3.</span> <span class="toc-text">输入提示词</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C%EF%BC%9A%E8%B0%83%E8%AF%95%E7%BD%91%E9%A1%B5%E9%97%AE%E9%A2%98"><span class="toc-number">3.0.1.</span> <span class="toc-text">场景二：调试网页问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%EF%BC%9A%E6%9F%90%E4%B8%AA-API-%E8%BF%94%E5%9B%9E-404"><span class="toc-number">4.</span> <span class="toc-text">场景：某个 API 返回 404</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%EF%BC%9A%E9%A1%B5%E9%9D%A2%E6%A0%B7%E5%BC%8F%E9%94%99%E4%B9%B1"><span class="toc-number">5.</span> <span class="toc-text">场景：页面样式错乱</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%89%EF%BC%9A%E6%89%B9%E9%87%8F%E6%8F%90%E5%8F%96%E7%BD%91%E9%A1%B5%E6%95%B0%E6%8D%AE"><span class="toc-number">5.0.1.</span> <span class="toc-text">场景三：批量提取网页数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%88%96%E8%80%85%E6%8A%93%E5%8F%96%E5%88%97%E8%A1%A8%E9%A1%B5"><span class="toc-number">6.</span> <span class="toc-text">或者抓取列表页</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hippo-%E7%9A%84%E8%B8%A9%E5%9D%91%E5%AE%9E%E5%BD%95"><span class="toc-number">6.1.</span> <span class="toc-text">hippo 的踩坑实录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E7%82%B9%E4%B8%80%EF%BC%9A%E6%89%A9%E5%B1%95%E8%BF%9E%E6%8E%A5%E5%A4%B1%E8%B4%A5"><span class="toc-number">6.1.1.</span> <span class="toc-text">坑点一：扩展连接失败</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8A%A5%E9%94%99%EF%BC%9A%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E5%88%B0-Chrome-%E6%89%A9%E5%B1%95"><span class="toc-number">7.</span> <span class="toc-text">报错：无法连接到 Chrome 扩展</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E7%A1%AE%E8%AE%A4-Chrome-%E5%B7%B2%E6%89%93%E5%BC%80"><span class="toc-number">8.</span> <span class="toc-text">1. 确认 Chrome 已打开</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8-Chrome-%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="toc-number">9.</span> <span class="toc-text">启动 Chrome 浏览器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%A3%80%E6%9F%A5%E6%89%A9%E5%B1%95%E6%98%AF%E5%90%A6%E5%90%AF%E7%94%A8"><span class="toc-number">10.</span> <span class="toc-text">2. 检查扩展是否启用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8-Chrome-%E5%9C%B0%E5%9D%80%E6%A0%8F%E8%BE%93%E5%85%A5%EF%BC%9Achrome-extensions"><span class="toc-number">11.</span> <span class="toc-text">在 Chrome 地址栏输入：chrome:&#x2F;&#x2F;extensions&#x2F;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A1%AE%E4%BF%9D-Claude-Code-%E6%89%A9%E5%B1%95%E5%B7%B2%E5%90%AF%E7%94%A8%EF%BC%88%E5%BC%80%E5%85%B3%E6%98%AF%E6%89%93%E5%BC%80%E7%8A%B6%E6%80%81%EF%BC%89"><span class="toc-number">12.</span> <span class="toc-text">确保 Claude Code 扩展已启用（开关是打开状态）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E9%87%8D%E5%90%AF%E6%89%A9%E5%B1%95"><span class="toc-number">13.</span> <span class="toc-text">3. 重启扩展</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%82%B9%E5%87%BB%E6%89%A9%E5%B1%95%E7%9A%84%E2%80%9D%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD%E2%80%9D%E6%8C%89%E9%92%AE"><span class="toc-number">14.</span> <span class="toc-text">点击扩展的”重新加载”按钮</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%A3%80%E6%9F%A5%E7%89%88%E6%9C%AC%E5%8C%B9%E9%85%8D"><span class="toc-number">15.</span> <span class="toc-text">4. 检查版本匹配</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8%E6%89%A9%E5%B1%95%E8%AE%BE%E7%BD%AE%E9%87%8C%E6%9F%A5%E7%9C%8B%E6%89%A9%E5%B1%95%E7%89%88%E6%9C%AC%EF%BC%8C%E7%A1%AE%E4%BF%9D%E4%B8%80%E8%87%B4"><span class="toc-number">16.</span> <span class="toc-text">在扩展设置里查看扩展版本，确保一致</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E7%82%B9%E4%BA%8C%EF%BC%9A%E7%BD%91%E9%A1%B5%E5%85%83%E7%B4%A0%E5%AE%9A%E4%BD%8D%E4%B8%8D%E5%87%86"><span class="toc-number">16.0.1.</span> <span class="toc-text">坑点二：网页元素定位不准</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Claude-%E6%89%BE%E4%B8%8D%E5%88%B0%E6%8C%89%E9%92%AE%EF%BC%8C%E6%88%96%E8%80%85%E7%82%B9%E9%94%99%E4%BA%86%E5%9C%B0%E6%96%B9"><span class="toc-number">17.</span> <span class="toc-text">Claude 找不到按钮，或者点错了地方</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%98%8E%E7%A1%AE%E6%8C%87%E5%AE%9A%E5%85%83%E7%B4%A0"><span class="toc-number">18.</span> <span class="toc-text">1. 明确指定元素</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%8C%87%E5%AE%9A%E4%BD%8D%E7%BD%AE"><span class="toc-number">19.</span> <span class="toc-text">2. 指定位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%85%88%E6%88%AA%E5%9B%BE%E7%A1%AE%E8%AE%A4"><span class="toc-number">20.</span> <span class="toc-text">3. 先截图确认</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%88%86%E6%AD%A5%E6%93%8D%E4%BD%9C"><span class="toc-number">21.</span> <span class="toc-text">4. 分步操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E7%82%B9%E4%B8%89%EF%BC%9A%E8%B7%A8%E5%9F%9F%E5%92%8C%E5%AE%89%E5%85%A8%E9%99%90%E5%88%B6"><span class="toc-number">21.0.1.</span> <span class="toc-text">坑点三：跨域和安全限制</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA%EF%BC%9A%E7%94%B1%E4%BA%8E%E8%B7%A8%E5%9F%9F%E7%AD%96%E7%95%A5%EF%BC%8C%E6%97%A0%E6%B3%95%E8%AF%BB%E5%8F%96%E9%A1%B5%E9%9D%A2%E5%86%85%E5%AE%B9"><span class="toc-number">22.</span> <span class="toc-text">提示：由于跨域策略，无法读取页面内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%85%88%E6%88%AA%E5%9B%BE%E8%AF%95%E8%AF%95"><span class="toc-number">23.</span> <span class="toc-text">1. 先截图试试</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%88%96-VPN%EF%BC%88%E5%A6%82%E6%9E%9C%E7%BD%91%E7%AB%99%E6%9C%89%E5%9C%B0%E5%8C%BA%E9%99%90%E5%88%B6%EF%BC%89"><span class="toc-number">24.</span> <span class="toc-text">2. 使用代理或 VPN（如果网站有地区限制）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%A8%A1%E6%8B%9F%E6%AD%A3%E5%B8%B8%E7%94%A8%E6%88%B7%E8%A1%8C%E4%B8%BA"><span class="toc-number">25.</span> <span class="toc-text">3. 模拟正常用户行为</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E7%99%BB%E5%BD%95"><span class="toc-number">26.</span> <span class="toc-text">4. 检查是否需要登录</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94"><span class="toc-number">26.1.</span> <span class="toc-text">常见问题解答</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E8%BF%99%E4%B8%AA%E5%8A%9F%E8%83%BD%E5%85%8D%E8%B4%B9%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.1.</span> <span class="toc-text">Q：这个功能免费吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E9%99%A4%E4%BA%86-Chrome%EF%BC%8C%E6%94%AF%E6%8C%81%E5%85%B6%E4%BB%96%E6%B5%8F%E8%A7%88%E5%99%A8%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.2.</span> <span class="toc-text">Q：除了 Chrome，支持其他浏览器吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E8%83%BD%E7%9C%8B%E5%88%B0-Claude-%E6%93%8D%E4%BD%9C%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E8%BF%87%E7%A8%8B%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.3.</span> <span class="toc-text">Q：能看到 Claude 操作浏览器的过程吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E5%8F%AF%E4%BB%A5%E5%90%8C%E6%97%B6%E6%93%8D%E4%BD%9C%E5%A4%9A%E4%B8%AA%E6%A0%87%E7%AD%BE%E9%A1%B5%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.4.</span> <span class="toc-text">Q：可以同时操作多个标签页吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E5%90%97%EF%BC%9F%E6%89%A9%E5%B1%95%E4%BC%9A%E8%AE%B0%E5%BD%95%E6%88%91%E7%9A%84%E6%B5%8F%E8%A7%88%E5%8E%86%E5%8F%B2%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.5.</span> <span class="toc-text">Q：数据安全吗？扩展会记录我的浏览历史吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q%EF%BC%9A%E5%8F%AF%E4%BB%A5%E7%94%A8%E5%9C%A8%E7%A7%BB%E5%8A%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8A%E5%90%97%EF%BC%9F"><span class="toc-number">26.1.6.</span> <span class="toc-text">Q：可以用在移动浏览器上吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="toc-number">26.2.</span> <span class="toc-text">一句话总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/ai-tools/official-docs/vs-code/" title="无标题">无标题</a><time datetime="2026-03-22T08:50:09.710Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/ai-tools/official-docs/troubleshooting/" title="无标题">无标题</a><time datetime="2026-03-22T08:50:09.707Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/ai-tools/official-docs/third-party-integrations/" title="无标题">无标题</a><time datetime="2026-03-22T08:50:09.702Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/ai-tools/official-docs/sub-agents/" title="无标题">无标题</a><time datetime="2026-03-22T08:50:09.699Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/ai-tools/official-docs/slack/" title="无标题">无标题</a><time datetime="2026-03-22T08:50:09.696Z" title="发表于 2026-03-22 16:50:09">2026-03-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By hippo0913</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="73,177,245" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      false
+        ? pjax.loadUrl('/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>
