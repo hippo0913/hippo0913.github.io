@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：法律和合规
-date: 2026-03-12 29:00:00
+date: 2026-03-12 02:00:00
 updated: 2026-03-22 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]

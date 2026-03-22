@@ -1,6 +1,6 @@
 ---
 title: 精读官方文档：通过 MCP 将 Claude Code 连接到工具
-date: 2026-03-12 13:00:00
+date: 2026-03-12 18:00:00
 updated: 2026-03-22 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
