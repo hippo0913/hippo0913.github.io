@@ -132,8 +132,6 @@ A: 网页版和你账户内所有其他 Claude 和 Claude Code 使用共享速�
 A: 不行。网络访问默认受限，只允许访问预定义的域名列表（如 npm、PyPI、GitHub 等）。你可以在环境设置中配置自定义网络访问权限。
 ## 一句话总结
 Claude Code 网页版是运行在云端的 AI 编程助手，让你随时随地处理代码任务，同时保持安全和高效。
-**上一篇**：[精读官方文档：Claude Code 概览](/ai-tools/official-docs/claude-code/)
-**下一篇**：[精读官方文档：Claude Code 配置](/ai-tools/official-docs/claude-code-configuration/)
 **上一篇**：[精读官方文档：JetBrains IDEs](/ai-tools/official-docs/jetbrains/)
 **下一篇**：[精读官方文档：使用远程控制从任何设备继续本地会话](/ai-tools/official-docs/remote-control/)
 *本文精读自 [精读官方文档：Claude Code 网页版 - Claude Code Docs](https://code.claude.com/docs/zh-CN/claude-code-on-the-web)*

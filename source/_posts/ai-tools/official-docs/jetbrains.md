@@ -171,8 +171,6 @@ A: 可以，每个 IDE 安装插件后都可以独立使用 Claude Code。
 A: Claude Code 插件本身是免费的，但使用 Claude Code 需要相应的 Anthropic 账户和使用配额。
 ## 一句话总结
 JetBrains IDE 插件让 Claude Code 和你熟悉的开发环境无缝集成，通过差异查看、上下文共享、错误诊断等功能，大幅提升开发效率。
-**上一篇**：[精读官方文档：在 Chrome 中使用 Claude Code（测试版）](/2026/03/12/chrome/)
-**下一篇**：[精读官方文档：Claude Code 网页版](/2026/03/12/claude-code-on-the-web/)
 **上一篇**：[精读官方文档：在 Chrome 中使用 Claude Code（测试版）](/ai-tools/official-docs/chrome/)
 **下一篇**：[精读官方文档：Claude Code 网页版](/ai-tools/official-docs/claude-code-on-the-web/)
 *本文精读自 [精读官方文档：JetBrains IDEs - Claude Code Docs](https://code.claude.com/docs/zh-CN/jetbrains)*
