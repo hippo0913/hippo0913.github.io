@@ -144,7 +144,7 @@ source_url: https://code.claude.com/docs/zh-CN/best-practices
 
 最佳实践的核心就三点：明确目标、小步迭代、提供上下文——记住这三点，比背一百条规则都有用。
 
-**下一篇**：[常见工作流程](/2026/03/12/ai-tools/official-docs/common-workflows/)，典型使用场景示例。
+**下一篇**：[精读官方文档：常见工作流程](/ai-tools/official-docs/common-workflows/)，典型使用场景示例。
 
 ---
 

@@ -175,7 +175,7 @@ Claude Code 的配置是分层的：
 
 设置不是填空题，而是渐进式配置——先搞定 CLAUDE.md 和危险拦截，再根据实际需求慢慢加。
 
-**下一篇**：[Claude Code 如何工作](/2026/03/12/ai-tools/official-docs/claude-how-it-works/)，理解底层原理。
+**下一篇**：[精读官方文档：Claude Code 如何工作](/ai-tools/official-docs/how-claude-code-works/)，理解底层原理。
 
 ---
 

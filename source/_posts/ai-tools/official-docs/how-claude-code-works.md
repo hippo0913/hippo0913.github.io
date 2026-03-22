@@ -139,7 +139,7 @@ Claude Code 可以使用的工具：
 
 Claude Code 的工作流程是：读取上下文 → 理解任务 → 规划执行 → 执行与反馈——理解这个流程，能帮你更好地下指令和管理预期。
 
-**下一篇**：[Claude Code 最佳实践](/2026/03/12/ai-tools/official-docs/best-practices/)，官方推荐的使用技巧。
+**下一篇**：[精读官方文档：Claude Code 最佳实践](/ai-tools/official-docs/best-practices/)，官方推荐的使用技巧。
 
 ---
 
