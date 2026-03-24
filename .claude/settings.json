@@ -8,6 +8,7 @@
       "Bash(cat *)",
       "Bash(hexo clean:*)",
       "Bash(hexo generate:*)",
+      "Bash(hexo server:*)",
       "Bash(git push:*)",
       "WebSearch"
     ],
