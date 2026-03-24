@@ -59,33 +59,33 @@ cover: https://picsum.photos/seed/ai-tools-claude/1920/1080
 
 | # | 文章 | 简介 |
 |---|------|------|
-| 2 | [Claude Code 概述](/2026/03/12/ai-tools/official-docs/claude-overview/) | 了解 Claude Code 的定位、核心功能和多平台使用方式。 |
-| 3 | [快速开始](/2026/03/12/ai-tools/official-docs/claude-quickstart/) | 从零开始安装配置，跑通第一个任务。 |
-| 4 | [设置 Claude Code](/2026/03/12/ai-tools/official-docs/claude-setup/) | 配置文件、模型选择、MCP 服务器等核心配置项。 |
-| 6 | [Claude Code 如何工作](/2026/03/12/ai-tools/official-docs/how-claude-code-works/) | 理解 Claude Code 的底层工作原理。 |
-| 7 | [Claude Code 最佳实践](/2026/03/12/ai-tools/official-docs/best-practices/) | 官方推荐的最佳实践和使用技巧。 |
-| 8 | [常见工作流程](/2026/03/12/ai-tools/official-docs/common-workflows/) | 典型使用场景和工作流程示例。 |
-| 9 | [Claude 如何记住你的项目](/2026/03/12/ai-tools/official-docs/memory/) | 项目记忆、CLAUDE.md 和上下文管理。 |
-| 10 | [使用 skills 扩展 Claude](/2026/03/12/ai-tools/official-docs/skills/) | 创建和使用 Skills 扩展 Claude 的能力。 |
-| 11 | [Hooks 参考](/2026/03/12/ai-tools/official-docs/hooks/) | Hooks 配置和安全性拦截。 |
-| 12 | [创建自定义 subagents](/2026/03/12/ai-tools/official-docs/sub-agents/) | 如何创建和使用自定义子代理。 |
-| 13 | [通过 MCP 将 Claude Code 连接到工具](/2026/03/12/ai-tools/official-docs/mcp/) | MCP 服务器配置和外部服务集成。 |
-| 14 | [Claude Code 设置](/2026/03/12/ai-tools/official-docs/settings/) | 完整设置选项参考。 |
-| 15 | [使用 Claude Code Desktop](/2026/03/12/ai-tools/official-docs/desktop/) | Desktop 应用使用指南。 |
-| 16 | [Desktop 快速开始](/2026/03/12/ai-tools/official-docs/desktop-quickstart/) | Desktop 版本快速上手。 |
-| 17 | [在 VS Code 中使用 Claude Code](/2026/03/12/ai-tools/official-docs/vs-code/) | VS Code 集成使用教程。 |
-| 18 | [在 Chrome 中使用 Claude Code（测试版）](/2026/03/12/ai-tools/official-docs/chrome/) | Chrome 扩展使用指南。 |
+| 2 | [Claude Code 概述](/2026/03/29/ai-tools/official-docs/claude-overview/) | 了解 Claude Code 的定位、核心功能和多平台使用方式。 |
+| 3 | [快速开始](/2026/03/28/ai-tools/official-docs/claude-quickstart/) | 从零开始安装配置，跑通第一个任务。 |
+| 4 | [设置 Claude Code](/2026/03/27/ai-tools/official-docs/claude-setup/) | 配置文件、模型选择、MCP 服务器等核心配置项。 |
+| 6 | [Claude Code 如何工作](/2026/03/25/ai-tools/official-docs/how-claude-code-works/) | 理解 Claude Code 的底层工作原理。 |
+| 7 | [Claude Code 最佳实践](/2026/03/24/ai-tools/official-docs/best-practices/) | 官方推荐的最佳实践和使用技巧。 |
+| 8 | [常见工作流程](/2026/03/23/ai-tools/official-docs/common-workflows/) | 典型使用场景和工作流程示例。 |
+| 9 | [Claude 如何记住你的项目](/2026/03/22/ai-tools/official-docs/memory/) | 项目记忆、CLAUDE.md 和上下文管理。 |
+| 10 | [使用 skills 扩展 Claude](/2026/03/21/ai-tools/official-docs/skills/) | 创建和使用 Skills 扩展 Claude 的能力。 |
+| 11 | [Hooks 参考](/2026/03/20/ai-tools/official-docs/hooks/) | Hooks 配置和安全性拦截。 |
+| 12 | [创建自定义 subagents](/2026/03/19/ai-tools/official-docs/sub-agents/) | 如何创建和使用自定义子代理。 |
+| 13 | [通过 MCP 将 Claude Code 连接到工具](/2026/03/18/ai-tools/official-docs/mcp/) | MCP 服务器配置和外部服务集成。 |
+| 14 | [Claude Code 设置](/2026/03/17/ai-tools/official-docs/settings/) | 完整设置选项参考。 |
+| 15 | [使用 Claude Code Desktop](/2026/03/16/ai-tools/official-docs/desktop/) | Desktop 应用使用指南。 |
+| 16 | [Desktop 快速开始](/2026/03/15/ai-tools/official-docs/desktop-quickstart/) | Desktop 版本快速上手。 |
+| 17 | [在 VS Code 中使用 Claude Code](/2026/03/14/ai-tools/official-docs/vs-code/) | VS Code 集成使用教程。 |
+| 18 | [在 Chrome 中使用 Claude Code（测试版）](/2026/03/13/ai-tools/official-docs/chrome/) | Chrome 扩展使用指南。 |
 | 19 | [JetBrains IDEs](/2026/03/12/ai-tools/official-docs/jetbrains/) | JetBrains 全家桶集成。 |
-| 20 | [Claude Code 网页版](/2026/03/12/ai-tools/official-docs/claude-code-on-the-web/) | 浏览器版本使用指南。 |
-| 21 | [使用远程控制从任何设备继续本地会话](/2026/03/12/ai-tools/official-docs/remote-control/) | 远程控制功能配置。 |
-| 22 | [Claude Code GitHub Actions](/2026/03/12/ai-tools/official-docs/github-actions/) | GitHub Actions 集成。 |
-| 23 | [Claude Code GitLab CI/CD](/2026/03/12/ai-tools/official-docs/gitlab-ci-cd/) | GitLab CI/CD 集成。 |
-| 24 | [Slack 中的 Claude Code](/2026/03/12/ai-tools/official-docs/slack/) | Slack 集成使用。 |
-| 25 | [企业部署概述](/2026/03/12/ai-tools/official-docs/third-party-integrations/) | 企业级部署方案。 |
-| 26 | [故障排除](/2026/03/12/ai-tools/official-docs/troubleshooting/) | 常见问题和解决方案。 |
-| 27 | [CLI 参考](/2026/03/12/ai-tools/official-docs/cli-reference/) | 命令行完整参考。 |
-| 28 | [扩展 Claude Code](/2026/03/12/ai-tools/official-docs/features-overview/) | 功能扩展概览。 |
-| 29 | [法律和合规](/2026/03/12/ai-tools/official-docs/legal-and-compliance/) | 法律条款和合规说明。 |
+| 20 | [Claude Code 网页版](/2026/03/11/ai-tools/official-docs/claude-code-on-the-web/) | 浏览器版本使用指南。 |
+| 21 | [使用远程控制从任何设备继续本地会话](/2026/03/10/ai-tools/official-docs/remote-control/) | 远程控制功能配置。 |
+| 22 | [Claude Code GitHub Actions](/2026/03/09/ai-tools/official-docs/github-actions/) | GitHub Actions 集成。 |
+| 23 | [Claude Code GitLab CI/CD](/2026/03/08/ai-tools/official-docs/gitlab-ci-cd/) | GitLab CI/CD 集成。 |
+| 24 | [Slack 中的 Claude Code](/2026/03/07/ai-tools/official-docs/slack/) | Slack 集成使用。 |
+| 25 | [企业部署概述](/2026/03/06/ai-tools/official-docs/third-party-integrations/) | 企业级部署方案。 |
+| 26 | [故障排除](/2026/03/05/ai-tools/official-docs/troubleshooting/) | 常见问题和解决方案。 |
+| 27 | [CLI 参考](/2026/03/04/ai-tools/official-docs/cli-reference/) | 命令行完整参考。 |
+| 28 | [扩展 Claude Code](/2026/03/03/ai-tools/official-docs/features-overview/) | 功能扩展概览。 |
+| 29 | [法律和合规](/2026/03/02/ai-tools/official-docs/legal-and-compliance/) | 法律条款和合规说明。 |
 
 ---
 
