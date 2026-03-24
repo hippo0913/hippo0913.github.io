@@ -1,5 +1,16 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(for *)",
+      "Bash(head *)",
+      "Bash(ls *)",
+      "Bash(grep *)",
+      "Bash(cat *)",
+      "Bash(hexo clean:*)",
+      "Bash(hexo generate:*)",
+      "Bash(git push:*)",
+      "WebSearch"
+    ],
     "deny": [
       "Bash(git reset:*)",
       "Bash(git clean:*)",
