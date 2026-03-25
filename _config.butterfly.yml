@@ -22,6 +22,7 @@ menu:
   归档: /archives/ || fas fa-archive
   标签: /tags/ || fas fa-tags
   分类: /categories/ || fas fa-folder
+  资源: /claude-code-resources/ || fas fa-bookmark
   关于: /about/ || fas fa-user
 
 # --------------------------------------
