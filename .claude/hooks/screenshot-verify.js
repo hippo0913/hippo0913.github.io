@@ -100,6 +100,41 @@ async function takeScreenshots(pages) {
   return results;
 }
 
+// 从文章文件解析 front matter 获取日期
+function parseArticleDate(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontMatterMatch) return null;
+
+    const frontMatter = frontMatterMatch[1];
+    const dateMatch = frontMatter.match(/date:\s*(\d{4}-\d{2}-\d{2})/);
+    return dateMatch ? dateMatch[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+// 构建文章 URL
+function buildArticleUrl(filePath) {
+  // 匹配 source/_posts/ 后面的路径
+  const match = filePath.match(/source\/_posts\/(.+)\.md$/);
+  if (!match) return null;
+
+  const slug = match[1]; // 例如: ai-tools/my-post
+
+  // 从 front matter 获取日期
+  const date = parseArticleDate(filePath);
+  if (!date) {
+    console.error(`[截图验证] 无法从文章获取日期，使用默认路径`);
+    return `${HEXO_URL}/${slug}/`;
+  }
+
+  // 构建 Hexo 默认的 URL 格式: /YYYY/MM/DD/slug/
+  const [year, month, day] = date.split('-');
+  return `${HEXO_URL}/${year}/${month}/${day}/${slug}/`;
+}
+
 // 主函数
 async function main() {
   const args = process.argv.slice(2);
@@ -120,14 +155,11 @@ async function main() {
   ];
 
   // 如果有文章路径，添加文章页
-  if (articlePath) {
-    // 从文章路径提取 URL
-    // 例如: source/_posts/ai-tools/my-post.md -> /2026/03/25/ai-tools/my-post/
-    const match = articlePath.match(/source\/_posts\/(.+)\.md$/);
-    if (match) {
-      // 这里简化处理，实际需要从文章 front matter 获取日期
-      // 暂时只截图首页
-      console.error(`[截图验证] 文章路径: ${match[1]}`);
+  if (articlePath && fs.existsSync(articlePath)) {
+    const articleUrl = buildArticleUrl(articlePath);
+    if (articleUrl) {
+      pages.push({ url: articleUrl, name: 'article' });
+      console.error(`[截图验证] 文章 URL: ${articleUrl}`);
     }
   }
 
