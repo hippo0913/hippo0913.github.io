@@ -9,7 +9,9 @@
       "Bash(hexo *)",
       "Bash(git push:*)",
       "Bash(sed *)",
-      "WebSearch"
+      "WebSearch",
+      "Edit",
+      "Write"
     ],
     "deny": [
       "Bash(git reset:*)",
