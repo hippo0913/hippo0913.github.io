@@ -1,95 +1,270 @@
 ---
 title: 精读官方文档：Claude 如何记住你的项目
 date: 2026-03-22 23:00:00
-updated: 2026-03-12 20:09:00
-tags: [Claude Code, AI 工具，官方文档精读]
+updated: 2026-03-25 10:00:00
+tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 9
-description: 精读 Claude Code 官方文档《Claude 如何记住你的项目》，结合官方最佳实践和 hippo 的真实踩坑经验。
+description: Claude Code 有两套记忆系统：CLAUDE.md（你写的指令）和自动记忆（Claude 自己记的笔记）。理解它们的区别和用法，能让 Claude 跨会话保持对你的项目和偏好的理解。
 cover: https://picsum.photos/seed/claude-memory/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/memory
 ---
 
 # 精读官方文档：Claude 如何记住你的项目
 
-> 💬 hippo：这是 Claude Code 官方文档精读系列的一篇。
+> 💬 hippo：每个 Claude Code 会话都从"零记忆"开始。想要 Claude 记住你的项目规范、编码习惯、常用命令？这篇文章讲的就是怎么让它"有记忆"。
 
 ---
 
-## 开篇：为什么读这篇文档
+## 核心概念：两套记忆系统
 
-这篇文档讲的是Claude 如何记住你的项目。
+Claude Code 提供两套互补的记忆机制：
 
-在我使用 Claude Code 的过程中，这个主题的重要性体现在：
-- 它帮助你理解Claude 如何记住你的项目的核心概念
-- 避免常见的使用误区
-- 提升你的工作效率
+| 特性 | CLAUDE.md 文件 | 自动记忆 |
+|------|---------------|----------|
+| **谁编写** | 你 | Claude |
+| **包含内容** | 指令和规则 | 学习和模式 |
+| **作用范围** | 项目、用户或组织 | 每个工作树 |
+| **加载时机** | 每个会话完整加载 | 每个会话加载前 200 行 |
+| **典型用途** | 编码标准、工作流、项目架构 | 构建命令、调试见解、Claude 发现的偏好 |
 
----
+> 💬 hippo：简单说——**CLAUDE.md 是你告诉 Claude 该怎么做，自动记忆是 Claude 自己学到的东西**。
 
-## 核心内容
-
-### 主要概念
-
-根据官方文档，Claude 如何记住你的项目涉及以下关键概念：
-
-1. **核心定义**：Claude 如何记住你的项目是 Claude Code 功能体系中的重要组成部分
-2. **使用场景**：适用于需要配置、使用或集成 Claude Code 的场景
-3. **最佳实践**：遵循官方推荐的使用方式可以避免常见问题
-
-### 关键要点
-
-> 💬 hippo：以下是官方文档的核心内容整理：
-
-- 理解Claude 如何记住你的项目的工作原理
-- 掌握正确的使用方法
-- 了解相关的配置选项
-- 熟悉常见问题和解决方案
+<!-- more -->
 
 ---
 
-## hippo 的注释
+## 一、CLAUDE.md 文件详解
 
-### 个人理解
+### 1.1 文件位置与作用范围
 
-> 💬 hippo：在我实际使用Claude 如何记住你的项目的过程中，有几点体会：
+CLAUDE.md 可以放在多个位置，位置越具体优先级越高：
 
-1. **实践出真知**：文档读得再熟，不如自己动手试一次
-2. **场景驱动学习**：遇到具体问题时再查文档，效率最高
-3. **渐进式掌握**：先用起来，再慢慢深入细节
+| 范围 | 位置 | 适用场景 |
+|------|------|----------|
+| **项目指令** | `./CLAUDE.md` 或 `./.claude/CLAUDE.md` | 项目架构、编码标准、常见工作流（通过 git 共享给团队） |
+| **用户指令** | `~/.claude/CLAUDE.md` | 所有项目的个人偏好（仅你可见） |
+| **托管策略** | `/etc/claude-code/CLAUDE.md` (Linux) | 组织范围的 IT 管理指令 |
 
-### 踩坑经验
+> 💬 hippo：我主要用项目级 `./CLAUDE.md`，记录构建命令、目录结构、代码规范。这样换了电脑、或者队友拉代码后，Claude 都能立刻"懂"这个项目。
 
-> 💬 hippo：这个主题我踩过的坑：
+### 1.2 CLAUDE.md 如何被加载
 
-- 一开始没有重视官方文档，走了弯路
-- 后来按官方推荐方式配置，问题解决了很多
-- 建议大家都先读文档再动手
+Claude Code 从当前工作目录**向上遍历目录树**，加载沿途所有的 CLAUDE.md：
+
+```
+foo/bar/           ← 你在这里运行 claude
+├── CLAUDE.md      ✅ 会被加载
+└── foo/
+    ├── CLAUDE.md  ✅ 会被加载
+    └── bar/
+        └── CLAUDE.md  ✅ 会被加载
+```
+
+子目录中的 CLAUDE.md 在 Claude 读取该目录时按需加载。
+
+### 1.3 编写有效指令的原则
+
+CLAUDE.md 是**上下文**，不是强制配置。Claude 会尽量遵循，但指令写得越好，遵循效果越好。
+
+**四个关键原则**：
+
+| 原则 | 说明 | 示例 |
+|------|------|------|
+| **大小** | 每个文件控制在 200 行以内 | 太长会消耗上下文、降低遵守度 |
+| **结构** | 用标题和列表分组 | 有组织的段落比密集文字更易遵循 |
+| **具体性** | 写可验证的具体指令 | "用 2 空格缩进" 而不是 "正确格式化代码" |
+| **一致性** | 消除冲突指令 | 两条矛盾规则会让 Claude 任意选择 |
+
+```markdown
+# 好的 CLAUDE.md 示例
+
+## 构建命令
+- 开发：`npm run dev`
+- 测试：`npm test`（提交前必须通过）
+- 构建：`npm run build`
+
+## 代码规范
+- 使用 2 空格缩进
+- API 处理器放在 `src/api/handlers/`
+- 所有公开函数必须有 JSDoc 注释
+
+## 常见工作流
+- 新功能：先写测试，再实现
+- 修复 bug：先复现，再加测试用例
+```
+
+### 1.4 导入其他文件
+
+CLAUDE.md 支持 `@path` 语法导入外部文件：
+
+```markdown
+# 项目概述
+参见 @README.md 了解项目背景
+参见 @package.json 了解可用命令
+
+# 详细规范
+- Git 工作流：@docs/git-workflow.md
+- API 设计：@docs/api-design.md
+
+# 个人偏好（不提交到 git）
+- @~/.claude/my-preferences.md
+```
+
+**导入特性**：
+- 支持相对路径和绝对路径
+- 最大递归深度 5 层
+- 导入文件在启动时展开加载
+
+### 1.5 使用 `.claude/rules/` 组织规则
+
+大型项目可以用规则目录分主题管理指令：
+
+```
+your-project/
+├── .claude/
+│   ├── CLAUDE.md           # 主项目指令
+│   └── rules/
+│       ├── code-style.md   # 代码样式
+│       ├── testing.md      # 测试约定
+│       └── security.md     # 安全要求
+```
+
+**规则可以限定到特定文件路径**，使用 YAML frontmatter：
+
+```markdown
+---
+paths:
+  - "src/api/**/*.ts"
+  - "src/lib/**/*.ts"
+---
+
+# API 开发规则
+
+- 所有 API 端点必须包含输入验证
+- 使用标准错误响应格式
+- 必须添加 OpenAPI 文档注释
+```
+
+**glob 模式示例**：
+
+| 模式 | 匹配内容 |
+|------|----------|
+| `**/*.ts` | 任意目录下的所有 TypeScript 文件 |
+| `src/**/*` | `src/` 目录下的所有文件 |
+| `*.{ts,tsx}` | 当前目录的 ts 和 tsx 文件 |
+| `src/components/*.tsx` | 特定目录下的 React 组件 |
+
+### 1.6 排除无关的 CLAUDE.md
+
+在 monorepo 中，可能需要排除其他团队的 CLAUDE.md。在 `.claude/settings.local.json` 中配置：
+
+```json
+{
+  "claudeMdExcludes": [
+    "**/other-team/CLAUDE.md",
+    "/home/user/monorepo/legacy/.claude/rules/**"
+  ]
+}
+```
+
+> 💬 hippo：托管策略级 CLAUDE.md（IT 管理的）不能被排除，确保组织规范始终生效。
 
 ---
 
-## 常见问答
+## 二、自动记忆
 
-**Q: 这个功能适合什么场景？**
+### 2.1 什么是自动记忆
 
-A: 根据你的实际需求来定。一般来说，官方文档推荐的场景都是最常见的。
+自动记忆让 Claude **自己记笔记**——构建命令、调试技巧、架构决策、你纠正过它的偏好。Claude 决定什么值得记，你不需要手动操作。
 
-**Q: 有没有什么使用技巧？**
+**默认开启**。可以通过以下方式禁用：
 
-A: 最好的技巧就是多实践。官方文档是基础，实际使用中你会发现自己的一套方法。
+```json
+// .claude/settings.json
+{
+  "autoMemoryEnabled": false
+}
+```
 
-**Q: 遇到问题是正常的吗？**
+或环境变量：`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`
 
-A: 正常。任何工具都有学习曲线，遇到问题时多查文档、多尝试。
+### 2.2 存储位置
+
+```
+~/.claude/projects/<project>/memory/
+├── MEMORY.md          # 索引文件，每次会话加载前 200 行
+├── debugging.md       # 调试相关笔记
+├── api-conventions.md # API 约定
+└── patterns.md        # 发现的代码模式
+```
+
+`<project>` 路径基于 git 仓库，所以同一仓库的所有 worktree 共享记忆。
+
+### 2.3 工作原理
+
+- **MEMORY.md 前 200 行**在每次对话开始时加载
+- **主题文件**（如 `debugging.md`）按需读取
+- Claude 在工作中自动读写这些文件
+
+> 💬 hippo：当你在界面看到 "Writing memory" 或 "Recalled memory" 时，就是 Claude 在更新或读取记忆文件。
+
+### 2.4 查看和编辑记忆
+
+运行 `/memory` 命令可以：
+- 列出所有加载的 CLAUDE.md 和规则文件
+- 开关自动记忆功能
+- 打开记忆文件夹浏览/编辑
+
+---
+
+## 三、常见问题排查
+
+### 3.1 Claude 不遵循我的 CLAUDE.md
+
+**排查步骤**：
+
+1. 运行 `/memory` 确认文件被加载
+2. 检查文件是否在正确位置
+3. 让指令更具体（"用 2 空格缩进" > "格式化代码很好"）
+4. 检查是否有冲突指令
+
+> 💬 hippo：CLAUDE.md 是上下文，不是系统指令。Claude 会尽量遵循，但不保证 100% 执行。需要强制行为的场景用 `--append-system-prompt`。
+
+### 3.2 CLAUDE.md 太大了
+
+**解决方案**：
+- 把详细内容移到独立文件，用 `@path` 导入
+- 用 `.claude/rules/` 分主题管理
+- 目标：每个文件 < 200 行
+
+### 3.3 `/compact` 后指令丢失
+
+CLAUDE.md 在 `/compact` 后会从磁盘重新加载。如果指令消失了，说明它只在对话中提过，没写进文件。
+
+**解决**：明确让 Claude "把它写到 CLAUDE.md"。
+
+---
+
+## 四、最佳实践总结
+
+| 场景 | 推荐做法 |
+|------|----------|
+| 新项目 | 先创建 `CLAUDE.md`，写明构建命令和目录结构 |
+| 团队协作 | 把项目规范写进 `./CLAUDE.md`，通过 git 共享 |
+| 个人偏好 | 放 `~/.claude/CLAUDE.md`，所有项目通用 |
+| 大型项目 | 用 `.claude/rules/` 分主题管理，配合 `paths` 限定范围 |
+| Monorepo | 用 `claudeMdExcludes` 排除无关团队的文件 |
+| 调试问题 | 运行 `/memory` 检查哪些文件被加载 |
 
 ---
 
 ## 一句话总结
 
-Claude 如何记住你的项目是 Claude Code 功能体系中的重要组成部分，掌握它能帮助你更高效地使用 Claude Code。
+**CLAUDE.md 是你给 Claude 的"员工手册"，自动记忆是 Claude 自己的"工作笔记"**——两者配合使用，让 Claude 越用越懂你。
 
-**下一篇**：请继续阅读本文档系列的其他文章。
+**下一篇**：[精读官方文档：使用 Skills 扩展 Claude](/2026/03/22/ai-tools/official-docs/skills/)，把常用工作流打包成可复用的命令。
 
 ---
 

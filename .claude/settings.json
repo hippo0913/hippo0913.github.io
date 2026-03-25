@@ -65,38 +65,11 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write(source/_posts/**)",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>&1"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(source/_posts/**)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>&1"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(_config*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js 2>&1"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(_config*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js 2>&1"
+            "command": "FILE_PATH=$(jq -r '.tool_input.file_path // empty'); case \"$FILE_PATH\" in *source/_posts/*|*_config*.yml) node \"$CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js\" \"$FILE_PATH\" 2>&1 ;; esac"
           }
         ]
       }
