@@ -584,6 +584,12 @@ Hooks 是 Claude Code 的"守门员"，在关键时机自动触发，强制执�
 
 ---
 
+## 实战案例
+
+📖 [Claude Code Hooks 实战：任务完成自动通知](/2026/03/25/ai-tools/claude-code-hooks-practice/) — 用 Stop Hook 实现桌面通知和飞书通知，包含完整的踩坑记录。
+
+---
+
 *本文精读自 [Hooks reference - Anthropic](https://docs.anthropic.com/en/docs/claude-code/hooks)*
 
 *最后更新：2026-03-25*
