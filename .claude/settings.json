@@ -6,9 +6,7 @@
       "Bash(ls *)",
       "Bash(grep *)",
       "Bash(cat *)",
-      "Bash(hexo clean:*)",
-      "Bash(hexo generate:*)",
-      "Bash(hexo server:*)",
+      "Bash(hexo *)",
       "Bash(git push:*)",
       "WebSearch"
     ],
