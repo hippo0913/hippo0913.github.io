@@ -8,6 +8,7 @@
       "Bash(cat *)",
       "Bash(hexo *)",
       "Bash(git push:*)",
+      "Bash(sed *)",
       "WebSearch"
     ],
     "deny": [
@@ -34,6 +35,44 @@
           {
             "type": "command",
             "command": "cd $CLAUDE_PROJECT_DIR && hexo clean && hexo generate 2>&1 | tail -5 || { echo 'Hexo 构建失败，禁止提交' >&2; exit 2; }"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write(source/_posts/**)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(source/_posts/**)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(_config*.yml)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(_config*.yml)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js 2>&1"
           }
         ]
       }

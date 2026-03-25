@@ -3,6 +3,7 @@ db.json
 .claude/logs/
 .claude/state/
 .claude/projects/
+.claude/screenshots/
 logs/
 state/
 TASKS.md
