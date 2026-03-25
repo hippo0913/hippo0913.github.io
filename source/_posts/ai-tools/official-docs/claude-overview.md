@@ -147,7 +147,7 @@ irm https://claude.ai/install.ps1 | iex
 
 Claude Code 不是一个"更聪明的代码补全"，而是一个**住在你终端里的 AI 协作者**——它能读代码、改文件、跑命令、自己调试，多平台可用。
 
-**下一篇**：[精读官方文档：快速开始](/ai-tools/official-docs/claude-quickstart/)，装好并跑通第一个任务。
+**下一篇**：[精读官方文档：快速开始](/2026/03/28/ai-tools/official-docs/claude-quickstart/)，装好并跑通第一个任务。
 
 ---
 

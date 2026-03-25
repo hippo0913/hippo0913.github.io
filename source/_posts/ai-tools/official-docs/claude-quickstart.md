@@ -161,7 +161,7 @@ A: Claude 的中文理解能力很强，但技术术语建议用英文提示词�
 
 快速开始就是装好、登录、跑通一个小任务——别急，先建立直觉再玩大的。
 
-**下一篇**：[精读官方文档：设置 Claude Code](/ai-tools/official-docs/claude-setup/)，了解配置文件和常用设置。
+**下一篇**：[精读官方文档：设置 Claude Code](/2026/03/27/ai-tools/official-docs/claude-setup/)，了解配置文件和常用设置。
 
 ---
 
