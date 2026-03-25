@@ -146,4 +146,10 @@ git push
 
 ## 当前系列规划
 
-- 《Claude Code 入门到上手》系列（待创建）
+- 《Claude Code 入门到上手》系列（已完结）
+
+---
+
+## 项目进度
+
+详见 [PROGRESS.md](PROGRESS.md)，每次完成重要功能后更新。
