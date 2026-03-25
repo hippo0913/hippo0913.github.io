@@ -162,6 +162,6 @@ Claude Code 的法律和合规框架相对简洁：采用商业许可证，通�
 
 ---
 
-*本文精读自 [Legal and compliance - Anthropic](https://docs.anthropic.com/en/docs/claude-code/legal-and-compliance)*
+*本文精读自 [Legal and compliance - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/legal-and-compliance)*
 
 *最后更新：2026-03-25*

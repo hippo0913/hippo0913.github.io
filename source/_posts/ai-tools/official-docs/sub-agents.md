@@ -254,6 +254,6 @@ Subagents 是 Claude Code 的"专家分工"机制：通过独立上下文、限�
 
 ---
 
-*本文精读自 [Subagents - Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code/subagents)*
+*本文精读自 [Subagents - Claude Code Docs](https://docs.anthropic.com/zh-CN/docs/claude-code/subagents)*
 
 *最后更新：2026-03-25*

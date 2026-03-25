@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 
 const PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const SCREENSHOT_DIR = path.join(PROJECT_DIR, '.claude', 'screenshots');
+const SCREENSHOT_DIR = path.join(PROJECT_DIR, '.claude-output', 'screenshots');
 const HEXO_PORT = 4000;
 const HEXO_URL = `http://localhost:${HEXO_PORT}`;
 
@@ -115,24 +115,25 @@ function parseArticleDate(filePath) {
   }
 }
 
-// 构建文章 URL
-function buildArticleUrl(filePath) {
+// 构建文章 URL 和文章名
+function buildArticleInfo(filePath) {
   // 匹配 source/_posts/ 后面的路径
   const match = filePath.match(/source\/_posts\/(.+)\.md$/);
   if (!match) return null;
 
   const slug = match[1]; // 例如: ai-tools/my-post
+  const articleName = slug.split('/').pop(); // 取最后一段作为文章名
 
   // 从 front matter 获取日期
   const date = parseArticleDate(filePath);
   if (!date) {
     console.error(`[截图验证] 无法从文章获取日期，使用默认路径`);
-    return `${HEXO_URL}/${slug}/`;
+    return { url: `${HEXO_URL}/${slug}/`, name: articleName };
   }
 
   // 构建 Hexo 默认的 URL 格式: /YYYY/MM/DD/slug/
   const [year, month, day] = date.split('-');
-  return `${HEXO_URL}/${year}/${month}/${day}/${slug}/`;
+  return { url: `${HEXO_URL}/${year}/${month}/${day}/${slug}/`, name: articleName };
 }
 
 // 主函数
@@ -155,16 +156,16 @@ async function main() {
     console.error(`[截图验证] Hexo server 已启动`);
   }
 
-  // 2. 构建文章 URL
-  const articleUrl = buildArticleUrl(articlePath);
-  if (!articleUrl) {
-    console.error(`[截图验证] 无法构建文章 URL`);
+  // 2. 构建文章 URL 和名称
+  const articleInfo = buildArticleInfo(articlePath);
+  if (!articleInfo) {
+    console.error(`[截图验证] 无法构建文章信息`);
     process.exit(0);
   }
-  console.error(`[截图验证] 文章 URL: ${articleUrl}`);
+  console.error(`[截图验证] 文章 URL: ${articleInfo.url}`);
 
   // 3. 只截图文章页
-  const pages = [{ url: articleUrl, name: 'article' }];
+  const pages = [{ url: articleInfo.url, name: articleInfo.name }];
 
   // 4. 截图
   console.error(`[截图验证] 开始截图...`);

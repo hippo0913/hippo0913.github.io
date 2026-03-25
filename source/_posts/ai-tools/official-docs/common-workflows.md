@@ -375,6 +375,6 @@ Common Workflows 这篇文档覆盖了 Claude Code 的 12 种日常用法。掌�
 
 ---
 
-*本文精读自 [Common workflows - Anthropic](https://docs.anthropic.com/en/docs/claude-code/common-workflows)*
+*本文精读自 [Common workflows - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/common-workflows)*
 
 *最后更新：2026-03-25*

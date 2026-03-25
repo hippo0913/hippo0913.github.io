@@ -206,6 +206,6 @@ Claude Code Desktop 把命令行版本的强大功能包装成了友好的图形
 
 ---
 
-*本文精读自 [Get started with the desktop app](https://docs.anthropic.com/en/docs/claude-code/desktop-quickstart)*
+*本文精读自 [Get started with the desktop app](https://docs.anthropic.com/zh-CN/docs/claude-code/desktop-quickstart)*
 
 *最后更新：2026-03-25*

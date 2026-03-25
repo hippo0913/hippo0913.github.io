@@ -228,6 +228,6 @@ Claude Code in Slack 的核心价值是**降低编码任务的启动门槛**—�
 
 ---
 
-*本文精读自 [Claude Code in Slack](https://docs.anthropic.com/en/docs/claude-code/slack)*
+*本文精读自 [Claude Code in Slack](https://docs.anthropic.com/zh-CN/docs/claude-code/slack)*
 
 *最后更新：2026-03-25*

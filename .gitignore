@@ -5,7 +5,9 @@ db.json
 .claude/projects/
 .claude/screenshots/
 logs/
+screenshots/
 state/
+.claude-output/
 TASKS.md
 TASKS (1).md
 public/

@@ -131,7 +131,7 @@ Prompt:
 
 1. 阅读文章模板：`.claude/templates/doc-rewrite-template.md`
 2. 阅读现有文章：`source/_posts/ai-tools/official-docs/sub-agents.md`
-3. 获取官方文档原文：https://docs.anthropic.com/en/docs/claude-code/subagents
+3. 获取官方文档原文：https://docs.anthropic.com/zh-CN/docs/claude-code/subagents
 4. 按照模板结构重写文章
 
 完成后输出简短总结。

@@ -290,6 +290,6 @@ Claude Code 的企业部署方案相当灵活：可以直连 Anthropic、走 AWS
 
 ---
 
-*本文精读自 [Enterprise deployment overview - Anthropic](https://docs.anthropic.com/en/docs/claude-code/third-party-integrations)*
+*本文精读自 [Enterprise deployment overview - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/third-party-integrations)*
 
 *最后更新：2026-03-25*

@@ -254,6 +254,6 @@ Claude Code 是 Anthropic 官方的 AI 编程助手，直接在终端运行。�
 
 ---
 
-*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview)*
+*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/overview)*
 
 *最后更新：2026-03-25*

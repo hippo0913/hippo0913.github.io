@@ -404,6 +404,6 @@ MCP 是 Claude Code 的"超能力扩展槽"，通过简单的配置就能让 Cla
 
 ---
 
-*本文精读自 [Connect Claude Code to tools via MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)*
+*本文精读自 [Connect Claude Code to tools via MCP](https://docs.anthropic.com/zh-CN/docs/claude-code/mcp)*
 
 *最后更新：2026-03-25*

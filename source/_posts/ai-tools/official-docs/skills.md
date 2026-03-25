@@ -253,6 +253,6 @@ Skills 是 Claude Code 的核心扩展机制，通过 `SKILL.md` 文件定义能
 
 ---
 
-*本文精读自 [Agent Skills - Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code/skills)*
+*本文精读自 [Agent Skills - Claude Code Docs](https://docs.anthropic.com/zh-CN/docs/claude-code/skills)*
 
 *最后更新：2026-03-25*

@@ -227,6 +227,6 @@ Claude Code 不是一个"更聪明的代码补全"，而是一个**住在你终�
 
 ---
 
-*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview)*
+*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/overview)*
 
 *最后更新：2026-03-25*

@@ -315,6 +315,6 @@ Claude Code GitHub Actions 让你在 GitHub 里直接用 AI 写代码、修 Bug�
 
 ---
 
-*本文精读自 [Claude Code GitHub Actions - Anthropic](https://docs.anthropic.com/en/docs/claude-code/github-actions)*
+*本文精读自 [Claude Code GitHub Actions - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/github-actions)*
 
 *最后更新：2026-03-25*

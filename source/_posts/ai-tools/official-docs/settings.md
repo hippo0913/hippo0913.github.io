@@ -310,6 +310,6 @@ Claude Code 的设置系统通过五层优先级实现了"企业管控 + 团队�
 
 ---
 
-*本文精读自 [Claude Code settings - Anthropic](https://docs.anthropic.com/en/docs/claude-code/settings)*
+*本文精读自 [Claude Code settings - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/settings)*
 
 *最后更新：2026-03-25*

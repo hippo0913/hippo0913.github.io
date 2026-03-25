@@ -1093,6 +1093,6 @@ Hooks 是 Claude Code 的"守门员"，在关键时机自动触发，强制执�
 
 ---
 
-*本文精读自 [Hooks reference - Anthropic](https://docs.anthropic.com/en/docs/claude-code/hooks)*
+*本文精读自 [Hooks reference - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/hooks)*
 
 *最后更新：2026-03-28*

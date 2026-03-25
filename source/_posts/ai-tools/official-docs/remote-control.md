@@ -238,6 +238,6 @@ Remote Control 让你用手机或浏览器「遥控」本地 Claude Code 会话�
 
 ---
 
-*本文精读自 [Continue local sessions from any device with Remote Control](https://docs.anthropic.com/en/docs/claude-code/remote-control)*
+*本文精读自 [Continue local sessions from any device with Remote Control](https://docs.anthropic.com/zh-CN/docs/claude-code/remote-control)*
 
 *最后更新：2026-03-25*

@@ -201,6 +201,6 @@ CLI 是 Claude Code 的入口，掌握这些命令和参数能让你：
 
 ---
 
-*本文精读自 [CLI reference - Anthropic](https://docs.anthropic.com/en/docs/claude-code/cli-reference)*
+*本文精读自 [CLI reference - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/cli-reference)*
 
 *最后更新：2026-03-25*
