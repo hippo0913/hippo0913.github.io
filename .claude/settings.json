@@ -8,8 +8,15 @@
       "Bash(cat *)",
       "Bash(hexo *)",
       "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "Bash(jq:*)",
+      "Bash(chmod:*)",
+      "Bash(mkdir:*)",
       "Bash(sed *)",
       "WebSearch",
+      "Read",
       "Edit",
       "Write"
     ],
@@ -28,6 +35,10 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/feishu-notify.sh"
           }
         ]
       }
