@@ -8,7 +8,7 @@ series: claude-code
 series_index: 16
 description: Claude Code Desktop 版本提供了图形化界面，支持可视化 diff 预览、实时应用预览、PR 监控自动合并、并行会话等功能，本文精读官方快速开始指南。
 cover: https://picsum.photos/seed/claude-desktop-quickstart/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/desktop-quickstart
+source_url: https://code.claude.com/docs/zh-CN/desktop-quickstart
 ---
 
 # 精读官方文档：Desktop 快速开始

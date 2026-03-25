@@ -8,7 +8,7 @@ series: claude-code
 series_index: 27
 description: Claude Code 命令行工具完整参考，包含所有命令、参数标志的使用方法和实战示例。
 cover: https://picsum.photos/seed/claude-cli-reference/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/cli-reference
+source_url: https://code.claude.com/docs/zh-CN/cli-reference
 ---
 
 # 精读官方文档：CLI 参考

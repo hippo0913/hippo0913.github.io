@@ -8,7 +8,7 @@ series: claude-code
 series_index: 15
 description: Claude Code 的 VS Code 扩展让你无需离开编辑器就能使用 AI 编程助手。本文详解安装配置、核心功能和实战技巧。
 cover: https://picsum.photos/seed/claude-vscode/1920/1080
-source_url: https://code.claude.com/docs/en/vs-code
+source_url: https://code.claude.com/docs/zh-CN/desktop
 ---
 
 # 精读官方文档：Claude Code VS Code 扩展

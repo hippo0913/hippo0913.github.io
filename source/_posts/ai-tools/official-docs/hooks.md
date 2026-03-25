@@ -8,7 +8,7 @@ series: claude-code
 series_index: 11
 description: Hooks 是 Claude Code 的"守门员"，在工具执行前后自动触发。这篇精读涵盖 10 种 Hook 事件、JSON 输入输出格式、退出码机制，以及如何用 Hooks 实现危险命令拦截和自动测试验证。
 cover: https://picsum.photos/seed/claude-hooks/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/hooks
+source_url: https://code.claude.com/docs/zh-CN/hooks
 ---
 
 # 精读官方文档：Hooks 参考

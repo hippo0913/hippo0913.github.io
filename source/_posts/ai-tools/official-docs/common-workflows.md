@@ -8,7 +8,7 @@ series: claude-code
 series_index: 8
 description: 掌握 Claude Code 的 12 种常见工作流程，包括理解新代码库、修复 Bug、重构代码、Plan Mode、Git Worktrees 并行开发、自定义斜杠命令等实战技巧。
 cover: https://picsum.photos/seed/claude-common-workflows/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/common-workflows
+source_url: https://code.claude.com/docs/zh-CN/common-workflows
 ---
 
 # 精读官方文档：常见工作流程

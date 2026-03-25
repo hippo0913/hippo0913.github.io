@@ -8,7 +8,7 @@ series: claude-code
 series_index: 19
 description: Claude Code 可以与 JetBrains 系列 IDE（IntelliJ、PyCharm、WebStorm 等）深度集成，提供 Diff 查看、自动上下文共享、诊断信息同步等功能。本文详解安装配置和常见问题。
 cover: https://picsum.photos/seed/claude-jetbrains/1920/1080
-source_url: https://code.claude.com/docs/en/jetbrains
+source_url: https://code.claude.com/docs/zh-CN/jetbrains
 ---
 
 # 精读官方文档：JetBrains IDEs

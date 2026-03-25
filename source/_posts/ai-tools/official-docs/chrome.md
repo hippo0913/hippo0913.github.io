@@ -8,7 +8,7 @@ series: claude-code
 series_index: 18
 description: Claude Code 可以直接操控你的 Chrome 浏览器，实现 Web 应用测试、表单自动填写、数据抓取等操作。本文精读官方文档，详解浏览器自动化功能的使用方法和常见问题。
 cover: https://picsum.photos/seed/claude-chrome-browser/1920/1080
-source_url: https://code.claude.com/docs/en/chrome
+source_url: https://code.claude.com/docs/zh-CN/chrome
 ---
 
 # 精读官方文档：在 Chrome 中使用 Claude Code（测试版）

@@ -8,7 +8,7 @@ series: claude-code
 series_index: 17
 description: VS Code 扩展是 Claude Code 的图形化界面版本，支持 inline diffs、@-mentions 引用文件、Plan 模式审批计划、checkpoints 回滚代码等功能。
 cover: https://picsum.photos/seed/claude-vs-code/1920/1080
-source_url: https://code.claude.com/docs/en/vs-code
+source_url: https://code.claude.com/docs/zh-CN/vs-code
 ---
 
 # 精读官方文档：在 VS Code 中使用 Claude Code

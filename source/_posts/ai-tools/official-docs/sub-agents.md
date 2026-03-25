@@ -8,7 +8,7 @@ series: claude-code
 series_index: 12
 description: Subagents 是 Claude Code 的专用 AI 助手，可以独立处理特定任务。本文详解配置方法、内置子代理类型、以及如何创建自定义子代理来提升开发效率。
 cover: https://picsum.photos/seed/claude-subagents/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/subagents
+source_url: https://code.claude.com/docs/zh-CN/sub-agents
 ---
 
 # 精读官方文档：Subagents（子代理）

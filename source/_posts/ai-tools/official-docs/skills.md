@@ -8,7 +8,7 @@ series: claude-code
 series_index: 10
 description: Skills 是 Claude Code 的模块化能力扩展机制。本文详细讲解如何创建、配置和分享 Skill，包含 SKILL.md 编写规范、allowed-tools 权限控制、多文件 Skill 组织等核心内容。
 cover: https://picsum.photos/seed/claude-skills/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/skills
+source_url: https://code.claude.com/docs/zh-CN/skills
 ---
 
 # 精读官方文档：Agent Skills（技能扩展）

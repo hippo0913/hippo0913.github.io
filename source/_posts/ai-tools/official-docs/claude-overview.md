@@ -8,7 +8,7 @@ series: claude-code
 series_index: 2
 description: Claude Code 是 Anthropic 官方推出的代理式编码工具，能在终端里读代码、改文件、跑命令。本文精读官方 Overview 文档，带你了解它的核心能力和设计哲学。
 cover: https://picsum.photos/seed/claude-code-overview/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/overview
+source_url: https://code.claude.com/docs/zh-CN/overview
 ---
 
 # 精读官方文档：Claude Code 概述

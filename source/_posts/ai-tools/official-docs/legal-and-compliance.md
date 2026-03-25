@@ -8,7 +8,7 @@ series: claude-code
 series_index: 29
 description: 精读 Claude Code 官方文档《法律和合规》，详解许可证条款、商业协议适用规则、医疗行业 BAA 合规条件、安全漏洞报告流程等核心内容。
 cover: https://picsum.photos/seed/claude-legal-compliance/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/legal-and-compliance
+source_url: https://code.claude.com/docs/zh-CN/legal-and-compliance
 ---
 
 # 精读官方文档：法律和合规

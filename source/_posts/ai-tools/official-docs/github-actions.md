@@ -8,7 +8,7 @@ series: claude-code
 series_index: 22
 description: Claude Code GitHub Actions 让你在 PR 和 Issue 里用 @claude 触发 AI 自动写代码、修 Bug、创建 PR。本文精读官方文档，详解配置方法、参数说明和踩坑经验。
 cover: https://picsum.photos/seed/claude-github-actions/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/github-actions
+source_url: https://code.claude.com/docs/zh-CN/github-actions
 ---
 
 # 精读官方文档：Claude Code GitHub Actions

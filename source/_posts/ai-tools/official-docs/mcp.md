@@ -8,7 +8,7 @@ series: claude-code
 series_index: 13
 description: MCP（Model Context Protocol）是连接 Claude Code 与外部工具的开放标准协议。本文精读官方文档，详解三种传输方式、配置作用域、企业级管控等核心内容。
 cover: https://picsum.photos/seed/claude-mcp-tools/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/mcp
+source_url: https://code.claude.com/docs/zh-CN/mcp
 ---
 
 # 精读官方文档：通过 MCP 将 Claude Code 连接到工具

@@ -8,7 +8,7 @@ series: claude-code
 series_index: 25
 description: Claude Code 支持多种企业级部署方式：直连 Anthropic API、通过 AWS Bedrock 或 Google Vertex AI 调用、配合企业代理和 LLM Gateway。本文详解各方案的配置方法和选型建议。
 cover: https://picsum.photos/seed/claude-enterprise-deploy/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/third-party-integrations
+source_url: https://code.claude.com/docs/zh-CN/third-party-integrations
 ---
 
 # 精读官方文档：企业部署概述

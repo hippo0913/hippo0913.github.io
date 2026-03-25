@@ -8,7 +8,7 @@ series: claude-code
 series_index: 1
 description: Claude Code 是 Anthropic 官方的 AI 编程助手，直接在终端运行。30 秒安装，支持自然语言构建功能、调试代码、导航代码库，还能通过 MCP 扩展连接外部工具。
 cover: https://picsum.photos/seed/claude-code-overview/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/overview
+source_url: https://code.claude.com/docs/zh-CN/features-overview
 ---
 
 # 精读官方文档：Claude Code 概览

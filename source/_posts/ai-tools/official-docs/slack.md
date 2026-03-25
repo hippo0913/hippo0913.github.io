@@ -8,7 +8,7 @@ series: claude-code
 series_index: 24
 description: 在 Slack 里直接 @Claude 让它帮你写代码、修 bug、创建 PR。本文详解 Claude Code Slack 集成的工作原理、配置步骤和最佳实践。
 cover: https://picsum.photos/seed/claude-slack/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/slack
+source_url: https://code.claude.com/docs/zh-CN/slack
 ---
 
 # 精读官方文档：Slack 中的 Claude Code

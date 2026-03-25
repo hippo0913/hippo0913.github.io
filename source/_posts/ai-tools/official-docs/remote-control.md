@@ -8,7 +8,7 @@ series: claude-code
 series_index: 21
 description: Remote Control 让你用手机或浏览器继续电脑上正在跑的 Claude Code 会话。会话仍在本地执行，远程设备只是一个「遥控器」。
 cover: https://picsum.photos/seed/claude-remote-control/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/remote-control
+source_url: https://code.claude.com/docs/zh-CN/remote-control
 ---
 
 # 精读官方文档：Remote Control 远程控制

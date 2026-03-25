@@ -8,7 +8,7 @@ series: claude-code
 series_index: 7
 description: Claude Code 最佳实践官方文档精读，涵盖 Context 窗口管理、验证工作流、环境配置、提示词技巧，以及如何避免常见失败模式。
 cover: https://picsum.photos/seed/claude-best-practices/1920/1080
-source_url: https://code.claude.com/docs/en/best-practices
+source_url: https://code.claude.com/docs/zh-CN/best-practices
 ---
 
 # 精读官方文档：Claude Code 最佳实践

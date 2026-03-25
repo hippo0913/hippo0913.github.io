@@ -8,7 +8,7 @@ series: claude-code
 series_index: 14
 description: Claude Code 的设置系统支持用户级、项目级和企业级三层配置，通过 settings.json 文件管理权限、环境变量、Hooks 等核心选项。
 cover: https://picsum.photos/seed/claude-code-settings/1920/1080
-source_url: https://docs.anthropic.com/en/docs/claude-code/settings
+source_url: https://code.claude.com/docs/zh-CN/settings
 ---
 
 # 精读官方文档：Claude Code 设置
