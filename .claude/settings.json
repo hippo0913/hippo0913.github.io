@@ -12,13 +12,16 @@
       "Bash(git commit:*)",
       "Bash(curl:*)",
       "Bash(jq:*)",
+      "Bash(echo *)",
+      "Bash(wc *)",
       "Bash(chmod:*)",
       "Bash(mkdir:*)",
       "Bash(sed *)",
       "WebSearch",
       "Read",
       "Edit",
-      "Write"
+      "Write",
+      "mcp__memory__read_graph"
     ],
     "deny": [
       "Bash(git reset:*)",
@@ -84,7 +87,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "FILE_PATH=$(jq -r '.tool_input.file_path // empty'); case \"$FILE_PATH\" in *source/_posts/*|*_config*.yml) node \"$CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js\" \"$FILE_PATH\" 2>&1 ;; esac"
+            "command": "sh -c 'FILE_PATH=$(cat | jq -r \".tool_input.file_path // empty\"); case \"$FILE_PATH\" in *source/_posts/*|*_config*.yml) node \"$CLAUDE_PROJECT_DIR/.claude/hooks/screenshot-verify.js\" \"$FILE_PATH\" 2>&1 ;; esac'"
           }
         ]
       }

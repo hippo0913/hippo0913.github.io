@@ -5,7 +5,7 @@
  */
 
 const puppeteer = require('puppeteer');
-const { exec, execSync, spawn } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -138,7 +138,13 @@ function buildArticleUrl(filePath) {
 // 主函数
 async function main() {
   const args = process.argv.slice(2);
-  const articlePath = args[0]; // 可选：文章路径
+  const articlePath = args[0]; // 文章路径
+
+  // 没有文章路径则不执行
+  if (!articlePath || !fs.existsSync(articlePath)) {
+    console.error(`[截图验证] 未提供有效文章路径，跳过`);
+    process.exit(0);
+  }
 
   console.error(`[截图验证] 开始执行...`);
 
@@ -149,39 +155,27 @@ async function main() {
     console.error(`[截图验证] Hexo server 已启动`);
   }
 
-  // 2. 构建要截图的页面列表
-  const pages = [
-    { url: `${HEXO_URL}/`, name: 'home' }
-  ];
-
-  // 如果有文章路径，添加文章页
-  if (articlePath && fs.existsSync(articlePath)) {
-    const articleUrl = buildArticleUrl(articlePath);
-    if (articleUrl) {
-      pages.push({ url: articleUrl, name: 'article' });
-      console.error(`[截图验证] 文章 URL: ${articleUrl}`);
-    }
+  // 2. 构建文章 URL
+  const articleUrl = buildArticleUrl(articlePath);
+  if (!articleUrl) {
+    console.error(`[截图验证] 无法构建文章 URL`);
+    process.exit(0);
   }
+  console.error(`[截图验证] 文章 URL: ${articleUrl}`);
 
-  // 3. 截图
+  // 3. 只截图文章页
+  const pages = [{ url: articleUrl, name: 'article' }];
+
+  // 4. 截图
   console.error(`[截图验证] 开始截图...`);
   const results = await takeScreenshots(pages);
 
-  // 4. 输出结果（JSON 格式供 Hook 读取）
-  const output = {
-    timestamp: new Date().toISOString(),
-    results,
-    screenshotDir: SCREENSHOT_DIR
-  };
-
-  console.log(JSON.stringify(output, null, 2));
-
-  // 5. 输出截图路径供 Claude 查看
+  // 5. 输出截图路径（给 Claude 看）
   for (const r of results) {
     if (r.success) {
-      console.error(`[截图验证] ${r.page}: ${r.screenshot}`);
+      console.log(`📸 截图已保存: ${r.screenshot}`);
     } else {
-      console.error(`[截图验证] ${r.page} 失败: ${r.error}`);
+      console.error(`[截图验证] 截图失败: ${r.error}`);
     }
   }
 }
