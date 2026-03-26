@@ -58,10 +58,9 @@ fi
 case "$FILE_PATH" in
   *source/_posts/*|*_config*.yml)
     log "匹配成功，执行截图"
-    node "$PROJECT_DIR/.claude/hooks/screenshot-verify.js" "$FILE_PATH" 2>&1 | while read line; do
-      log "screenshot-verify: $line"
-      echo "$line"
-    done
+    echo "📸 正在生成文章预览截图..."
+    # 直接运行，让 node 的 stdout 直接输出到会话
+    node "$PROJECT_DIR/.claude/hooks/screenshot-verify.js" "$FILE_PATH" 2>&1
     ;;
   *)
     log "文件路径不匹配，跳过"

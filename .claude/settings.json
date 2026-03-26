@@ -79,11 +79,20 @@
             "command": "cd $CLAUDE_PROJECT_DIR && hexo clean && hexo generate 2>&1 | tail -5 || { echo 'Hexo 构建失败，禁止提交' >&2; exit 2; }"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/protect-files.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",

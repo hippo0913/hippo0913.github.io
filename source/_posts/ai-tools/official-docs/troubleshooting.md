@@ -38,6 +38,29 @@ source_url: https://code.claude.com/docs/zh-CN/troubleshooting
 | `unable to get local issuer certificate` | 配置企业 CA 证书 |
 | `OAuth error` 或 `403 Forbidden` | 修复身份验证 |
 
+### 快速诊断命令
+
+遇到问题时，先用这些命令快速定位：
+
+```bash
+# 1. 检查 Claude Code 是否安装成功
+claude --version
+
+# 2. 运行内置诊断工具
+/doctor
+
+# 3. 检查网络连通性
+curl -sI https://storage.googleapis.com
+
+# 4. 检查 PATH 配置
+echo $PATH | tr ':' '\n' | grep -E "(local/bin|\.claude)"
+
+# 5. 查看当前配置文件
+cat ~/.claude/settings.json
+```
+
+> 💡 **小技巧**：如果网络有问题，可以先测试 `ping 8.8.8.8` 排除是否完全断网。如果 ping 通但 curl 不行，多半是 DNS 或代理配置问题。另外，`/doctor` 命令能自动检测大部分常见配置问题。
+
 <!-- more -->
 
 ---
