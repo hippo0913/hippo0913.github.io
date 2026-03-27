@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：快速开始
 date: 2026-03-28 23:00:00
-updated: 2026-03-27 10:00:00
+updated: 2026-03-27 16:30:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -40,9 +40,19 @@ source_url: https://code.claude.com/docs/zh-CN/quickstart
 
 ## 第一步：安装
 
-官方提供了多种安装方式：
+官方提供了三种安装方式，根据你的操作系统和偏好选择：
+
+### 安装方式对比
+
+| 方式 | 平台 | 优点 | 缺点 |
+| --- | --- | --- | --- |
+| 原生安装（推荐） | 全平台 | 官方首推，更新最快 | 需要网络访问 claude.ai |
+| Homebrew | macOS | 方便管理，自动更新 | 比 native 晚几天 |
+| WinGet | Windows | 系统集成好 | 比 native 晚几天 |
 
 ### 方式一：原生安装（推荐）
+
+这是官方首推的安装方式，能获得最新版本和功能。
 
 **macOS / Linux / WSL：**
 
@@ -58,13 +68,17 @@ irm https://claude.ai/install.ps1 | iex
 
 **Windows CMD：**
 
+如果你习惯用传统的 cmd.exe，可以用这个命令：
+
 ```cmd
 curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
 ```
 
-> ⚠️ Windows 需要先安装 Git for Windows。
+> ⚠️ **Windows 用户注意**：Windows 需要先安装 [Git for Windows](https://git-scm.com/download/win)。Claude Code 依赖 Git 来进行版本控制操作。
 
 ### 方式二：包管理器安装
+
+如果你更习惯用系统包管理器，也可以用这种方式。
 
 **Homebrew（macOS）：**
 
@@ -74,19 +88,36 @@ brew install --cask claude-code
 
 **WinGet（Windows）：**
 
-```bash
+```cmd
 winget install Anthropic.ClaudeCode
 ```
 
-> 💬 hippo：推荐用原生安装方式，这是官方首推的方法。如果报错，99% 是网络问题，换个代理再试。
+> 💬 hippo：推荐用原生安装方式，这是官方首推的方法。如果报错，99% 是网络问题，换个代理再试。包管理器版本通常比原生安装晚几天发布。
 
 ### 验证安装
+
+安装完成后，验证是否成功：
 
 ```bash
 claude --version
 ```
 
-看到版本号就说明装好了。
+看到类似这样的输出就说明装好了：
+
+```
+claude version 1.x.x
+```
+
+### 安装失败排查
+
+如果安装过程中遇到问题，按以下步骤排查：
+
+| 错误信息 | 可能原因 | 解决方案 |
+| --- | --- | --- |
+| `Connection refused` | 网络无法访问 claude.ai | 检查代理设置，确保能访问外网 |
+| `Permission denied` | 权限不足 | macOS/Linux 加 `sudo`，Windows 以管理员运行 |
+| `command not found` | PATH 未更新 | 重启终端或手动添加 PATH |
+| `SSL certificate problem` | 证书问题 | 检查系统时间，或用 `-k` 跳过验证（不推荐） |
 
 ---
 
@@ -183,17 +214,71 @@ Claude Code 将：
 
 ## 第六步：在 Claude Code 中使用 Git
 
-Claude Code 使 Git 操作变得对话式：
+Claude Code 让 Git 操作变得对话式，你可以用自然语言完成各种版本控制任务。
+
+### 基本 Git 操作
+
+**创建提交：**
 
 ```bash
 "创建一个 Git 提交"
 ```
 
-你也可以提示更复杂的 Git 操作：
+Claude Code 会：
+1. 查看当前 `git status` 和 `git diff`
+2. 分析变更内容
+3. 生成符合规范的 commit message
+4. 询问你是否确认提交
+
+**创建新分支：**
 
 ```bash
 "创建一个名为 feature/quickstart 的新分支"
 ```
+
+**切换分支：**
+
+```bash
+"切换到 master 分支"
+```
+
+**查看提交历史：**
+
+```bash
+"查看最近 5 次提交"
+```
+
+### 常用 Git 命令对照表
+
+| 自然语言提示 | 等效 Git 命令 | 说明 |
+| --- | --- | --- |
+| "创建一个提交" | `git add . && git commit` | 自动生成 commit message |
+| "创建分支 xxx" | `git checkout -b xxx` | 创建并切换到新分支 |
+| "切换到 xxx 分支" | `git checkout xxx` | 切换分支 |
+| "合并 xxx 分支" | `git merge xxx` | 合并指定分支到当前分支 |
+| "查看提交历史" | `git log --oneline` | 查看简洁的提交记录 |
+| "撤销上次提交" | `git reset --soft HEAD~1` | 保留更改，撤销提交 |
+
+### 实战示例：完整的功能开发流程
+
+```bash
+# 1. 先创建功能分支
+"创建一个新分支 feature/user-profile"
+
+# 2. 进行代码修改
+"添加用户个人资料页面，包含头像、昵称、个人简介"
+
+# 3. 查看修改
+"查看我修改了哪些文件"
+
+# 4. 提交更改
+"创建一个提交，描述这次改动"
+
+# 5. 推送到远程
+"推送这个分支到远程仓库"
+```
+
+> 💬 hippo：用 Claude Code 做 Git 操作最大的好处是——不用担心 commit message 写得烂。它会根据实际改动自动生成清晰的提交信息，比如 `feat: 添加用户个人资料页面`。
 
 ---
 
@@ -221,49 +306,128 @@ Claude Code 将：
 
 ## 其他常见工作流
 
-官方文档还列出了多种工作方式：
+官方文档列出了多种工作方式，以下是几个高频场景的详细示例。
 
 ### 重构代码
+
+让 Claude Code 帮你改进代码结构：
 
 ```bash
 "重构身份验证模块以使用 async/await 而不是回调"
 ```
 
+Claude 会：
+1. 找到所有使用回调的认证代码
+2. 逐个转换为 async/await
+3. 保持功能不变
+4. 询问你是否应用更改
+
 ### 编写测试
+
+自动生成单元测试：
 
 ```bash
 "为 src/utils/ 目录下的工具函数编写单元测试"
 ```
 
+你可以进一步指定：
+
+```bash
+"使用 Jest 框架，覆盖率达到 80% 以上"
+```
+
 ### 更新文档
+
+保持文档与代码同步：
 
 ```bash
 "更新 README.md，添加新功能的说明"
 ```
 
+或更具体：
+
+```bash
+"在 README 的 API 章节添加用户登录接口的文档"
+```
+
 ### 代码审查
+
+让 Claude 审查你的代码：
 
 ```bash
 "审查最近的 Git 变更，提出改进建议"
 ```
 
+Claude 会检查：
+- 代码风格问题
+- 潜在的 bug
+- 性能优化建议
+- 安全漏洞
+
+### 常见工作流速查表
+
+| 场景 | 示例提示 | 预期输出 |
+| --- | --- | --- |
+| 理解代码 | "这个函数是做什么的？" | 代码解释 + 调用关系 |
+| 修复 bug | "修复这个 TypeError" | 定位问题 + 修复代码 |
+| 添加功能 | "添加分页功能" | 设计方案 + 代码实现 |
+| 优化性能 | "优化这个循环的性能" | 分析瓶颈 + 优化代码 |
+| 生成文档 | "为这个模块生成 JSDoc" | 完整的注释文档 |
+| 代码审查 | "审查 PR #123" | 变更分析 + 改进建议 |
+
 ---
 
 ## 基本命令速查表
 
-以下是日常使用中最重要的命令：
+以下是日常使用中最重要的命令。建议收藏这个表格，随时查阅。
+
+### 启动模式命令
 
 | 命令 | 功能 | 示例 |
 | --- | --- | --- |
 | `claude` | 启动交互模式 | `claude` |
-| `claude "task"` | 运行一次性任务 | `claude "fix the build error"` |
-| `claude -p "query"` | 运行一次性查询，然后退出 | `claude -p "explain this function"` |
-| `claude -c` | 在当前目录中继续最近的对话 | `claude -c` |
-| `claude -r` | 恢复之前的对话 | `claude -r` |
-| `claude commit` | 创建 Git 提交 | `claude commit` |
-| `/clear` | 清除对话历史 | `/clear` |
-| `/help` | 显示可用命令 | `/help` |
-| `exit` 或 Ctrl+C | 退出 Claude Code | `exit` |
+| `claude "task"` | 运行一次性任务，完成后退出 | `claude "fix the build error"` |
+| `claude -p "query"` | 运行一次性查询（print 模式），输出后退出 | `claude -p "explain this function"` |
+| `claude -c` | 在当前目录继续最近的对话（continue） | `claude -c` |
+| `claude -r` | 恢复之前的对话（resume），可选择历史会话 | `claude -r` |
+| `claude commit` | 快捷创建 Git 提交 | `claude commit` |
+
+### 交互模式内部命令
+
+| 命令 | 功能 | 说明 |
+| --- | --- | --- |
+| `/help` | 显示可用命令 | 查看所有内置命令 |
+| `/clear` | 清除对话历史 | 开始新的对话，保留上下文 |
+| `/login` | 切换账户 | 重新登录或更换账户类型 |
+| `/resume` | 继续之前的对话 | 选择历史会话继续 |
+| `exit` 或 Ctrl+C | 退出 Claude Code | 结束当前会话 |
+
+### CLI 参数详解
+
+| 参数 | 缩写 | 功能 | 示例 |
+| --- | --- | --- | --- |
+| `--print` | `-p` | 执行查询后立即退出，适合脚本调用 | `claude -p "list all TODOs"` |
+| `--continue` | `-c` | 继续当前目录最近的对话 | `claude -c` |
+| `--resume` | `-r` | 从历史对话中选择恢复 | `claude -r` |
+| `--version` | `-v` | 显示版本号 | `claude --version` |
+| `--help` | `-h` | 显示帮助信息 | `claude --help` |
+| `--verbose` | | 显示详细日志，用于调试 | `claude --verbose` |
+
+### 实用组合示例
+
+```bash
+# 快速查看函数定义，不进入交互模式
+claude -p "这个项目的主入口在哪里？"
+
+# 继续刚才的对话，继续之前的工作
+claude -c
+
+# 在 CI/CD 中自动修复 lint 错误
+claude "修复所有 ESLint 报错" && npm run lint
+
+# 快速生成 commit
+claude commit
+```
 
 > 💬 hippo：这个表格建议收藏。`claude -p` 特别适合快速查询，不用进入交互模式；`claude commit` 比手动写 commit message 方便很多。
 

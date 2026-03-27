@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude 如何记住你的项目
 date: 2026-03-22 23:00:00
-updated: 2026-03-27 12:00:00
+updated: 2026-03-27 15:30:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -242,7 +242,33 @@ ln -s ~/company-standards/security.md .claude/rules/security.md
 
 或环境变量：`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`
 
-### 2.2 存储位置
+### 2.2 记忆系统配置参数
+
+以下是与记忆系统相关的所有可配置参数：
+
+| 参数名 | 配置层级 | 默认值 | 说明 |
+|--------|----------|--------|------|
+| `autoMemoryEnabled` | 用户、本地、项目 | `true` | 是否启用自动记忆功能 |
+| `autoMemoryDirectory` | 策略、本地、用户 | `~/.claude/projects/<project>/memory/` | 自动记忆文件的存储目录 |
+| `claudeMdExcludes` | 策略、用户、项目、本地 | `[]` | 要排除的 CLAUDE.md 文件 glob 模式数组 |
+
+> 💬 hippo：`autoMemoryDirectory` 不接受项目设置（`.claude/settings.json`），防止共享项目把自动记忆写入重定向到敏感位置。这是一个安全设计。
+
+**配置示例**：
+
+```json
+// .claude/settings.local.json（本地设置）
+{
+  "autoMemoryEnabled": true,
+  "autoMemoryDirectory": "~/my-custom-memory-dir",
+  "claudeMdExcludes": [
+    "**/legacy-team/CLAUDE.md",
+    "/home/user/monorepo/old-project/.claude/rules/**"
+  ]
+}
+```
+
+### 2.3 存储位置
 
 ```
 ~/.claude/projects/<project>/memory/
@@ -252,9 +278,11 @@ ln -s ~/company-standards/security.md .claude/rules/security.md
 └── patterns.md        # 发现的代码模式
 ```
 
-`<project>` 路径基于 git 仓库，所以同一仓库的所有 worktree 共享记忆。
+`<project>` 路径基于 git 仓库，所以同一仓库的所有 worktree 共享记忆。在 git 仓库外，则使用项目根目录作为标识。
 
-### 2.3 工作原理
+> 💬 hippo：自动记忆是**机器本地**的，不会通过 git 同步，也不会在云端共享。换电脑后需要让 Claude 重新学习。
+
+### 2.4 工作原理
 
 - **MEMORY.md 前 200 行**在每次对话开始时加载
 - **主题文件**（如 `debugging.md`）按需读取
@@ -262,7 +290,7 @@ ln -s ~/company-standards/security.md .claude/rules/security.md
 
 > 💬 hippo：当你在界面看到 "Writing memory" 或 "Recalled memory" 时，就是 Claude 在更新或读取记忆文件。
 
-### 2.4 查看和编辑记忆
+### 2.5 查看和编辑记忆
 
 运行 `/memory` 命令可以：
 - 列出所有加载的 CLAUDE.md 和规则文件
@@ -282,7 +310,28 @@ ln -s ~/company-standards/security.md .claude/rules/security.md
 3. 让指令更具体（"用 2 空格缩进" > "格式化代码很好"）
 4. 检查是否有冲突指令
 
-> 💬 hippo：CLAUDE.md 是上下文，不是系统指令。Claude 会尽量遵循，但不保证 100% 执行。需要强制行为的场景用 `--append-system-prompt`。
+> 💬 hippo：CLAUDE.md 是上下文，不是系统指令。Claude 会尽量遵循，但不保证 100% 执行。
+
+#### 使用 --append-system-prompt 强制行为
+
+如果你需要 Claude **强制**遵循某些指令（而非"尽量"遵循），可以使用 `--append-system-prompt` 标志。这会将内容直接追加到系统提示中，而不是作为用户消息传递。
+
+```bash
+# 强制 Claude 始终用中文回复
+claude --append-system-prompt "你必须始终使用中文回答问题"
+
+# 在脚本中强制特定的代码风格
+claude --append-system-prompt "所有生成的代码必须使用 4 空格缩进"
+```
+
+**使用场景对比**：
+
+| 方式 | 执行方式 | 遵循程度 | 适用场景 |
+|------|----------|----------|----------|
+| CLAUDE.md | 作为用户消息 | 尽量遵循 | 项目规范、编码标准、工作流 |
+| `--append-system-prompt` | 追加到系统提示 | 更强制性 | CI/CD 脚本、自动化任务、必须遵守的约束 |
+
+> 💬 hippo：`--append-system-prompt` 必须在**每次调用时传递**，所以更适合脚本和自动化场景，而不是日常交互使用。日常交互还是用 CLAUDE.md 更方便。
 
 ### 3.2 CLAUDE.md 太大了
 
