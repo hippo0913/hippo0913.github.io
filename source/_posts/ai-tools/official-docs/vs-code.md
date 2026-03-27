@@ -95,7 +95,29 @@ Claude Code 的 VS Code 扩展是一个原生图形界面，让你在 IDE 里直
 # 自动插入当前文件路径和选中行号
 ```
 
-### 2.4 键盘快捷键
+### 2.4 引用终端输出
+
+使用 `@terminal:name` 格式引用终端输出，其中 `name` 是终端的标题：
+
+```markdown
+> @terminal:build 看看构建报了什么错
+```
+
+这样 Claude 能看到命令输出、错误信息或日志，无需复制粘贴。
+
+### 2.5 恢复过去的对话
+
+点击 Claude Code 面板顶部的下拉菜单访问对话历史：
+
+- 按关键字搜索
+- 按时间浏览（今天、昨天、过去 7 天等）
+- 点击任意对话恢复完整消息历史
+
+新会话会根据第一条消息生成 AI 标题。悬停在会话上可以：
+- **重命名**：给它一个描述性标题
+- **删除**：从列表中移除
+
+### 2.6 键盘快捷键
 
 | 命令 | 快捷键 | 说明 |
 |------|--------|------|
@@ -104,7 +126,7 @@ Claude Code 的 VS Code 扩展是一个原生图形界面，让你在 IDE 里直
 | New Conversation | `Cmd+N` (Mac) / `Ctrl+N` (Win) | 开始新对话（需要 Claude 面板聚焦） |
 | Insert @-Mention | `Option+K` (Mac) / `Alt+K` (Win) | 插入当前文件和选区的引用（需要编辑器聚焦） |
 
-### 2.5 VS Code 扩展配置项
+### 2.7 VS Code 扩展配置项
 
 打开 VS Code 设置（`Cmd+,` 或 `Ctrl+,`），进入 Extensions → Claude Code：
 
@@ -130,7 +152,78 @@ Claude Code 的 VS Code 扩展是一个原生图形界面，让你在 IDE 里直
 }
 ```
 
-### 2.6 Checkpoints 回滚功能
+### 2.8 Plugins 管理
+
+VS Code 扩展内置了 Plugins 图形管理界面。在提示框输入 `/plugins` 打开。
+
+**安装 Plugins：**
+
+- **已安装的 plugins**：显示在顶部，可切换启用/禁用
+- **可用的 plugins**：来自配置的 marketplaces，显示在下方
+- 点击任意 plugin 的**安装**按钮
+
+安装时选择范围：
+- **为您安装**：所有项目可用（用户范围）
+- **为此项目安装**：与协作者共享（项目范围）
+- **本地安装**：仅自己可见，仅此仓库（本地范围）
+
+**管理 Marketplaces：**
+
+切换到 **Marketplaces** 选项卡：
+- 输入 GitHub 仓库、URL 或本地路径添加新源
+- 点击刷新图标更新 plugin 列表
+- 点击垃圾桶图标删除 marketplace
+
+### 2.9 Chrome 浏览器集成
+
+将 Claude 连接到 Chrome 浏览器，可以在 VS Code 里：
+- 测试 Web 应用
+- 使用控制台日志调试
+- 自动化浏览器工作流
+
+**前提条件：** Claude in Chrome 扩展版本 1.0.36 或更高
+
+**使用方式：**
+
+```markdown
+> @browser go to localhost:3000 and check the console for errors
+```
+
+Claude 会为新任务打开浏览器标签页，并共享你的登录状态，可以访问已登录的网站。
+
+也可打开附件菜单选择特定浏览器工具，如打开新标签页或读取页面内容。
+
+### 2.10 从外部工具打开 VS Code 标签页
+
+扩展注册了 URI 处理程序：`vscode://anthropic.claude-code/open`
+
+可以从 shell 别名、浏览器书签或脚本打开 Claude Code 标签页：
+
+```bash
+# macOS
+open "vscode://anthropic.claude-code/open"
+
+# Linux
+xdg-open "vscode://anthropic.claude-code/open"
+
+# Windows
+start "vscode://anthropic.claude-code/open"
+```
+
+**支持的查询参数：**
+
+| 参数 | 说明 |
+|------|------|
+| `prompt` | 预填充的文本（需 URL 编码），不自动提交 |
+| `session` | 要恢复的会话 ID，会话需属于当前工作区 |
+
+示例：预填充 "review my changes"
+
+```bash
+vscode://anthropic.claude-code/open?prompt=review%20my%20changes
+```
+
+### 2.11 Checkpoints 回滚功能
 
 扩展支持 checkpoints，可以追踪 Claude 的文件修改并回滚。悬停在任意消息上会出现回滚按钮：
 
@@ -138,7 +231,7 @@ Claude Code 的 VS Code 扩展是一个原生图形界面，让你在 IDE 里直
 - **Rewind code to here**：回退文件到此节点的状态，保留完整对话历史
 - **Fork conversation and rewind code**：分叉对话并回退代码
 
-### 2.7 CLI vs 扩展功能对比
+### 2.12 CLI vs 扩展功能对比
 
 | 功能 | CLI | VS Code 扩展 |
 |------|-----|--------------|
@@ -150,7 +243,7 @@ Claude Code 的 VS Code 扩展是一个原生图形界面，让你在 IDE 里直
 
 如果需要 CLI 独有功能，可以在 VS Code 集成终端（`` Ctrl+` `` 或 `` Cmd+` ``）中运行 `claude`。
 
-### 2.8 内置 IDE MCP 服务器
+### 2.13 内置 IDE MCP 服务器
 
 扩展运行时会启动一个本地 MCP 服务器，让 CLI 连接。这个服务器提供了两个工具：
 
@@ -249,6 +342,6 @@ VS Code 扩展让 Claude Code 的使用更直观：可视化 diff、Plan 模式�
 
 ---
 
-*本文精读自 [Use Claude Code in VS Code](https://code.claude.com/docs/en/vs-code)*
+*本文精读自 [在 VS Code 中使用 Claude Code](https://code.claude.com/docs/zh-CN/vs-code)*
 
 *最后更新：2026-03-25*

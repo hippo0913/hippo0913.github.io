@@ -29,14 +29,57 @@ Claude Code 是 Anthropic 官方推出的 **代理式编码工具（Agentic Codi
 
 ## 二、官方教程精读
 
-### 2.1 30秒快速开始
+### 2.1 选择你的环境
 
-官方文档给了一个超简洁的安装流程：
+Claude Code 支持五种使用环境，你可以根据自己的习惯选择：
+
+| 环境 | 特点 | 适合人群 |
+|------|------|----------|
+| Terminal | 功能完整，直接操作文件和命令 | 命令行爱好者、CI/CD 集成 |
+| VS Code | 内联 diff、@-引用、Plan 模式 | VS Code 用户 |
+| Desktop app | 桌面应用，支持计划任务 | 偏好图形界面 |
+| Web | 无需本地安装，支持移动设备 | 临时使用、远程协作 |
+| JetBrains | IntelliJ/PyCharm/WebStorm 集成 | JetBrains 用户 |
+
+> 💬 hippo：所有环境共享相同的底层引擎，你的 CLAUDE.md 文件、设置和 MCP 服务器在所有界面中都能工作。
+
+### 2.2 终端安装方式
+
+官方推荐使用原生安装脚本，而不是 npm：
+
+**macOS / Linux / WSL：**
 
 ```bash
-# 安装 Claude Code
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
+```
 
+**Windows PowerShell：**
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
+**Windows CMD：**
+
+```cmd
+curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+```
+
+> ⚠️ Windows 需要先安装 [Git for Windows](https://gitforwindows.org/)。
+
+**其他安装方式：**
+
+```bash
+# macOS Homebrew
+brew install --cask claude-code
+
+# Windows WinGet
+winget install Anthropic.ClaudeCode
+```
+
+安装完成后，启动非常简单：
+
+```bash
 # 进入你的项目目录
 cd your-awesome-project
 
@@ -49,12 +92,69 @@ claude
 
 | 要求 | 说明 |
 |------|------|
-| Node.js | 18 或更高版本 |
 | 账户 | Claude.ai 订阅（推荐）或 Anthropic Console 账户 |
+| 第三方提供商 | Terminal CLI 和 VS Code 支持配置第三方 API |
 
-> 💬 hippo：如果你用的是第三方 API 提供商（比如通过 OpenRouter 等），CLI 也支持配置，但体验最好的还是官方订阅。
+### 2.3 VS Code 扩展安装
 
-### 2.2 Claude Code 能帮你做什么
+VS Code 扩展提供内联差异、@-提及、计划审查和对话历史：
+
+- [为 VS Code 安装](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code)
+- [为 Cursor 安装](https://marketplace.cursorapi.com/items?itemName=anthropic.claude-code)
+
+或在扩展视图中搜索 "Claude Code"（Mac 上为 `Cmd+Shift+X`，Windows/Linux 上为 `Ctrl+Shift+X`）。
+
+安装后，打开命令面板（`Cmd+Shift+P` / `Ctrl+Shift+P`），输入 "Claude Code"，然后选择**在新标签页中打开**。
+
+### 2.4 桌面应用和 Web 版
+
+**桌面应用：** 通过 Homebrew 或 WinGet 安装，支持计划任务功能。
+
+```bash
+# macOS
+brew install --cask claude-code
+
+# Windows
+winget install Anthropic.ClaudeCode
+```
+
+**Web 版：** 在浏览器中运行 Claude Code，无需本地设置。访问 [claude.ai/code](https://claude.ai/code) 开始编码。
+
+Web 版特点：
+- 启动长时间运行的任务，完成后再检查
+- 处理你本地没有的仓库
+- 并行运行多个任务
+- 在桌面浏览器和 Claude iOS 应用中使用
+
+### 2.5 集成工作流
+
+除了终端和 IDE 环境，Claude Code 还与 CI/CD、聊天和浏览器工作流集成：
+
+| 我想要... | 最佳选项 |
+|-----------|----------|
+| 从手机或另一台设备继续本地会话 | 远程控制 |
+| 从 Telegram、Discord 或 webhook 推送事件到会话中 | Channels |
+| 在本地启动任务，在移动设备上继续 | 网络或 Claude iOS 应用 |
+| 按定期计划运行 Claude | 云计划任务或桌面计划任务 |
+| 自动化 PR 审查和问题分类 | GitHub Actions 或 GitLab CI/CD |
+| 在每个 PR 上获得自动代码审查 | GitHub Code Review |
+| 将 Slack 中的错误报告路由到拉取请求 | Slack |
+| 调试实时网络应用 | Chrome |
+| 为你自己的工作流构建自定义代理 | Agent SDK |
+
+### 2.6 后续步骤
+
+安装 Claude Code 后，官方推荐的学习路径：
+
+| 指南 | 内容 |
+|------|------|
+| 快速入门 | 通过第一个真实任务，从探索代码库到提交修复 |
+| 存储说明和内存 | 使用 CLAUDE.md 文件和自动内存为 Claude 提供持久说明 |
+| 常见工作流和最佳实践 | 充分利用 Claude Code 的模式 |
+| 设置 | 为你的工作流自定义 Claude Code |
+| 故障排除 | 常见问题的解决方案 |
+
+### 2.7 Claude Code 能帮你做什么
 
 官方列出了四大核心能力：
 
@@ -107,7 +207,7 @@ claude -p "这个项目的认证模块在哪里？怎么工作的？"
 claude -p "修复所有 ESLint 警告"
 ```
 
-### 2.3 为什么开发者喜欢 Claude Code
+### 2.8 为什么开发者喜欢 Claude Code
 
 官方给出了四个理由，每个都很有意思：
 
@@ -227,6 +327,6 @@ Claude Code 不是一个"更聪明的代码补全"，而是一个**住在你终�
 
 ---
 
-*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/overview)*
+*本文精读自 [Claude Code 概述](https://code.claude.com/docs/zh-CN/overview)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*
