@@ -36,11 +36,14 @@ source_url: https://code.claude.com/docs/zh-CN/legal-and-compliance
 
 ### 2.1 许可证条款
 
-Claude Code 采用 Anthropic 的商业服务条款（Commercial Terms of Service），而不是开源许可证。这意味着：
+Claude Code 的使用受以下条款约束：
 
-- 你不能自由分发、修改源码
-- 使用受 Anthropic 服务条款约束
-- 企业用户需要遵守相应的商业协议
+| 用户类型 | 适用条款 |
+|---------|---------|
+| Team、Enterprise、Claude API 用户 | [商业条款](https://www.anthropic.com/commercial-terms) |
+| Free、Pro、Max 用户 | [消费者条款](https://www.anthropic.com/consumer-terms) |
+
+> 💬 hippo：Claude Code 不是开源软件，不能自由分发或修改源码。
 
 ### 2.2 商业协议适用规则
 
@@ -51,6 +54,7 @@ Claude Code 采用 Anthropic 的商业服务条款（Commercial Terms of Service
 | 直接使用 Anthropic API | 1P（First Party） | 直接连 Anthropic，条款以 Anthropic 商业协议为准 |
 | 通过 AWS Bedrock | 3P（Third Party） | AWS 作为中间层，你的 AWS 协议适用 |
 | 通过 Google Vertex | 3P（Third Party） | Google 作为中间层，你的 GCP 协议适用 |
+| 通过 Microsoft Foundry | 3P（Third Party） | Azure 作为中间层，你的 Azure 协议适用 |
 
 **关键点**：除非双方另有约定，否则你现有的商业协议会自动覆盖 Claude Code 的使用。这避免了"又要签一份新协议"的麻烦。
 
@@ -81,8 +85,8 @@ effect:
 
 | 资源 | 用途 | 链接 |
 |------|------|------|
-| Anthropic Trust Center | 了解 Anthropic 的安全合规认证 | [trust.anthropic.com](https://trust.anthropic.com) |
-| Transparency Hub | 透明度报告和政策信息 | Anthropic 官网相关页面 |
+| Anthropic 信任中心 | 了解 Anthropic 的安全合规认证 | [trust.anthropic.com](https://trust.anthropic.com) |
+| Anthropic 透明度中心 | 透明度报告和政策信息 | Anthropic 官网 |
 
 **安全漏洞报告**：Anthropic 通过 HackerOne 管理安全漏洞赏金计划。如果你发现 Claude Code 的安全漏洞，应通过 HackerOne 提交报告，而不是公开披露。
 
@@ -124,6 +128,7 @@ effect:
   - 直连用户: Anthropic Commercial Terms
   - AWS Bedrock 用户: AWS 服务条款
   - Google Vertex 用户: GCP 服务条款
+  - Microsoft Foundry 用户: Azure 服务条款
 ```
 
 ### 3.3 我的建议
@@ -144,9 +149,9 @@ A: 通常不需要。个人使用遵守 Anthropic 的商业服务条款即可，
 
 A: ZDR（Zero Data Retention）是企业级功能，需要联系 Anthropic 销售团队开通。普通个人账户默认不启用。
 
-**Q: 通过 AWS Bedrock 用 Claude Code，数据还走 Anthropic 吗？**
+**Q: 通过云服务商（AWS Bedrock/Google Vertex/Microsoft Foundry）用 Claude Code，数据还走 Anthropic 吗？**
 
-A: 是的，Claude Code 的 API 请求最终还是会到 Anthropic。但商业条款以你和 AWS 的协议为准，而非直接和 Anthropic 签署的协议。
+A: 是的，Claude Code 的 API 请求最终还是会到 Anthropic。但商业条款以你和云服务商的协议为准，而非直接和 Anthropic 签署的协议。
 
 **Q: 发现安全漏洞能直接发邮件给 Anthropic 吗？**
 
@@ -162,6 +167,6 @@ Claude Code 的法律和合规框架相对简洁：采用商业许可证，通�
 
 ---
 
-*本文精读自 [Legal and compliance - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/legal-and-compliance)*
+*本文精读自 [法律和合规](https://code.claude.com/docs/zh-CN/legal-and-compliance)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

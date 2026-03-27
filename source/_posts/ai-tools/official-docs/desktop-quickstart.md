@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Desktop 快速开始
 date: 2026-03-15 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -98,21 +98,102 @@ npm install -g @anthropic-ai/claude-code
 
 权限模式决定了 Claude 操作时需要你审批的程度：
 
-```yaml
-# 三种权限模式对比
-权限模式:
-  Ask permissions:  # 默认模式
-    说明: 每次编辑都需要你批准
-    适用: 新项目、重要代码库
+| 模式 | 设置键 | 行为 |
+|------|--------|------|
+| **Ask permissions** | `default` | 每次编辑或运行命令前都需要你批准，推荐新用户使用 |
+| **Auto accept edits** | `acceptEdits` | 自动接受文件编辑，但运行终端命令前仍需询问 |
+| **Plan Mode** | `plan` | 只分析代码并创建计划，不修改文件或运行命令 |
+| **Auto** | `auto` | 后台安全检查验证一致性，减少权限提示（Team 计划可用） |
+| **Bypass permissions** | `bypassPermissions` | 无任何权限提示，仅在沙箱或虚拟机中使用 |
 
-  Auto accept edits:
-    说明: 自动接受文件编辑
-    适用: 快速迭代、实验性代码
+> 远程会话支持"自动接受编辑"和 Plan Mode，"询问权限"不可用。
 
-  Plan mode:
-    说明: 只规划不修改文件
-    适用: 大型重构前的方案设计
+### 2.6 预览您的应用
+
+点击 **Preview** 下拉菜单可以直接在桌面中运行开发服务器。这个功能非常强大：
+
+**Claude 可以做的事情：**
+
+- 启动开发服务器并打开嵌入式浏览器验证更改
+- 查看正在运行的应用界面
+- 测试 API 端点、查看服务器日志
+- 拍摄屏幕截图、检查 DOM、点击元素、填充表单
+- 自动迭代发现的问题
+
+**配置预览服务器：**
+
+Claude 会自动检测开发服务器设置，配置存储在 `.claude/launch.json`：
+
+```json
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}
 ```
+
+**配置字段说明：**
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| `name` | string | 服务器的唯一标识符 |
+| `runtimeExecutable` | string | 要运行的命令，如 `npm`、`yarn`、`node` |
+| `runtimeArgs` | string[] | 传递给命令的参数，如 `["run", "dev"]` |
+| `port` | number | 服务器监听端口，默认 3000 |
+| `cwd` | string | 相对于项目根目录的工作目录 |
+| `autoPort` | boolean | 端口冲突时自动查找空闲端口 |
+
+**Monorepo 多服务器示例：**
+
+```json
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "apps/web",
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "server",
+      "port": 8080,
+      "autoPort": false
+    }
+  ]
+}
+```
+
+### 2.7 监控拉取请求状态
+
+打开 PR 后，CI 状态栏会出现在会话中。Claude Code 使用 GitHub CLI 轮询检查结果。
+
+**两大核心功能：**
+
+| 功能 | 说明 |
+|------|------|
+| **Auto-fix** | Claude 自动读取失败输出并迭代修复失败的 CI 检查 |
+| **Auto-merge** | 所有检查通过后自动合并 PR（使用压缩合并方式） |
+
+**使用方法：**
+
+1. 在 CI 状态栏中找到 **Auto-fix** 和 **Auto-merge** 切换开关
+2. 启用后，Claude 会自动处理 CI 流程
+3. CI 完成时会收到桌面通知
+
+> Auto-merge 需要在你的 GitHub 仓库设置中启用才能工作
 
 ---
 
@@ -189,7 +270,30 @@ A: Cowork 是云端运行的自主 Agent，你关闭应用后它继续工作；C
 
 **Q: 如何从 CLI 迁移到 Desktop？**
 
-A: 不需要迁移。Desktop 会自动读取你现有的 `CLAUDE.md`、`.claude/settings.json` 等配置文件。直接打开项目即可。
+A: 不需要迁移。Desktop 和 CLI 共享配置，你的设置会自动转移：
+
+**共享配置文件列表：**
+
+| 配置文件 | 说明 |
+|---------|------|
+| `CLAUDE.md` | 项目级上下文和规则，两者共用 |
+| `~/.claude.json` | 全局 MCP 服务器配置 |
+| `.mcp.json` | 项目级 MCP 服务器配置 |
+| `~/.claude/settings.json` | 全局设置（权限规则、允许的工具等） |
+| `.claude/settings.json` | 项目级设置 |
+| `~/.claude/skills/` | 全局 skills 目录 |
+| `.claude/skills/` | 项目级 skills 目录 |
+
+**CLI 到 Desktop 的会话迁移：**
+
+在终端中运行 `/desktop` 命令可以将 CLI 会话移动到 Desktop：
+
+```bash
+# 在 CLI 中运行，会保存当前会话并在 Desktop 中打开
+/desktop
+```
+
+> 此命令仅在 macOS 和 Windows 上可用。迁移后 CLI 会话会自动退出。
 
 ---
 
@@ -206,6 +310,6 @@ Claude Code Desktop 把命令行版本的强大功能包装成了友好的图形
 
 ---
 
-*本文精读自 [Get started with the desktop app](https://docs.anthropic.com/zh-CN/docs/claude-code/desktop-quickstart)*
+*本文精读自 [开始使用桌面应用](https://code.claude.com/docs/zh-CN/desktop-quickstart)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

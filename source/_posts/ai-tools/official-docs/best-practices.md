@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude Code 最佳实践
 date: 2026-03-24 23:00:00
-updated: 2026-03-25 12:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -332,7 +332,30 @@ Use subagents to investigate how our authentication system handles token
 refresh, and whether we have any existing OAuth utilities I should reuse.
 ```
 
-### 7.4 恢复对话
+### 7.4 使用检查点进行 Rewind
+
+Claude 在更改前**自动检查点**。双击 `Escape` 或运行 `/rewind` 来打开 rewind 菜单。
+
+**Rewind 菜单选项**：
+
+| 选项 | 说明 |
+|------|------|
+| 恢复对话 | 仅恢复对话历史 |
+| 恢复代码 | 仅恢复代码状态 |
+| 恢复两者 | 同时恢复对话和代码 |
+| 从选定消息总结 | 压缩从该点开始的消息，保持早期 context 完整 |
+
+**核心优势**：
+
+与其仔细规划每一步，你可以告诉 Claude 尝试一些冒险的事情。如果不起作用，rewind 并尝试不同的方法。
+
+**检查点特性**：
+
+- 检查点在会话中**持续存在**
+- 即使关闭终端，稍后仍然可以 rewind
+- 每次文件修改前自动创建检查点
+
+### 7.5 恢复对话
 
 Claude Code 在本地保存对话：
 
@@ -400,7 +423,44 @@ claude --permission-mode auto -p "fix all lint errors"
 
 ---
 
-## 十、hippo 的实战经验
+## 十、培养你的直觉
+
+> 💬 hippo：这节很重要！很多教程会告诉你"必须这样做"，但真实世界没那么简单。
+
+本指南中的模式**不是一成不变的**。它们是通常效果很好的起点，但可能不是每种情况的最优选择。
+
+### 10.1 什么时候应该"打破规则"
+
+| 通常建议 | 但有时你应该... |
+|---------|---------------|
+| 频繁 `/clear` | 让 context 累积，因为你深入一个复杂问题，历史很有价值 |
+| 先规划再编码 | 跳过规划，让 Claude 弄清楚，因为任务是探索性的 |
+| 提供具体提示 | 用模糊提示，因为你想看看 Claude 如何解释问题，再决定是否限制它 |
+
+### 10.2 培养直觉的方法
+
+1. **注意什么有效**：当 Claude 产出很好时，分析你做了什么
+   - 提示结构是什么？
+   - 提供了什么 context？
+   - 在哪个模式下工作？
+
+2. **分析为什么失败**：当 Claude 遇到困难时，问为什么
+   - Context 太嘈杂了吗？
+   - 提示太模糊了吗？
+   - 任务对于一次通过来说太大了吗？
+
+3. **记录你的模式**：把你发现有效的模式写入 CLAUDE.md
+
+### 10.3 你会培养的直觉
+
+随着时间的推移，你会培养没有指南能捕捉的直觉：
+- 何时具体，何时开放
+- 何时规划，何时探索
+- 何时清除 context，何时让它累积
+
+---
+
+## 十一、hippo 的实战经验
 
 > 💬 hippo：以下是我实际使用中的踩坑经验：
 
@@ -475,10 +535,23 @@ A: 取决于你的使用模式。一般：
 4. **积极管理会话**：频繁 `/clear`，使用 subagents
 5. **配置好环境**：CLAUDE.md、CLI 工具、权限
 
+## 十二、相关资源
+
+官方文档提供了以下进阶阅读材料：
+
+| 资源 | 说明 |
+|------|------|
+| [Claude Code 如何工作](https://code.claude.com/docs/zh-CN/how-it-works) | 了解代理循环、工具系统和 context 管理的内部机制 |
+| [扩展 Claude Code](https://code.claude.com/docs/zh-CN/features-overview) | Skills、Hooks、MCP、Subagents 和 Plugins 的完整指南 |
+| [常见工作流程](https://code.claude.com/docs/zh-CN/common-workflows) | 调试、测试、PR 等场景的分步配方 |
+| [CLAUDE.md 指南](https://code.claude.com/docs/zh-CN/memory) | 存储项目约定和持久 context 的完整文档 |
+
+---
+
 **下一篇**：[精读官方文档：常见工作流程](/2026/03/23/ai-tools/official-docs/common-workflows/)，调试、测试、PR 的分步配方。
 
 ---
 
-*本文精读自 [Best Practices for Claude Code](https://code.claude.com/docs/en/best-practices)*
+*本文精读自 [Best Practices for Claude Code](https://code.claude.com/docs/zh-CN/best-practices)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

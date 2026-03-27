@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude Code 网页版
 date: 2026-03-11 23:00:00
-updated: 2026-03-25 12:00:00
+updated: 2026-03-27 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -292,6 +292,64 @@ pip install -r requirements.txt
 exit 0
 ```
 
+### 7.5 持久化环境变量（CLAUDE_ENV_FILE）
+
+SessionStart hooks 可以通过写入 `CLAUDE_ENV_FILE` 环境变量中指定的文件来为后续 Bash 命令持久化环境变量。
+
+**工作原理**：
+
+1. `CLAUDE_ENV_FILE` 包含一个文件路径
+2. Hook 脚本可以向该文件写入 `KEY=value` 格式的环境变量
+3. 后续所有 Bash 命令都会自动加载这些环境变量
+
+**示例**：
+
+```bash
+#!/bin/bash
+# scripts/setup-env.sh
+
+# 将环境变量写入 CLAUDE_ENV_FILE
+echo "MY_API_KEY=sk-xxxxx" >> "$CLAUDE_ENV_FILE"
+echo "DEBUG_MODE=true" >> "$CLAUDE_ENV_FILE"
+echo "CUSTOM_PATH=/custom/bin" >> "$CLAUDE_ENV_FILE"
+```
+
+> 💬 hippo：这个机制非常适合在 SessionStart hook 中设置需要跨命令持久化的环境变量，比如 API 密钥、配置路径等。
+
+### 7.6 依赖管理的限制
+
+使用 SessionStart hooks 进行依赖管理时，有以下已知限制：
+
+| 限制 | 说明 |
+|------|------|
+| **Hooks 对所有会话触发** | SessionStart hooks 在本地和远程环境中都运行。没有配置可以仅将 hook 限定到远程会话。要跳过本地执行，请在脚本中检查 `CLAUDE_CODE_REMOTE` 环境变量 |
+| **需要网络访问** | 安装命令需要网络访问才能到达包注册表。如果环境配置为"无互联网"访问，这些 hooks 将失败。使用"受限"（默认）或"完全"网络访问 |
+| **代理兼容性问题** | 远程环境中的所有出站流量都通过安全代理。某些包管理器不能与此代理正确配合使用。**Bun 是一个已知的例子** |
+| **每次会话启动都运行** | Hooks 在每次会话启动或恢复时运行，增加启动延迟。通过在重新安装之前检查依赖是否已存在来保持安装脚本快速 |
+
+**优化依赖安装脚本示例**：
+
+```bash
+#!/bin/bash
+# scripts/install_pkgs.sh
+
+# 仅在远程环境运行
+if [ "$CLAUDE_CODE_REMOTE" != "true" ]; then
+  exit 0
+fi
+
+# 检查依赖是否已存在，避免重复安装
+if [ ! -d "node_modules" ]; then
+  npm install
+fi
+
+if [ ! -d ".venv" ]; then
+  pip install -r requirements.txt
+fi
+
+exit 0
+```
+
 ---
 
 ## 八、网络访问和安全
@@ -315,21 +373,204 @@ exit 0
 | **无互联网** | 完全禁用网络访问（仍可与 Anthropic API 通信） |
 | **完全** | 允许所有互联网访问 |
 
-### 8.3 默认允许的域（部分）
+### 8.3 默认允许的域（完整列表）
 
-| 类别 | 域名 |
+使用"受限"网络访问时，默认允许以下域。标记为 `*` 的域表示**通配符子域匹配**，例如 `*.gcr.io` 允许访问 `gcr.io` 的任何子域。
+
+#### Anthropic 服务
+
+| 域名 |
+|------|
+| api.anthropic.com |
+| statsig.anthropic.com |
+| platform.claude.com |
+| code.claude.com |
+| claude.ai |
+
+#### 版本控制
+
+| 域名 |
+|------|
+| github.com、www.github.com、api.github.com |
+| npm.pkg.github.com、raw.githubusercontent.com |
+| pkg-npm.githubusercontent.com、objects.githubusercontent.com |
+| codeload.githubusercontent.com、avatars.githubusercontent.com |
+| camo.githubusercontent.com、gist.github.com |
+| gitlab.com、www.gitlab.com、registry.gitlab.com |
+| bitbucket.org、www.bitbucket.org、api.bitbucket.org |
+
+#### 容器注册表
+
+| 域名 |
+|------|
+| registry-1.docker.io、auth.docker.io、index.docker.io |
+| hub.docker.com、www.docker.com |
+| production.cloudflare.docker.com、download.docker.com |
+| gcr.io、**\*.gcr.io** |
+| ghcr.io |
+| mcr.microsoft.com、**\*.data.mcr.microsoft.com** |
+| public.ecr.aws |
+
+#### 云平台
+
+| 域名 |
+|------|
+| cloud.google.com、accounts.google.com、gcloud.google.com |
+| **\*.googleapis.com**、storage.googleapis.com、compute.googleapis.com、container.googleapis.com |
+| azure.com、portal.azure.com |
+| microsoft.com、www.microsoft.com、**\*.microsoftonline.com** |
+| packages.microsoft.com、dotnet.microsoft.com、dot.net |
+| visualstudio.com、dev.azure.com |
+| **\*.amazonaws.com**、**\*.api.aws** |
+| oracle.com、www.oracle.com、java.com、www.java.com、java.net、www.java.net |
+| download.oracle.com、yum.oracle.com |
+
+#### 包管理器 - JavaScript/Node
+
+| 域名 |
+|------|
+| registry.npmjs.org、www.npmjs.com、www.npmjs.org、npmjs.com、npmjs.org |
+| yarnpkg.com、registry.yarnpkg.com |
+
+#### 包管理器 - Python
+
+| 域名 |
+|------|
+| pypi.org、www.pypi.org、files.pythonhosted.org、pythonhosted.org |
+| test.pypi.org、pypi.python.org |
+| pypa.io、www.pypa.io |
+
+#### 包管理器 - Ruby
+
+| 域名 |
+|------|
+| rubygems.org、www.rubygems.org、api.rubygems.org、index.rubygems.org |
+| ruby-lang.org、www.ruby-lang.org |
+| rubyforge.org、www.rubyforge.org |
+| rubyonrails.org、www.rubyonrails.org |
+| rvm.io、get.rvm.io |
+
+#### 包管理器 - Rust
+
+| 域名 |
+|------|
+| crates.io、www.crates.io、index.crates.io、static.crates.io |
+| rustup.rs、static.rust-lang.org、www.rust-lang.org |
+
+#### 包管理器 - Go
+
+| 域名 |
+|------|
+| proxy.golang.org、sum.golang.org、index.golang.org |
+| golang.org、www.golang.org |
+| goproxy.io、pkg.go.dev |
+
+#### 包管理器 - JVM
+
+| 域名 |
+|------|
+| maven.org、repo.maven.org、central.maven.org、repo1.maven.org |
+| jcenter.bintray.com |
+| gradle.org、www.gradle.org、services.gradle.org、plugins.gradle.org |
+| kotlin.org、www.kotlin.org |
+| spring.io、repo.spring.io |
+
+#### 包管理器 - 其他语言
+
+| 语言 | 域名 |
 |------|------|
-| **Anthropic** | api.anthropic.com、claude.ai、code.claude.com |
-| **版本控制** | github.com、gitlab.com、bitbucket.org |
-| **包管理器** | npmjs.org、pypi.org、rubygems.org、crates.io |
-| **云平台** | amazonaws.com、googleapis.com、azure.com |
-| **容器注册表** | docker.io、gcr.io、ghcr.io |
+| PHP (Composer) | packagist.org、www.packagist.org、repo.packagist.org |
+| .NET (NuGet) | nuget.org、www.nuget.org、api.nuget.org |
+| Dart/Flutter | pub.dev、api.pub.dev |
+| Elixir/Erlang | hex.pm、www.hex.pm |
+| Perl (CPAN) | cpan.org、www.cpan.org、metacpan.org、www.metacpan.org、api.metacpan.org |
+| iOS/macOS | cocoapods.org、www.cocoapods.org、cdn.cocoapods.org |
+| Haskell | haskell.org、www.haskell.org、hackage.haskell.org |
+| Swift | swift.org、www.swift.org |
+
+#### Linux 发行版
+
+| 域名 |
+|------|
+| archive.ubuntu.com、security.ubuntu.com、ubuntu.com、www.ubuntu.com、**\*.ubuntu.com** |
+| ppa.launchpad.net、launchpad.net、www.launchpad.net |
+
+#### 开发工具和平台
+
+| 工具 | 域名 |
+|------|------|
+| Kubernetes | dl.k8s.io、pkgs.k8s.io、k8s.io、www.k8s.io |
+| HashiCorp | releases.hashicorp.com、apt.releases.hashicorp.com、rpm.releases.hashicorp.com、archive.releases.hashicorp.com、hashicorp.com、www.hashicorp.com |
+| Anaconda/Conda | repo.anaconda.com、conda.anaconda.org、anaconda.org、www.anaconda.com、anaconda.com、continuum.io |
+| Apache | apache.org、www.apache.org、archive.apache.org、downloads.apache.org |
+| Eclipse | eclipse.org、www.eclipse.org、download.eclipse.org |
+| Node.js | nodejs.org、www.nodejs.org |
+
+#### 云服务和监控
+
+| 域名 |
+|------|
+| statsig.com、www.statsig.com、api.statsig.com |
+| sentry.io、**\*.sentry.io** |
+| http-intake.logs.datadoghq.com、**\*.datadoghq.com**、**\*.datadoghq.eu** |
+
+#### 内容交付和镜像
+
+| 域名 |
+|------|
+| sourceforge.net、**\*.sourceforge.net** |
+| packagecloud.io、**\*.packagecloud.io** |
+
+#### 架构和配置
+
+| 域名 |
+|------|
+| json-schema.org、www.json-schema.org |
+| json.schemastore.org、www.schemastore.org |
+
+#### Model Context Protocol
+
+| 域名 |
+|------|
+| **\*.modelcontextprotocol.io** |
 
 ---
 
-## 九、共享会话
+## 九、管理会话
 
-### 9.1 Enterprise / Teams 账户
+### 9.1 归档会话
+
+归档会话可以保持会话列表有序。归档的会话从默认会话列表中隐藏，但可以通过筛选已归档会话来查看。
+
+**操作步骤**：
+
+1. 在侧边栏中找到要归档的会话
+2. 将鼠标悬停在会话上
+3. 点击**归档图标**
+
+### 9.2 删除会话
+
+删除会话会**永久删除**会话及其数据，此操作**无法撤销**。
+
+**方式一：从侧边栏删除**
+
+1. 筛选已归档会话
+2. 将鼠标悬停在要删除的会话上
+3. 点击**删除图标**
+
+**方式二：从会话菜单删除**
+
+1. 打开要删除的会话
+2. 点击会话标题旁的**下拉菜单**
+3. 选择**删除**
+
+> ⚠️ 删除会话前会要求你确认。
+
+---
+
+## 十一、共享会话
+
+### 11.1 Enterprise / Teams 账户
 
 | 可见性 | 说明 |
 |--------|------|
@@ -338,7 +579,7 @@ exit 0
 
 > 默认启用存储库访问验证，基于 GitHub 账户权限。
 
-### 9.2 Max / Pro 账户
+### 11.2 Max / Pro 账户
 
 | 可见性 | 说明 |
 |--------|------|
@@ -349,7 +590,7 @@ exit 0
 
 ---
 
-## 十、限制
+## 十二、限制
 
 | 限制 | 说明 |
 |------|------|
@@ -370,4 +611,4 @@ exit 0
 
 *本文精读自 [Claude Code on the web](https://code.claude.com/docs/zh-CN/claude-code-on-the-web)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Slack 中的 Claude Code
 date: 2026-03-07 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -92,7 +92,43 @@ Claude 会根据对话内容自动选择仓库。如果多个仓库都匹配，�
 @Claude 在 hippo0913/blog 仓库里，帮我修复 footer 组件的样式问题
 ```
 
-### 2.5 用户权限与访问控制
+### 2.5 首次配置步骤
+
+> 💬 hippo：以下是详细的配置流程，按顺序操作即可。
+
+**步骤 1：在 Slack 安装 Claude App**
+
+1. 让 Slack 工作区管理员在 Slack App Directory 搜索 "Claude" 并安装
+2. 安装完成后，Claude 会自动出现在你的工作区
+
+**步骤 2：连接 Claude 账号（Claude App Home）**
+
+1. 在 Slack 左侧边栏，点击 **Apps**（应用）
+2. 找到并点击 **Claude**
+3. 这会打开 **Claude App Home** 选项卡
+4. 点击 **Connect Account**（连接账号）按钮
+5. 浏览器会跳转到 claude.ai，登录你的 Claude 账号并授权
+6. 授权成功后，返回 Slack，你会看到 "Connected" 状态
+
+> 💬 hippo：如果 App Home 显示 "Disconnect" 按钮，说明你已经连接成功了。
+
+**步骤 3：确保 Web 端 Claude Code 已启用**
+
+1. 访问 [claude.ai/code](https://claude.ai/code)
+2. 确认你能正常访问 Code 界面（不是所有套餐都有这个权限）
+3. 在 Settings → Repositories 里连接至少一个 GitHub 仓库
+
+**步骤 4：邀请 Claude 进入频道**
+
+安装 Claude App 不等于它能访问所有频道，需要显式邀请：
+
+```slack
+/invite @Claude
+```
+
+> 💬 hippo：在频道里输入 `/invite @Claude` 然后回车，Claude 就会加入该频道。只有在 Claude 已加入的频道里，@Claude 才会触发 Code Session。
+
+### 2.6 用户权限与访问控制
 
 **用户级别**：
 
@@ -113,7 +149,28 @@ Slack 工作区管理员控制是否安装 Claude App。安装后，还需要**�
 
 这个设计很关键：管理员可以通过"允许 Claude 进入哪些频道"来控制谁能用这个功能。
 
-### 2.6 当前限制
+### 2.8 消息操作按钮详解
+
+Claude 在 Slack 里的回复会附带几个操作按钮，以下是每个按钮的使用场景：
+
+| 按钮 | 功能 | 使用场景 |
+|------|------|----------|
+| **View Session** | 在浏览器中打开完整的 Claude Code 会话 | 想看完整 diff、继续对话、修改代码时使用 |
+| **Create PR** | 直接从会话的更改创建拉取请求 | 确认改动没问题，想快速提交 PR 时使用 |
+| **Retry as Code** | 将请求重试为 Claude Code 任务 | Claude 最初作为聊天助手响应但你想要编码会话时使用 |
+| **Change Repo** | 选择不同的存储库 | Claude 选错了仓库，需要手动切换时使用 |
+
+**Change Repo 按钮使用场景详解**：
+
+这个按钮在以下情况特别有用：
+
+1. **多个相似仓库**：你有 `frontend-app` 和 `frontend-admin`，Claude 选错了
+2. **仓库名不够明确**：对话上下文无法准确推断目标仓库
+3. **临时切换**：想在另一个仓库里执行类似任务
+
+> 💬 hippo：点击 Change Repo 后会显示下拉菜单，列出你所有已连接的 GitHub 仓库。选择正确的仓库后，Claude 会在新选的仓库里重新执行任务。
+
+### 2.9 当前限制
 
 | 限制项 | 说明 |
 |--------|------|
@@ -186,20 +243,73 @@ IP 地址，用 winston 的 info 级别，完成后不要创建 PR
 
 ---
 
-## 四、常见问题
+## 四、常见问题与故障排除
 
-**Q: Session 没启动，只收到普通聊天回复怎么办？**
+### 4.1 Session 未启动
 
-A: 三个检查步骤：
-1. 去 Claude App Home 确认账号已连接
-2. 确认你有 claude.ai/code 的访问权限
-3. 确认至少连接了一个 GitHub 仓库
+**症状**：@Claude 后只收到普通聊天回复，没有创建 Code Session。
 
-如果都 OK，点击消息下方的"Retry as Code"按钮强制以编码任务重试。
+**排查步骤**：
 
-**Q: 仓库没显示在下拉列表里怎么办？**
+| 步骤 | 操作 | 检查点 |
+|------|------|--------|
+| 1 | 打开 Claude App Home | 确认显示 "Connected" 状态，不是 "Connect Account" |
+| 2 | 访问 claude.ai/code | 确认你能正常访问，不是 403 或付费提示 |
+| 3 | 检查仓库连接 | 在 claude.ai/code 的 Settings → Repositories 里确认至少有一个仓库 |
+| 4 | 检查套餐权限 | 确认你的 Claude 套餐包含 Claude Code 访问权限 |
 
-A: 先去 claude.ai/code 连接该仓库。如果已连接还是不显示，尝试重新授权 GitHub。
+**快速解决**：如果以上都 OK，点击消息下方的 **"Retry as Code"** 按钮强制以编码任务重试。
+
+### 4.2 认证错误
+
+**症状**：提示认证失败、会话无法创建。
+
+**排查步骤**：
+
+```bash
+# 步骤 1：断开并重新连接 Claude 账号
+1. 打开 Claude App Home
+2. 点击 "Disconnect" 断开连接
+3. 刷新页面
+4. 点击 "Connect Account" 重新连接
+5. 在浏览器里确认登录的是正确的 Claude 账号
+
+# 步骤 2：检查套餐
+1. 登录 claude.ai
+2. 进入 Settings → Plan
+3. 确认套餐包含 Claude Code 权限
+
+# 步骤 3：检查浏览器登录状态
+1. 在浏览器打开 claude.ai/code
+2. 确认你是登录状态，没有被登出
+```
+
+> 💬 hippo：多账号用户容易踩坑——浏览器登录的是个人账号，但 Slack 关联的是工作账号。确保两边账号一致。
+
+### 4.3 仓库未显示或选择错误
+
+**症状**：下拉列表里找不到目标仓库，或者 Claude 自动选错了仓库。
+
+| 问题 | 解决方案 |
+|------|----------|
+| 仓库没在列表里 | 去 claude.ai/code 的 Settings → Repositories 连接该仓库 |
+| 已连接但不显示 | 尝试断开并重新授权 GitHub 账户 |
+| Claude 选错了仓库 | 点击 **"Change Repo"** 按钮手动选择 |
+| 多次选错 | 在请求里显式指定仓库全名：`@Claude 在 org/repo-name 里...` |
+
+### 4.4 会话过期处理
+
+**症状**：想继续之前的对话，但提示会话已过期。
+
+**处理方式**：
+
+1. **历史记录可访问**：过期的 Session 仍然可以在 claude.ai/code 的历史记录里找到
+2. **继续对话**：从 claude.ai/code 打开历史 Session，可以继续对话
+3. **参考内容**：即使过期，你仍可以查看之前的代码改动和对话内容
+
+> 💬 hippo：Slack 里的 Session 通知会保留，点击 "View Session" 会跳转到 Web 端。即使会话过期，你仍然可以查看完整记录。
+
+### 4.5 其他常见问题
 
 **Q: 如何让团队成员也能看到我的 Session?**
 
@@ -228,6 +338,6 @@ Claude Code in Slack 的核心价值是**降低编码任务的启动门槛**—�
 
 ---
 
-*本文精读自 [Claude Code in Slack](https://docs.anthropic.com/zh-CN/docs/claude-code/slack)*
+*本文精读自 [Claude Code in Slack 官方文档（中文版）](https://code.claude.com/docs/zh-CN/slack)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

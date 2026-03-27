@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：JetBrains IDEs
 date: 2026-03-12 23:00:00
-updated: 2026-03-25 16:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -33,14 +33,16 @@ Claude Code 是一个终端优先的 AI 编程助手。虽然你可以直接在�
 
 Claude Code 的 JetBrains 插件支持大多数 JetBrains 系 IDE：
 
-| IDE | 说明 |
-|-----|------|
-| IntelliJ IDEA | Java/Kotlin 开发首选 |
-| PyCharm | Python 开发 |
-| Android Studio | Android 应用开发 |
-| WebStorm | 前端/Node.js 开发 |
-| PhpStorm | PHP 开发 |
-| GoLand | Go 语言开发 |
+| IDE | 说明 | 特殊配置提示 |
+|-----|------|-------------|
+| IntelliJ IDEA | Java/Kotlin 开发首选 | 无特殊配置 |
+| PyCharm | Python 开发 | 如使用虚拟环境，确保 Claude 命令路径正确 |
+| Android Studio | Android 应用开发 | 无特殊配置 |
+| WebStorm | 前端/Node.js 开发 | 无特殊配置 |
+| PhpStorm | PHP 开发 | 无特殊配置 |
+| GoLand | Go 语言开发 | 无特殊配置 |
+
+> 所有 IDE 的插件配置路径一致：`Settings` → `Tools` → `Claude Code [Beta]`
 
 ### 2.2 核心功能
 
@@ -160,6 +162,8 @@ Windows Subsystem for Linux 环境可能需要额外配置：
 - 网络模式设置
 - 防火墙规则更新
 
+详细的 WSL 故障排除步骤，请参考官方文档：[WSL 故障排除指南](https://code.claude.com/docs/zh-CN/wsl)
+
 ---
 
 ## 三、hippo 的实战经验
@@ -214,7 +218,7 @@ A: 按顺序排查：
 1. 确认插件已安装且启用
 2. 完全重启 IDE（有时需要重启多次）
 3. 确认你是从内置终端运行 `claude`
-4. WSL 用户参考官方 WSL 故障排除指南
+4. WSL 用户参考官方 [WSL 故障排除指南](https://code.claude.com/docs/zh-CN/wsl)
 
 **Q: 插件显示 Beta，稳定吗？**
 
@@ -239,6 +243,6 @@ JetBrains 插件让 Claude Code 从"终端工具"升级为"IDE 原生体验"。�
 
 ---
 
-*本文精读自 [JetBrains IDEs - Claude Code Docs](https://code.claude.com/docs/en/jetbrains)*
+*本文精读自 [JetBrains IDEs - Claude Code Docs](https://code.claude.com/docs/zh-CN/jetbrains)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

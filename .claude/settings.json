@@ -7,6 +7,8 @@
       "Bash(grep *)",
       "Bash(cat *)",
       "Bash(hexo *)",
+      "Bash(pkill *)",
+      "Bash(curl -s *)",
       "Bash(git push:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",

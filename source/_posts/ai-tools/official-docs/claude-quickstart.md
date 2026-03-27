@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：快速开始
 date: 2026-03-28 23:00:00
-updated: 2026-03-12 20:01:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -25,23 +25,60 @@ source_url: https://code.claude.com/docs/zh-CN/quickstart
 
 ---
 
+## 开始前的准备
+
+官方文档列出了三个必要条件：
+
+1. **打开的终端或命令提示符** - 如果你之前从未使用过终端，可以查看终端指南
+2. **一个可以使用的代码项目** - 建议是你熟悉的小项目
+3. **一个 Claude 账户** - 支持以下类型：
+   - Claude Pro、Max、Teams 或 Enterprise（推荐）
+   - Claude Console（具有预付费额度的 API 访问）
+   - Amazon Bedrock、Google Vertex AI 或 Microsoft Foundry（企业云提供商）
+
+---
+
 ## 第一步：安装
 
-官方推荐的安装方式非常简单：
+官方提供了多种安装方式：
 
-### macOS / Linux / WSL
+### 方式一：原生安装（推荐）
+
+**macOS / Linux / WSL：**
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-### Windows PowerShell
+**Windows PowerShell：**
 
 ```powershell
 irm https://claude.ai/install.ps1 | iex
 ```
 
-> 💬 hippo：这个脚本会帮你处理好 PATH 配置，装完后直接运行 `claude` 即可。如果报错，99% 是网络问题，换个代理再试。
+**Windows CMD：**
+
+```cmd
+curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+```
+
+> ⚠️ Windows 需要先安装 Git for Windows。
+
+### 方式二：包管理器安装
+
+**Homebrew（macOS）：**
+
+```bash
+brew install --cask claude-code
+```
+
+**WinGet（Windows）：**
+
+```bash
+winget install Anthropic.ClaudeCode
+```
+
+> 💬 hippo：推荐用原生安装方式，这是官方首推的方法。如果报错，99% 是网络问题，换个代理再试。
 
 ### 验证安装
 
@@ -53,35 +90,50 @@ claude --version
 
 ---
 
-## 第二步：认证
+## 第二步：登录账户
 
-安装完成后，需要登录你的 Claude 账户：
+Claude Code 需要账户才能使用。当使用 `claude` 命令启动交互式会话时，需要完成登录。
 
-```bash
-claude login
-```
+### 支持的账户类型
 
-这会打开浏览器让你完成 OAuth 认证。
+| 账户类型 | 说明 |
+| --- | --- |
+| Claude Pro / Max / Teams / Enterprise | 推荐方式，最完整的功能支持 |
+| Claude Console | 具有预付费额度的 API 访问，首次登录时会自动创建"Claude Code"工作区用于集中成本跟踪 |
+| Amazon Bedrock | 企业云提供商，适合已有 AWS 基础设施的企业 |
+| Google Vertex AI | 企业云提供商，适合已有 GCP 基础设施的企业 |
+| Microsoft Foundry | 企业云提供商，适合已有 Azure 基础设施的企业 |
 
-> 💬 hippo：如果你在国内，这一步可能会卡住。确保你的代理能访问 `claude.ai`。认证 token 会保存在 `~/.claude/config.json`，后续请求都用这个 token。
+登录后，凭证将被存储，无需再次登录。如需切换账户，使用 `/login` 命令。
+
+> 💬 hippo：如果你在国内，登录步骤可能会卡住。确保你的代理能访问 `claude.ai`。认证 token 会保存在 `~/.claude/config.json`。
 
 ---
 
-## 第三步：跑通第一个任务
+## 第三步：启动第一个会话
 
-官方文档建议从简单的项目开始。让我给你个真实的例子：
-
-### 示例：让 Claude 帮你读代码
+在任何项目目录中打开终端并启动 Claude Code：
 
 ```bash
-# 进入一个你熟悉的项目
-cd ~/your-project
-
-# 启动 Claude Code
+cd /path/to/your/project
 claude
+```
 
-# 试试这个提示词：
-"帮我看看这个项目的结构，有哪些主要目录和文件"
+你会看到 Claude Code 欢迎屏幕，包含：
+- 会话信息
+- 最近的对话
+- 最新更新
+
+输入 `/help` 查看可用命令，或输入 `/resume` 继续之前的对话。
+
+---
+
+## 第四步：提出第一个问题
+
+让我们从理解代码库开始。尝试以下命令：
+
+```bash
+"这个项目是做什么的？主要结构是什么？"
 ```
 
 Claude 会读取你的项目，给出类似这样的回答：
@@ -93,51 +145,158 @@ Claude 会读取你的项目，给出类似这样的回答：
 - tests/ - 单元测试
 - docs/ - 文档
 - package.json - 依赖配置
-- ...
 
 需要我详细解释某个部分吗？
 ```
 
-> 💬 hippo：第一个任务的目的不是"完成什么"，而是让你感受 Claude 如何理解你的代码库。找个你熟悉的项目，这样你能判断它说的是否准确。
+你也可以提出更具体的问题：
+
+```bash
+"解释一下 src/auth/ 目录下的认证逻辑"
+```
+
+甚至询问 Claude 关于其自身功能：
+
+```bash
+"我如何在 Claude Code 中创建自定义 skills？"
+"Claude Code 可以与 Docker 一起工作吗？"
+```
 
 ---
 
-## 第四步：尝试一个实际任务
+## 第五步：进行第一次代码更改
 
-跑通读代码后，试试让它帮你做点小事：
+现在让 Claude Code 进行实际的编码。尝试一个简单的任务：
 
 ```bash
-# 继续在当前项目，试试：
 "帮我写一个函数，计算数组中所有数字的平均值"
 ```
 
-或者更实际一点：
+Claude Code 将：
 
-```bash
-"在 src/utils/ 目录下创建一个新文件 string.js，包含三个工具函数：
-1. capitalize(str) - 首字母大写
-2. truncate(str, length) - 截断字符串
-3. slugify(str) - 转为 URL 友好的 slug
-"
-```
-
-> 💬 hippo：从小任务开始，建立对 Claude 能力的直觉。不要一上来就"帮我写个完整的博客系统"——那会让你很难判断输出质量。
+1. 找到适当的文件
+2. 向你显示建议的更改
+3. 请求你的批准
+4. 进行编辑
 
 ---
 
-## 原文精读：关键段落
+## 第六步：在 Claude Code 中使用 Git
 
-### 关于安装要求
+Claude Code 使 Git 操作变得对话式：
 
-> 大多数界面需要 Claude 订阅或 Anthropic Console 账户。Terminal CLI 和 VS Code 也支持第三方提供商。
+```bash
+"创建一个 Git 提交"
+```
 
-> 💬 hippo：如果你有企业账户或者想用第三方 API 服务（比如某些国内代理），CLI 和 VS Code 是支持的。但桌面应用和网页版必须用官方账户。
+你也可以提示更复杂的 Git 操作：
 
-### 关于第一个项目
+```bash
+"创建一个名为 feature/quickstart 的新分支"
+```
 
-> 建议从一个你熟悉的小项目开始，这样你能快速判断 Claude 的输出是否准确。
+---
 
-> 💬 hippo：这正是我上面建议的——用熟悉的项目做测试，因为你知道正确答案是什么。
+## 第七步：修复错误或添加功能
+
+Claude 擅长调试和功能实现。用自然语言描述你想要的内容：
+
+```bash
+"添加一个用户登录功能"
+```
+
+或修复现有问题：
+
+```bash
+"修复测试失败的错误"
+```
+
+Claude Code 将：
+- 定位相关代码
+- 理解上下文
+- 实现解决方案
+- 如果可用，运行测试
+
+---
+
+## 其他常见工作流
+
+官方文档还列出了多种工作方式：
+
+### 重构代码
+
+```bash
+"重构身份验证模块以使用 async/await 而不是回调"
+```
+
+### 编写测试
+
+```bash
+"为 src/utils/ 目录下的工具函数编写单元测试"
+```
+
+### 更新文档
+
+```bash
+"更新 README.md，添加新功能的说明"
+```
+
+### 代码审查
+
+```bash
+"审查最近的 Git 变更，提出改进建议"
+```
+
+---
+
+## 基本命令速查表
+
+以下是日常使用中最重要的命令：
+
+| 命令 | 功能 | 示例 |
+| --- | --- | --- |
+| `claude` | 启动交互模式 | `claude` |
+| `claude "task"` | 运行一次性任务 | `claude "fix the build error"` |
+| `claude -p "query"` | 运行一次性查询，然后退出 | `claude -p "explain this function"` |
+| `claude -c` | 在当前目录中继续最近的对话 | `claude -c` |
+| `claude -r` | 恢复之前的对话 | `claude -r` |
+| `claude commit` | 创建 Git 提交 | `claude commit` |
+| `/clear` | 清除对话历史 | `/clear` |
+| `/help` | 显示可用命令 | `/help` |
+| `exit` 或 Ctrl+C | 退出 Claude Code | `exit` |
+
+> 💬 hippo：这个表格建议收藏。`claude -p` 特别适合快速查询，不用进入交互模式；`claude commit` 比手动写 commit message 方便很多。
+
+---
+
+## 初学者专业提示
+
+官方文档给初学者几个重要建议：
+
+1. **从小任务开始** - 不要一上来就让 AI 做复杂的事情，先建立直觉
+2. **用熟悉的项目练习** - 这样你能快速判断输出是否准确
+3. **善用 `/help`** - 遇到不确定的命令，直接问 Claude
+
+更多技巧请参阅最佳实践和常见工作流文档。
+
+---
+
+## 接下来呢？
+
+现在你已经学习了基础知识，可以探索更多高级功能：
+
+- **[交互模式](/2026/03/27/ai-tools/official-docs/claude-interactive-mode/)** - 深入了解对话式编程
+- **[常见工作流](/2026/03/27/ai-tools/official-docs/claude-workflows/)** - 学习更多实用场景
+- **[CLI 参考](/2026/03/27/ai-tools/official-docs/claude-cli/)** - 查看完整命令列表
+- **[最佳实践](/2026/03/27/ai-tools/official-docs/claude-best-practices/)** - 提高 Claude Code 使用效率
+
+---
+
+## 获取帮助
+
+- **在 Claude Code 中**：输入 `/help` 或询问「我如何…」
+- **文档**：浏览官方文档的其他指南
+- **社区**：加入 Discord 获取提示和支持
 
 ---
 
@@ -154,6 +313,9 @@ A: 可能是网络延迟或服务器负载。试试简单任务，如果持续�
 
 ### Q: 中文回答质量如何？
 A: Claude 的中文理解能力很强，但技术术语建议用英文提示词，避免翻译歧义。
+
+### Q: 可以用企业云账户吗？
+A: 可以。支持 Amazon Bedrock、Google Vertex AI 和 Microsoft Foundry。
 
 ---
 

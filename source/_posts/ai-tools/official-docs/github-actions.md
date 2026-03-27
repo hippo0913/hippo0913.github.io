@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude Code GitHub Actions
 date: 2026-03-09 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -106,11 +106,12 @@ jobs:
 | `mode: "tag"` 或 `mode: "agent"` | 删除 | 现在自动检测 |
 | `direct_prompt` | `prompt` | 参数名变了 |
 | `override_prompt` | `prompt` + GitHub 变量 | 合并了 |
-| `custom_instructions` | `claude_args: --system-prompt` | 移到 claude_args |
+| `custom_instructions` | `claude_args: --append-system-prompt` | 移到 claude_args |
 | `max_turns` | `claude_args: --max-turns` | 移到 claude_args |
 | `model` | `claude_args: --model` | 移到 claude_args |
 | `allowed_tools` | `claude_args: --allowedTools` | 移到 claude_args |
 | `disallowed_tools` | `claude_args: --disallowedTools` | 移到 claude_args |
+| `claude_env` | `settings` | JSON 格式配置 |
 
 **升级前（Beta 版）：**
 
@@ -141,6 +142,7 @@ jobs:
 |------|------|----------|
 | `prompt` | 给 Claude 的指令，可以是文本或斜杠命令 | 否* |
 | `claude_args` | 传递给 Claude Code CLI 的参数 | 否 |
+| `settings` | JSON 格式的设置配置（替代旧版 `claude_env`） | 否 |
 | `anthropic_api_key` | Anthropic API Key | 是** |
 | `github_token` | GitHub Token，用于 API 访问 | 否 |
 | `trigger_phrase` | 触发短语，默认是 `@claude` | 否 |
@@ -164,12 +166,152 @@ claude_args: >
 |------|------|
 | `--max-turns` | 最大对话轮数，默认 10 |
 | `--model` | 使用的模型 |
-| `--mcp-config` | MCP 配置文件路径 |
+| `--mcp-config` | MCP 配置文件路径，用于动态加载 Model Context Protocol 服务器 |
 | `--allowed-tools` | 允许使用的工具列表 |
 | `--disallowed-tools` | 禁止使用的工具列表 |
+| `--append-system-prompt` | 追加系统提示（不是替换） |
 | `--debug` | 开启调试输出 |
 
-### 2.5 常见使用场景
+**settings 参数（JSON 格式）：**
+
+```yaml
+- uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+    settings: |
+      {
+        "env": {
+          "MY_CUSTOM_VAR": "value"
+        }
+      }
+```
+
+> 💬 hippo：`settings` 参数是 v1 新增的，用于替代旧版的 `claude_env`，支持更复杂的 JSON 格式配置。
+
+### 2.5 使用 AWS Bedrock 和 Google Vertex AI
+
+对于企业环境，你可以将 Claude Code GitHub Actions 与自己的云基础设施配合使用。这种方法让你可以控制数据驻留和计费，同时保持相同的功能。
+
+**Google Cloud Vertex AI 前置条件：**
+
+1. 启用了 Vertex AI 的 Google Cloud 项目
+2. 为 GitHub Actions 配置的工作负载身份联合（Workload Identity Federation）
+3. 具有所需权限的服务账户
+4. GitHub 应用（推荐）或使用默认 GITHUB_TOKEN
+
+**AWS Bedrock 前置条件：**
+
+1. 启用了 Amazon Bedrock 的 AWS 账户
+2. 在 AWS 中配置的 GitHub OIDC 身份提供商
+3. 具有 Bedrock 权限的 IAM 角色
+4. GitHub 应用（推荐）或使用默认 GITHUB_TOKEN
+
+**Vertex AI 配置示例：**
+
+```yaml
+name: Claude Code with Vertex AI
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write  # OIDC 认证必需
+
+jobs:
+  claude:
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID'
+          service_account: 'claude-code@PROJECT_ID.iam.gserviceaccount.com'
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          use_vertex: true
+          # 不需要 anthropic_api_key
+```
+
+**AWS Bedrock 配置示例：**
+
+```yaml
+name: Claude Code with Bedrock
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write  # OIDC 认证必需
+
+jobs:
+  claude:
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/ClaudeCodeRole
+          aws-region: us-east-1
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          use_bedrock: true
+          # 不需要 anthropic_api_key
+```
+
+### 2.6 自定义 GitHub App
+
+对于需要品牌用户名或自定义身份验证流的组织，可以创建自己的 GitHub App：
+
+**创建步骤：**
+
+1. 访问 GitHub Settings → Developer settings → GitHub Apps → New GitHub App
+2. 配置所需权限：
+   - **Contents**: Read and write（用于修改仓库文件）
+   - **Issues**: Read and write（用于响应 issue）
+   - **Pull requests**: Read and write（用于创建 PR 和推送更改）
+3. 创建后，记录 App ID 和 Private Key
+4. 在 workflow 中使用 `actions/create-github-app-token` action 生成令牌
+
+**配置示例：**
+
+```yaml
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### 2.7 常见使用场景
 
 **场景一：在 Issue 里让 Claude 实现功能**
 
@@ -193,7 +335,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-**场景二：用斜杠命令**
+**场景二：用斜杠命令（Skills）**
 
 ```yaml
 - uses: anthropics/claude-code-action@v1
@@ -202,19 +344,67 @@ jobs:
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-**场景三：自定义提示词**
+**场景三：代码审查工作流**
+
+```yaml
+name: Code Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "Review this pull request for code quality, correctness, and security. Analyze the diff, then post your findings as review comments."
+          claude_args: "--max-turns 5"
+```
+
+**场景四：定时任务（每日报告）**
+
+```yaml
+name: Daily Report
+on:
+  schedule:
+    - cron: "0 9 * * *"
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "Generate a summary of yesterday's commits and open issues"
+          claude_args: "--model opus"
+```
+
+**场景五：使用 MCP 配置**
 
 ```yaml
 - uses: anthropics/claude-code-action@v1
   with:
-    prompt: |
-      Review this PR for:
-      1. Security vulnerabilities
-      2. Performance issues
-      3. Code style consistency with CLAUDE.md
-    claude_args: "--max-turns 3"
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+    claude_args: "--mcp-config /path/to/config.json"
 ```
+
+> 💬 hippo：`--mcp-config` 参数用于动态加载 MCP（Model Context Protocol）服务器配置，让 Claude 可以连接外部工具和数据源。
+
+### 2.8 官方示例目录
+
+官方提供了完整的示例工作流文件，可以在 examples 目录中找到：
+
+```
+https://github.com/anthropics/claude-code-action/tree/main/examples
+```
+
+示例包括：
+- `claude.yml` - 基础配置
+- 各种触发场景的配置模板
+- 企业部署示例
 
 ---
 
@@ -279,6 +469,12 @@ concurrency:
   cancel-in-progress: true
 ```
 
+5. **控制成本**：
+   - 使用具体的 `@claude` 命令来减少不必要的 API 调用
+   - 在 `claude_args` 中配置适当的 `--max-turns` 以防止过度迭代
+   - 设置工作流级别的超时以避免失控的作业
+   - 考虑使用 GitHub 的并发控制来限制并行运行
+
 ---
 
 ## 四、常见问题
@@ -297,7 +493,7 @@ A: 使用 GitHub App 或自定义 App，不要用 Actions 默认用户。同时�
 
 **Q: API 认证失败？**
 
-A: 确认 API Key 有效且有足够余额。如果使用 Bedrock/Vertex，检查云服务凭证配置是否正确。
+A: 确认 API Key 有效且有足够余额。如果使用 Bedrock/Vertex，检查云服务凭证配置是否正确，以及密钥在工作流中是否正确命名。
 
 **Q: 成本怎么控制？**
 
@@ -307,14 +503,20 @@ A:
 - 配置 workflow 超时
 - 使用 GitHub 的 concurrency 控制并发
 
+**Q: CI 成本由哪些部分组成？**
+
+A:
+- **GitHub Actions 成本**：Claude Code 在 GitHub 托管的运行器上运行，会消耗 GitHub Actions 分钟数
+- **API 成本**：每次 Claude 交互都会根据提示和响应的长度消耗 API 令牌，令牌使用量因任务复杂性和代码库大小而异
+
 ---
 
 ## 五、小结
 
-Claude Code GitHub Actions 让你在 GitHub 里直接用 AI 写代码、修 Bug、创建 PR。核心配置就是安装 App、配置 API Key、写个 workflow 文件。记住写好 `CLAUDE.md` 让 AI 懂你的项目规范，控制好 `--max-turns` 避免 token 爆炸。
+Claude Code GitHub Actions 让你在 GitHub 里直接用 AI 写代码、修 Bug、创建 PR。核心配置就是安装 App、配置 API Key、写个 workflow 文件。记住写好 `CLAUDE.md` 让 AI 懂你的项目规范，控制好 `--max-turns` 避免 token 爆炸。企业用户可以使用 AWS Bedrock 或 Google Vertex AI 来控制数据驻留和计费。
 
 ---
 
-*本文精读自 [Claude Code GitHub Actions - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/github-actions)*
+*本文精读自 [Claude Code GitHub Actions - Claude Code Docs](https://code.claude.com/docs/zh-CN/github-actions)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

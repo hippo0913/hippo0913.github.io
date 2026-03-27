@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude 如何记住你的项目
 date: 2026-03-22 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -41,15 +41,29 @@ Claude Code 提供两套互补的记忆机制：
 
 CLAUDE.md 可以放在多个位置，位置越具体优先级越高：
 
-| 范围 | 位置 | 适用场景 |
-|------|------|----------|
-| **项目指令** | `./CLAUDE.md` 或 `./.claude/CLAUDE.md` | 项目架构、编码标准、常见工作流（通过 git 共享给团队） |
-| **用户指令** | `~/.claude/CLAUDE.md` | 所有项目的个人偏好（仅你可见） |
-| **托管策略** | `/etc/claude-code/CLAUDE.md` (Linux) | 组织范围的 IT 管理指令 |
+| 范围 | 位置 | 目的 | 共享对象 |
+|------|------|------|----------|
+| **托管策略** | macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`<br>Linux/WSL: `/etc/claude-code/CLAUDE.md`<br>Windows: `C:\Program Files\ClaudeCode\CLAUDE.md` | 组织范围的 IT 管理指令 | 组织中所有用户 |
+| **项目指令** | `./CLAUDE.md` 或 `./.claude/CLAUDE.md` | 项目架构、编码标准、常见工作流 | 通过 git 共享给团队 |
+| **用户指令** | `~/.claude/CLAUDE.md` | 所有项目的个人偏好 | 仅你（所有项目） |
 
 > 💬 hippo：我主要用项目级 `./CLAUDE.md`，记录构建命令、目录结构、代码规范。这样换了电脑、或者队友拉代码后，Claude 都能立刻"懂"这个项目。
 
-### 1.2 CLAUDE.md 如何被加载
+### 1.2 与 AGENTS.md 互操作
+
+如果你的仓库已经为其他 AI 编程助手（如 Cursor、Windsurf）配置了 `AGENTS.md`，可以用 `@` 语法导入，实现一份配置多工具共用：
+
+```markdown
+@AGENTS.md
+
+## Claude Code 特定指令
+
+对 `src/billing/` 下的修改使用 plan mode。
+```
+
+> 💬 hippo：Claude Code 读取 `CLAUDE.md` 而非 `AGENTS.md`。用导入语法可以让两个工具读取相同指令，避免重复维护。
+
+### 1.3 CLAUDE.md 如何被加载
 
 Claude Code 从当前工作目录**向上遍历目录树**，加载沿途所有的 CLAUDE.md：
 
@@ -64,7 +78,19 @@ foo/bar/           ← 你在这里运行 claude
 
 子目录中的 CLAUDE.md 在 Claude 读取该目录时按需加载。
 
-### 1.3 编写有效指令的原则
+#### 从其他目录加载（--add-dir 标志）
+
+`--add-dir` 标志可以让 Claude 访问主工作目录外的其他目录，但默认不会加载这些目录中的 CLAUDE.md 文件。
+
+要同时加载额外目录的 CLAUDE.md，需要设置环境变量：
+
+```bash
+CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir ../shared-config
+```
+
+> 💬 hippo：这在需要引用共享配置仓库时很有用，比如公司的通用代码规范。
+
+### 1.4 编写有效指令的原则
 
 CLAUDE.md 是**上下文**，不是强制配置。Claude 会尽量遵循，但指令写得越好，遵循效果越好。
 
@@ -95,7 +121,7 @@ CLAUDE.md 是**上下文**，不是强制配置。Claude 会尽量遵循，但�
 - 修复 bug：先复现，再加测试用例
 ```
 
-### 1.4 导入其他文件
+### 1.5 导入其他文件
 
 CLAUDE.md 支持 `@path` 语法导入外部文件：
 
@@ -117,7 +143,7 @@ CLAUDE.md 支持 `@path` 语法导入外部文件：
 - 最大递归深度 5 层
 - 导入文件在启动时展开加载
 
-### 1.5 使用 `.claude/rules/` 组织规则
+### 1.6 使用 `.claude/rules/` 组织规则
 
 大型项目可以用规则目录分主题管理指令：
 
@@ -156,7 +182,33 @@ paths:
 | `*.{ts,tsx}` | 当前目录的 ts 和 tsx 文件 |
 | `src/components/*.tsx` | 特定目录下的 React 组件 |
 
-### 1.6 排除无关的 CLAUDE.md
+#### 使用符号链接跨项目共享规则
+
+`.claude/rules/` 目录支持符号链接，可以维护一组共享规则并链接到多个项目：
+
+```bash
+# 链接整个共享规则目录
+ln -s ~/shared-claude-rules .claude/rules/shared
+
+# 链接单个规则文件
+ln -s ~/company-standards/security.md .claude/rules/security.md
+```
+
+> 💬 hippo：循环符号链接会被检测并优雅处理，不用担心无限循环。
+
+#### 用户级规则
+
+`~/.claude/rules/` 中的规则适用于你机器上的每个项目：
+
+```
+~/.claude/rules/
+├── preferences.md    # 个人编码偏好
+└── workflows.md      # 首选工作流
+```
+
+用户级规则在项目规则之前加载，项目规则优先级更高。
+
+### 1.7 排除无关的 CLAUDE.md
 
 在 monorepo 中，可能需要排除其他团队的 CLAUDE.md。在 `.claude/settings.local.json` 中配置：
 

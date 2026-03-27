@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Claude Code GitLab CI/CD
 date: 2026-03-08 23:00:00
-updated: 2026-03-25 12:00:00
+updated: 2026-03-27 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -226,6 +226,7 @@ claude-vertex:
       }
       EOF
       )
+    - gcloud config set project "$(gcloud projects list --format='value(projectId)' --filter="name:${CI_PROJECT_NAMESPACE}" | head -n1)" || true
   script:
     - /bin/gitlab-mcp-server || true
     - >
@@ -329,6 +330,71 @@ claude:
 
 Claude 在运行时会读取此文件并遵循你的约定。
 
+### 9.1 自定义 Claude 行为的两种方式
+
+你可以通过以下两种主要方式指导 Claude：
+
+| 方式 | 说明 | 适用场景 |
+|------|------|---------|
+| **CLAUDE.md** | 定义编码标准、安全要求和项目约定 | 项目级通用规则 |
+| **自定义提示** | 通过 `prompt`/`prompt_file` 传递任务说明 | 特定作业的定制化指令 |
+
+**自定义提示示例**：
+
+```yaml
+script:
+  # 不同的作业使用不同的提示
+  - >
+    claude
+    -p "Review this code for security vulnerabilities and suggest fixes"
+    --permission-mode acceptEdits
+    --allowedTools "Bash Read Edit Write mcp__gitlab"
+```
+
+你也可以通过文件提供提示：
+
+```yaml
+script:
+  - claude --prompt-file ./prompts/review-security.md
+```
+
+---
+
+## 十、CI 成本
+
+在 GitLab CI/CD 中使用 Claude Code 时，请注意相关成本：
+
+### 10.1 成本构成
+
+| 成本类型 | 说明 |
+|---------|------|
+| **GitLab Runner 时间** | Claude 在你的 GitLab runners 上运行并消耗计算分钟数，详情请参阅你的 GitLab 计划的 runner 计费 |
+| **API 成本** | 每次 Claude 交互根据提示和响应大小消耗令牌，令牌使用因任务复杂性和代码库大小而异，详情请参阅 Anthropic 定价 |
+
+### 10.2 成本优化建议
+
+| 建议 | 说明 |
+|------|------|
+| 使用特定的 `@claude` 命令 | 减少不必要的轮次，让 Claude 一次完成任务 |
+| 设置适当的 `max_turns` | 限制 AI 迭代次数，避免失控运行 |
+| 设置合理的作业超时 | 使用 `timeout_minutes` 限制总执行时间 |
+| 限制并发 | 控制并行运行的作业数量 |
+
+**优化配置示例**：
+
+```yaml
+claude:
+  stage: ai
+  timeout: 30m  # 限制总执行时间
+  script:
+    - >
+      claude
+      -p "${AI_FLOW_INPUT:-'Implement the requested changes'}"
+      --permission-mode acceptEdits
+      --max-turns 10  # 限制迭代次数
+      --allowedTools "Bash Read Edit Write mcp__gitlab"
+```
+
 ---
 
 ## 一句话总结
@@ -339,6 +405,6 @@ Claude 在运行时会读取此文件并遵循你的约定。
 
 ---
 
-*本文精读自 [Claude Code GitLab CI/CD](https://code.claude.com/docs/zh-CN/gitlab-ci-cd)*
+*本文精读自 [Claude Code GitLab CI/CD 官方文档](https://code.claude.com/docs/zh-CN/gitlab-ci-cd)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

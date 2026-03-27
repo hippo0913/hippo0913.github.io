@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Remote Control 远程控制
 date: 2026-03-10 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -110,6 +110,16 @@ claude --rc
 3. 已有对话中最后一条有意义的消息
 4. 你发送的第一条提示词
 
+**获取 Claude 移动应用**：
+
+如果你还没有安装 Claude App，可以在 Claude Code 中使用 `/mobile` 命令显示 iOS 或 Android 的下载二维码：
+
+```bash
+/mobile
+```
+
+扫描二维码即可快速下载对应平台的 Claude 应用。
+
 ### 2.4 全局启用远程控制
 
 如果希望每次交互式会话都自动开启远程控制：
@@ -183,10 +193,13 @@ claude
 
 **问题二：组织策略禁用**
 
-如果你是 Team 或 Enterprise 用户，看到「disabled by your organization's policy」：
+如果你是 Team 或 Enterprise 用户，看到「disabled by your organization's policy」，有三个可能原因：
+
 1. 先运行 `/status` 确认登录方式和订阅类型
 2. 确认不是用 API Key 认证（Remote Control 必须用 claude.ai OAuth）
 3. 联系管理员在 claude.ai/admin-settings/claude-code 开启 Remote Control 开关
+
+**特别注意**：如果管理员看到 Remote Control 切换按钮是**灰色**（无法点击），说明你的组织配置了数据保留或合规策略，这些策略与 Remote Control 不兼容。这种情况无法从管理面板更改，需要联系 Anthropic 支持讨论可能的解决方案。
 
 **问题三：凭证获取失败**
 
@@ -230,7 +243,28 @@ A: Dispatch 是从手机发消息触发任务，Remote Control 是直接操控�
 
 ---
 
-## 六、小结
+## 六、选择正确的方法
+
+Claude Code 提供了多种在离开终端时继续工作的方式。它们在触发方式、执行位置和设置复杂度上有所不同：
+
+| 方式 | 触发方式 | Claude 运行位置 | 设置复杂度 | 适用场景 |
+|------|----------|-----------------|------------|----------|
+| **Dispatch** | 从 Claude 手机应用发送任务消息 | 你的电脑（Desktop） | 需要配对手机应用和 Desktop | 离开时委托任务，设置最简单 |
+| **Remote Control** | 从 claude.ai/code 或 Claude 手机应用驱动正在运行的会话 | 你的电脑（CLI 或 VS Code） | 运行 `claude remote-control` | 从其他设备操控进行中的工作 |
+| **Channels** | 从 Telegram、Discord 等聊天应用或自己的服务器推送事件 | 你的电脑（CLI） | 安装 channel 插件或自己开发 | 响应外部事件如 CI 失败或聊天消息 |
+| **Slack** | 在团队频道中 @Claude | Anthropic 云端 | 安装 Slack 应用并启用 Claude Code on the web | 从团队聊天进行 PR 和代码审查 |
+| **Scheduled tasks** | 设置定时计划 | CLI、Desktop 或云端 | 选择频率 | 日常自动化如每日代码审查 |
+
+**简单选择指南**：
+- 想**从手机继续**当前会话 → Remote Control
+- 想**离开时派发**新任务 → Dispatch
+- 想**响应外部事件**（如 CI 失败）→ Channels
+- 想**在 Slack 里用** → Slack 集成
+- 想**定时自动执行** → Scheduled tasks
+
+---
+
+## 七、小结
 
 Remote Control 让你用手机或浏览器「遥控」本地 Claude Code 会话，会话始终在本地执行，完整保留你的文件系统、MCP 配置和项目设置。三种启动方式中，服务器模式适合长期运行，交互模式适合边用边控。
 
@@ -238,6 +272,6 @@ Remote Control 让你用手机或浏览器「遥控」本地 Claude Code 会话�
 
 ---
 
-*本文精读自 [Continue local sessions from any device with Remote Control](https://docs.anthropic.com/zh-CN/docs/claude-code/remote-control)*
+*本文精读自 [使用 Remote Control 从任何设备继续本地会话](https://code.claude.com/docs/zh-CN/remote-control)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*
