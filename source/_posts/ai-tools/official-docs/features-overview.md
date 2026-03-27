@@ -1,259 +1,256 @@
 ---
-title: 精读官方文档：Claude Code 概览
+title: 精读官方文档：扩展 Claude Code
 date: 2026-03-03 23:00:00
-updated: 2026-03-25 15:00:00
+updated: 2026-03-27 15:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 1
-description: Claude Code 是 Anthropic 官方的 AI 编程助手，直接在终端运行。30 秒安装，支持自然语言构建功能、调试代码、导航代码库，还能通过 MCP 扩展连接外部工具。
-cover: https://picsum.photos/seed/claude-code-overview/1920/1080
+description: Claude Code 内置工具覆盖大多数编码任务，但你还可以通过 CLAUDE.md、Skills、Subagents、MCP、Hooks、Plugins 等扩展层来定制它。本文帮你理解这些扩展功能的作用和使用场景。
+cover: https://picsum.photos/seed/claude-features-overview/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/features-overview
 ---
 
-# 精读官方文档：Claude Code 概览
+# 精读官方文档：扩展 Claude Code
 
-> 💬 hippo：这是 Claude Code 官方文档精读系列的第一篇。如果你刚听说 Claude Code，不知道它到底是什么、能干什么，这篇就是起点。
+> 💬 hippo：这是 Claude Code 官方文档精读系列的第一篇。先理解扩展功能的整体架构，才能知道什么时候该用什么工具。
 
 ---
 
-## 一、Claude Code 是什么
+## 一、这个功能是什么
 
-**一句话：Claude Code 是一个住在终端里的 AI 程序员。**
+Claude Code 结合了一个能够推理代码的模型和内置工具，用于文件操作、搜索、执行和网络访问。**内置工具覆盖了大多数编码任务**。
 
-它不是另一个聊天窗口，也不是新 IDE——它就在你每天工作的终端里，直接读写你的代码、运行命令、创建 Git 提交。
-
-和 Claude.ai 网页版不同，Claude Code 能：
-- 直接编辑你项目里的文件
-- 执行 shell 命令并看到结果
-- 理解整个项目结构（不只是当前文件）
-- 通过 MCP（Model Context Protocol，一种让 AI 连接外部工具的标准协议）读取 Google Drive、Figma、Slack 等外部数据源
+本指南讲的是**扩展层**：你添加的功能，用于自定义 Claude 的知识、将其连接到外部服务以及自动化工作流。
 
 <!-- more -->
 
 ---
 
-## 二、30 秒上手
+## 二、官方教程精读
 
-### 2.1 环境要求
+### 2.1 扩展功能概览
 
-| 要求 | 说明 |
-|------|------|
-| Node.js | 18 或更高版本 |
-| 账号 | Claude.ai 账号（推荐）或 Anthropic Console 账号 |
+扩展功能插入代理循环的不同部分：
 
-### 2.2 安装与启动
+| 功能 | 作用 | 何时使用 | 示例 |
+|------|------|----------|------|
+| **CLAUDE.md** | 每次对话加载的持久上下文 | 项目约定、"始终执行 X" 规则 | "使用 pnpm，而不是 npm。提交前运行测试。" |
+| **Skill** | Claude 可以使用的说明、知识和工作流 | 可重用内容、参考文档、可重复的任务 | `/deploy` 运行你的部署清单；包含端点模式的 API 文档 skill |
+| **Subagent** | 返回摘要结果的隔离执行上下文 | 上下文隔离、并行任务、专门的工作者 | 读取许多文件但仅返回关键发现的研究任务 |
+| **Agent teams** | 协调多个独立的 Claude Code 会话 | 并行研究、新功能开发、使用竞争假设进行调试 | 生成审查者同时检查安全性、性能和测试 |
+| **MCP** | 连接到外部服务 | 外部数据或操作 | 查询你的数据库、发布到 Slack、控制浏览器 |
+| **Hook** | 在事件上运行的确定性脚本 | 可预测的自动化，不涉及 LLM | 每次文件编辑后运行 ESLint |
 
-```bash
-# 全局安装 Claude Code
-npm install -g @anthropic-ai/claude-code
+> 💬 hippo：**Plugins** 是打包层。Plugin 将 skills、hooks、subagents 和 MCP servers 捆绑到单个可安装单元中。Plugin skills 是命名空间的（如 `/my-plugin:review`），因此多个 plugins 可以共存。
 
-# 进入你的项目目录
-cd your-awesome-project
+### 2.2 相似功能对比
 
-# 启动 Claude Code
-claude
-# 首次使用会提示登录
-```
+某些功能可能看起来相似，以下是区分方法：
 
-就这么简单，你已经可以开始用了。
+**Skill vs Subagent：**
 
----
+| 方面 | Skill | Subagent |
+|------|-------|----------|
+| **它是什么** | 可重用的说明、知识或工作流 | 具有自己上下文的隔离工作者 |
+| **关键优势** | 在上下文之间共享内容 | 上下文隔离。工作单独进行，仅返回摘要 |
+| **最适合** | 参考材料、可调用的工作流 | 读取许多文件的任务、并行工作、专门的工作者 |
 
-## 三、Claude Code 能帮你做什么
+**Skills 可以是参考或操作：**
+- **参考 skills** 提供 Claude 在整个会话中使用的知识（如你的 API 风格指南）
+- **操作 skills** 告诉 Claude 执行特定操作（如运行你的部署工作流的 `/deploy`）
 
-### 3.1 用自然语言构建功能
+**当需要上下文隔离或上下文窗口变满时，使用 subagent**。Subagent 可能读取数十个文件或运行广泛的搜索，但你的主对话仅接收摘要。
 
-直接告诉 Claude 你想做什么，它会：
-1. 制定计划
-2. 编写代码
-3. 确保代码能运行
+**CLAUDE.md vs Skill：**
 
-**示例**：
+| 方面 | CLAUDE.md | Skill |
+|------|-----------|-------|
+| **加载** | 每个会话，自动 | 按需 |
+| **可以包含文件** | 是，使用 `@path` 导入 | 是，使用 `@path` 导入 |
+| **可以触发工作流** | 否 | 是，使用 `/<name>` |
+| **最适合** | "始终执行 X" 规则 | 参考材料、可调用的工作流 |
 
-```
-帮我给博客添加一个文章目录组件，要求：
-- 自动提取 h2/h3 标题
-- 支持点击跳转
-- 移动端自动隐藏
-```
+> 💬 hippo：**经验法则** — 保持 CLAUDE.md 在 200 行以下。如果它在增长，将参考内容移到 skills 或拆分为 `.claude/rules/` 文件。
 
-Claude Code 会分析你的代码结构，找到合适的插入位置，写代码，测试。
+**CLAUDE.md vs Rules vs Skills：**
 
-### 3.2 调试和修复问题
+| 方面 | CLAUDE.md | `.claude/rules/` | Skill |
+|------|-----------|------------------|-------|
+| **加载** | 每个会话 | 每个会话，或当打开匹配的文件时 | 按需，当调用或相关时 |
+| **范围** | 整个项目 | 可以限定到文件路径 | 特定于任务 |
+| **最适合** | 核心约定和构建命令 | 特定于语言或目录的指南 | 参考材料、可重复的工作流 |
 
-遇到 bug 时，直接描述问题或粘贴错误信息：
+**Subagent vs Agent team：**
 
-```
-运行 npm run build 报错了：
-ERROR in ./src/utils/date.js
-Module not found: './format'
-```
+| 方面 | Subagent | Agent team |
+|------|----------|------------|
+| **上下文** | 自己的上下文窗口；结果返回给调用者 | 自己的上下文窗口；完全独立 |
+| **通信** | 仅向主代理报告结果 | 队友直接相互发送消息 |
+| **协调** | 主代理管理所有工作 | 具有自我协调的共享任务列表 |
+| **最适合** | 仅结果重要的专注任务 | 需要讨论和协作的复杂工作 |
+| **令牌成本** | 较低：结果摘要返回到主上下文 | 较高：每个队友是一个单独的 Claude 实例 |
 
-Claude Code 会：
-- 分析你的代码库
-- 定位问题根源
-- 实现修复
+**MCP vs Skill：**
 
-### 3.3 理解陌生代码库
+| 方面 | MCP | Skill |
+|------|-----|-------|
+| **它是什么** | 连接到外部服务的协议 | 知识、工作流和参考材料 |
+| **提供** | 工具和数据访问 | 知识、工作流、参考材料 |
+| **示例** | Slack 集成、数据库查询、浏览器控制 | 代码审查清单、部署工作流、API 风格指南 |
 
-接手新项目时，直接问：
+这两个可以协同工作：**MCP 给予 Claude 与外部系统交互的能力**，**Skills 给予 Claude 关于如何有效使用这些工具的知识**。
 
-```
-这个项目的认证流程是怎样的？用户登录后发生了什么？
-```
+### 2.3 功能如何分层
 
-Claude Code 维护着整个项目的上下文感知，能找到相关文件并解释逻辑。
+功能可以在多个级别定义：用户范围、每个项目、通过 plugins 或通过托管策略。
 
-### 3.4 自动化繁琐任务
+**CLAUDE.md 文件是累加的**：所有级别同时向 Claude 的上下文贡献内容。来自你的工作目录及以上的文件在启动时加载；子目录在你其中工作时加载。当说明冲突时，更具体的说明通常优先。
 
-- 修复 lint 问题
-- 解决合并冲突
-- 写发布说明
-- 在 CI 中自动运行
+**Skills 和 subagents 按名称覆盖**：当相同的名称存在于多个级别时，一个定义根据优先级获胜：
+- Skills：托管 > 用户 > 项目 > plugin
+- Subagents：托管 > CLI 标志 > 项目 > 用户 > plugin
 
----
+**MCP 服务器按名称覆盖**：本地 > 项目 > 用户
 
-## 四、为什么开发者喜欢 Claude Code
+**Hooks 合并**：所有注册的 hooks 为其匹配的事件触发，无论来源如何。
 
-### 4.1 在终端工作，不切换上下文
+### 2.4 组合功能示例
 
-不需要：
-- 打开另一个浏览器窗口
-- 安装新的 IDE 插件
-- 学习新的界面
+真实的设置根据你的工作流组合多个扩展：
 
-就在你习惯的终端里，用你习惯的工具。
+| 模式 | 工作原理 | 示例 |
+|------|----------|------|
+| **Skill + MCP** | MCP 提供连接；skill 教导 Claude 如何很好地使用它 | MCP 连接到你的数据库，skill 记录你的架构和查询模式 |
+| **Skill + Subagent** | Skill 为并行工作生成 subagents | `/audit` skill 启动在隔离上下文中工作的安全性、性能和风格 subagents |
+| **CLAUDE.md + Skills** | CLAUDE.md 保存始终开启的规则；skills 保存按需加载的参考材料 | CLAUDE.md 说"遵循我们的 API 约定"，skill 包含完整的 API 风格指南 |
+| **Hook + MCP** | Hook 通过 MCP 触发外部操作 | 编辑后 hook 在 Claude 修改关键文件时发送 Slack 通知 |
 
-### 4.2 真正能"动手"
+### 2.5 上下文成本
 
-Claude Code 不是只给建议——它能：
-- 直接编辑文件
-- 运行命令
-- 创建 Git 提交
+你添加的每个功能都会消耗 Claude 的一些上下文。太多可能会填满你的上下文窗口，也可能增加噪音使 Claude 效率降低。
 
-通过 MCP，它还能读取 Google Drive 里的设计文档、更新 Jira 里的工单。
+**按功能的上下文成本：**
 
-### 4.3 符合 Unix 哲学
+| 功能 | 何时加载 | 加载内容 | 上下文成本 |
+|------|----------|----------|------------|
+| **CLAUDE.md** | 会话开始 | 完整内容 | 每个请求 |
+| **Skills** | 会话开始 + 使用时 | 启动时的描述，使用时的完整内容 | 低（每个请求的描述）* |
+| **MCP 服务器** | 会话开始 | 所有工具定义和 JSON 架构 | 每个请求 |
+| **Subagents** | 生成时 | 具有指定 skills 的新鲜上下文 | 与主会话隔离 |
+| **Hooks** | 触发时 | 无（外部运行） | 零，除非 hook 返回额外上下文 |
 
-可组合、可脚本化。看看这个命令：
+> *默认情况下，skill 描述在会话开始时加载，以便 Claude 可以决定何时使用它们。在 skill 的 frontmatter 中设置 `disable-model-invocation: true` 以将其完全隐藏在 Claude 中，直到你手动调用它。这将 skills 的上下文成本降低到零。
 
-```bash
-# 监控日志，发现异常自动发 Slack
-tail -f app.log | claude -p "发现异常时发 Slack 通知"
-```
+### 2.6 各功能加载时机详解
 
-这个命令真的能用。
+**CLAUDE.md：**
+- **何时**：会话开始
+- **加载内容**：所有 CLAUDE.md 文件的完整内容（托管、用户和项目级别）
+- **继承**：Claude 从你的工作目录读取 CLAUDE.md 文件直到根目录，并在访问这些文件时发现子目录中的嵌套文件
 
-CI 里也能跑：
+**Skills：**
+- **何时**：取决于 skill 的配置
+- **默认**：描述在会话开始时加载，完整内容在使用时加载
+- **仅用户 skills**（`disable-model-invocation: true`）：在调用它们之前不加载任何内容
+- **在 subagents 中**：传递给 subagent 的 skills 在启动时完全预加载到其上下文中
 
-```bash
-# 自动翻译新增文本并提 PR
-claude -p "如果有新增的文本字符串，翻译成法语并给 @lang-fr-team 提 PR 审核"
-```
+**MCP 服务器：**
+- **何时**：会话开始
+- **加载内容**：来自连接的服务器的所有工具定义和 JSON 架构
+- **注意**：MCP 连接可能在会话中途无声地失败。如果服务器断开连接，其工具会无警告地消失。
 
-### 4.4 企业级就绪
+**Subagents：**
+- **何时**：按需，当你或 Claude 为任务生成一个时
+- **加载内容**：新鲜、隔离的上下文，包含系统提示、agent 的 `skills:` 字段中列出的 skills、CLAUDE.md 和 git 状态
 
-- 可用 Anthropic API
-- 支持部署到 AWS 或 GCP
-- 内置企业级安全、隐私和合规
-
----
-
-## 五、Claude Code 启动参数
-
-除了直接运行 `claude`，还支持多种参数：
-
-| 参数 | 说明 | 示例 |
-|------|------|------|
-| `-p` | 直接传入提示词，非交互模式 | `claude -p "修复测试"` |
-| `--debug` | 调试模式，输出详细日志 | `claude --debug` |
-| `--print` | 打印响应到 stdout | `claude -p "hello" --print` |
-| `--allowedTools` | 预授权工具列表 | `claude --allowedTools "Bash,Read,Write"` |
-| `--maxThinkingTokens` | 思考过程 token 限制 | `claude --maxThinkingTokens 10000` |
-
-**管道用法示例**：
-
-```bash
-# 把文件内容传给 Claude 分析
-cat error.log | claude -p "分析这个错误日志，找出根本原因"
-
-# 把 git diff 传给 Claude 写提交信息
-git diff | claude -p "根据这些改动写一个 commit message"
-```
+**Hooks：**
+- **何时**：触发时
+- **加载内容**：默认情况下无。Hooks 作为外部脚本运行
+- **上下文成本**：零，除非 hook 返回作为消息添加到你的对话中的输出
 
 ---
 
-## 六、hippo 的实战经验
+## 三、hippo 的实战经验
 
-> 💬 hippo：用了 Claude Code 几个月，有几点体会：
+> 💬 hippo：以下是我实际使用中的经验：
 
-### 6.1 它不是"答案机"，是"协作者"
+### 3.1 我的选择策略
 
-不要问"XX 怎么写"，而是说"帮我实现 XX 功能"。
+刚接触 Claude Code 时，我的建议是：
 
-前者的回答像搜索引擎结果，后者会真正理解你的项目并动手干。
+1. **先从 CLAUDE.md 开始**：把项目最核心的约定写进去（用 pnpm 不是 npm、测试命令是什么、目录结构怎样）
+2. **遇到重复任务时加 Skill**：比如你经常要写类似的代码审查，就做一个 `/review` skill
+3. **需要外部数据时加 MCP**：想让 Claude 能查数据库、发 Slack，就配置 MCP 服务器
+4. **要自动化时加 Hook**：每次编辑后自动检查格式、提交前自动跑测试
 
-### 6.2 让它看全貌
+### 3.2 我的 CLAUDE.md 结构
 
-Claude Code 的优势是理解整个项目。给它足够的上下文：
-- 不要只让它看单个文件
-- 让它先读 README 和 CLAUDE.md
-- 用 `#` 提到相关文件让它参考
+```markdown
+# 项目名称
 
-### 6.3 用自然语言，但要具体
+## 构建命令
+- 安装依赖：`yarn`
+- 本地预览：`yarn server`
+- 构建：`yarn build`
 
-模糊的指令：
+## 代码规范
+- 使用 ESLint + Prettier
+- 提交信息遵循 Conventional Commits
+
+## 注意事项
+- 不要修改 .github/workflows/ 下的文件
+- 敏感操作（git push、删除文件）要先确认
 ```
-优化这个代码
-```
 
-好的指令：
-```
-这个函数在处理 10 万条数据时很慢，帮我优化到 1 秒内完成，优先考虑算法复杂度
-```
+保持在 100 行以内，核心信息优先。
 
-### 6.4 我的启动习惯
+### 3.3 我的建议
 
-```bash
-# 我常用的启动方式
-claude --debug  # 开调试，方便排查问题
-```
+1. **不要一次性配置所有扩展**：先用起来，遇到痛点再加
+2. **CLAUDE.md 控制长度**：超过 200 行就该拆分了
+3. **善用 Skills 的 `disable-model-invocation`**：有些 skill 不需要 Claude 自动发现，手动调用就行
+4. **定期检查 MCP 连接**：用 `/mcp` 命令确认服务器还在正常运行
 
 ---
 
-## 七、常见问题
+## 四、常见问题
 
-**Q: Claude Code 和 Claude.ai 网页版有什么区别？**
+**Q: CLAUDE.md 和 Skill 都能存说明，用哪个？**
 
-A: 核心区别是"能动手"：
-- Claude.ai：对话为主，给建议
-- Claude Code：能直接编辑文件、运行命令、创建提交
+A: 看"是否每次都需要"：如果是每次对话都要遵守的规则（构建命令、代码规范），放 CLAUDE.md；如果是偶尔用到的参考材料（API 文档、部署清单），做 Skill。
 
-**Q: 需要付费吗？**
+**Q: Subagent 和 Agent team 有什么区别？**
 
-A: 使用 Claude.ai 账号登录时，消耗的是你的 Claude Pro 额度。用 Anthropic Console 账号则按 API 调用计费。
+A: Subagent 是你（或 Claude）启动的"临时工"，干完活就返回摘要；Agent team 是多个独立的 Claude 实例，它们之间可以相互通信协作。
 
-**Q: 支持哪些操作系统？**
+**Q: 上下文满了怎么办？**
 
-A: macOS、Linux、Windows（通过 WSL 或 PowerShell）。
+A: 检查 CLAUDE.md 是否太长、MCP 服务器是否太多。考虑把参考材料移到 Skills 并设置 `disable-model-invocation: true`。
 
-**Q: 会不会乱改我的代码？**
+**Q: Hook 会消耗上下文吗？**
 
-A: 每次修改前会显示 diff，你可以选择接受或拒绝。敏感操作（如 git push）需要确认。
+A: 默认不会。Hook 作为外部脚本运行，只有当它返回输出时才会添加到对话中。
 
 ---
 
-## 八、小结
+## 五、小结
 
-Claude Code 是 Anthropic 官方的 AI 编程助手，直接在终端运行。它不只是"问答机"，而是能真正动手干活的"协作者"——编辑文件、运行命令、创建提交，都能自动完成。
+扩展 Claude Code 的六大功能：
 
-**下一步**：
-- [快速入门](/2026/03/04/ai-tools/official-docs/quickstart/) — 5 分钟上手教程
-- [Hooks 参考](/2026/03/20/ai-tools/official-docs/hooks/) — 让 Claude Code 更安全、更自动化
+| 功能 | 一句话 | 典型场景 |
+|------|--------|----------|
+| CLAUDE.md | 每次加载的"项目说明书" | 项目约定、构建命令 |
+| Skill | 可调用的"知识包" | 参考文档、部署工作流 |
+| Subagent | 隔离的"临时工" | 大规模搜索、并行任务 |
+| Agent team | 协作的"团队" | 复杂研究、多角色审查 |
+| MCP | 外部服务的"连接器" | 数据库、Slack、浏览器 |
+| Hook | 事件触发的"自动化脚本" | 保存后 lint、提交前检查 |
+
+**下一步**：[精读官方文档：CLAUDE.md](/2026/03/05/ai-tools/official-docs/claude-md/)，深入学习如何写好项目的"说明书"。
 
 ---
 
-*本文精读自 [Claude Code overview - Anthropic](https://docs.anthropic.com/zh-CN/docs/claude-code/overview)*
+*本文精读自 [扩展 Claude Code](https://code.claude.com/docs/zh-CN/features-overview)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*
