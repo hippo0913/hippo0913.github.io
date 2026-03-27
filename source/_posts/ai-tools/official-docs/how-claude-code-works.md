@@ -176,66 +176,192 @@ claude --continue --fork-session
 - 切换分支时，对话历史保持不变
 - 可以通过 git worktrees 运行并行 Claude 会话
 
+**多终端同会话问题：**
+
+如果你在多个终端中恢复相同的会话，两个终端都会写入相同的会话文件：
+
+```bash
+# 终端1
+claude --continue
+
+# 终端2（同时）
+claude --continue
+# 两个终端写入同一会话文件，消息会交错
+```
+
+**解决方案：使用分叉而非恢复**
+
+```bash
+# 正确做法：每个终端分叉独立会话
+# 终端1
+claude --continue
+
+# 终端2（从同一起点分叉）
+claude --continue --fork-session
+# 创建新会话ID，互不干扰
+```
+
+| 场景 | 推荐做法 | 命令 |
+|------|---------|------|
+| 单人继续之前工作 | 恢复 | `claude --continue` |
+| 从同一起点尝试不同方案 | 分叉 | `claude --continue --fork-session` |
+| 多人/多终端并行工作 | 各自分叉 | 各用 `--fork-session` |
+| 隔离实验性修改 | 分叉 | `--fork-session` |
+
+> ⚠️ 恢复的会话不继承会话范围的权限。每次恢复后需要重新批准权限设置。
+
 ### 2.7 上下文窗口
 
 Claude 的上下文窗口保存你的对话历史、文件内容、命令输出、CLAUDE.md、加载的 skills 和系统说明。
 
+**上下文窗口内容构成：**
+
+| 内容类型 | 来源 | 备注 |
+|---------|------|------|
+| 对话历史 | 用户消息 + Claude 回复 | 随对话增长 |
+| 文件内容 | 读取/编辑的文件 | 可能很大 |
+| 命令输出 | Bash 命令结果 | 测试输出可能很长 |
+| CLAUDE.md | 项目根目录 | 每次会话都加载 |
+| 自动内存 | MEMORY.md | 前 200 行自动加载 |
+| Skills | 已安装的 skills | 描述加载，内容按需 |
+| MCP 工具定义 | MCP servers | 每个工具占用空间 |
+
 **当上下文填满时：**
-- Claude Code 自动管理上下文
-- 首先清除较旧的工具输出
-- 然后在需要时总结对话
-- 你的请求和关键代码片段被保留
+
+Claude Code 的自动压缩策略：
+
+1. **优先清除**：较早的工具输出（如长测试日志）
+2. **其次总结**：对话早期内容被压缩成摘要
+3. **保留重点**：用户请求、关键代码片段、最近操作
 
 ```bash
-# 查看什么在占用空间
+# 查看上下文使用情况
 /context
 
-# 手动压缩
+# 输出示例：
+# Context usage: 87,234 / 200,000 tokens (43.6%)
+#
+# Breakdown:
+# - Conversation: 45,000 tokens
+# - Files: 30,000 tokens
+# - Tool outputs: 10,000 tokens
+# - CLAUDE.md: 2,234 tokens
+
+# 手动触发压缩
 /compact
 
-# 带焦点的压缩
-/compact focus on the API changes
+# 带焦点的压缩（保留指定内容）
+/compact focus on the authentication flow changes
+
+# 在 CLAUDE.md 中定义压缩保留内容
+# 添加 "## Compact Instructions" 部分
 ```
 
 > 💬 hippo：将持久规则放在 CLAUDE.md 中，而不是依赖对话历史。对话早期的详细说明可能会在压缩时丢失。
 
 **使用 Skills 和 Subagents 管理上下文：**
 
-| 功能 | 如何帮助 |
-|------|---------|
-| **Skills** | 按需加载。描述在会话开始时加载，完整内容仅在使用时加载 |
-| **Subagents** | 获得自己的新上下文，完全独立于主对话。他们的工作不会使你的上下文膨胀 |
+| 功能 | 上下文行为 | 最佳实践 |
+|------|-----------|---------|
+| **Skills** | 描述在会话开始时加载（约 100-500 tokens），完整内容仅在使用时加载 | 设置 `disable-model-invocation: true` 避免自动加载 |
+| **Subagents** | 获得独立上下文窗口，完全不占用主对话空间 | 用于大任务隔离（如重构整个模块） |
+
+**MCP Servers 的上下文成本：**
+
+每个 MCP server 会将工具定义添加到每个请求中。几个 server 可能在你开始工作之前就消耗大量上下文。
+
+```bash
+# 检查每个 MCP server 的上下文成本
+/mcp
+
+# 输出示例：
+# MCP Servers:
+# - filesystem: ~500 tokens
+# - memory: ~300 tokens
+# - web-reader: ~400 tokens
+# Total: ~1,200 tokens per request
+```
+
+> ⚠️ 如果上下文紧张，考虑禁用不常用的 MCP servers。
 
 ### 2.8 检查点和权限
 
 Claude 有两个安全机制：检查点让你撤销文件更改，权限控制 Claude 可以做什么。
 
-**检查点：**
-- 每个文件编辑都是可逆的
-- 在 Claude 编辑任何文件之前，它会对当前内容进行快照
-- 如果出现问题，按两次 `Esc` 回退
+**检查点工作原理：**
 
-> ⚠️ 检查点仅涵盖文件更改。影响远程系统（数据库、API、部署）的操作无法进行检查点。
+检查点是 Claude Code 的"后悔药"。每次 Claude 准备编辑文件时，它会：
+
+1. 先读取文件当前内容
+2. 将当前内容保存为快照（checkpoint）
+3. 执行编辑操作
+4. 如果出错，可以从快照恢复
+
+```bash
+# 检查点恢复操作
+# 方式1：按两次 Esc 键快速回退
+# 方式2：直接告诉 Claude 撤销
+> 撤销刚才的修改，回到修改前的状态
+
+# 方式3：查看检查点历史
+> 显示最近的检查点
+```
+
+**检查点特点与限制：**
+
+| 特性 | 支持情况 | 说明 |
+|------|---------|------|
+| 文件编辑 | 支持 | 每次编辑前自动创建快照 |
+| 文件创建 | 支持 | 删除新创建的文件 |
+| Shell 命令 | 不支持 | 命令执行后无法自动撤销 |
+| 数据库操作 | 不支持 | 远程系统操作不在检查点范围 |
+| API 调用 | 不支持 | 外部服务调用无法回滚 |
+
+> ⚠️ **重要**：检查点仅涵盖本地文件更改。对于 `git push`、数据库迁移、API 调用等操作，Claude 会额外询问确认，因为这些无法自动撤销。
 
 **权限模式（按 Shift+Tab 切换）：**
 
-| 模式 | 说明 |
-|------|------|
-| **默认** | Claude 在文件编辑和 shell 命令之前询问 |
-| **自动接受编辑** | Claude 编辑文件而不询问，仍然询问命令 |
-| **Plan Mode** | Claude 仅使用只读工具，创建你可以在执行前批准的计划 |
+Claude Code 提供三种权限模式，适应不同工作场景：
+
+| 模式 | 文件编辑 | Shell 命令 | 适用场景 |
+|------|---------|-----------|---------|
+| **默认** | 询问 | 询问 | 新手、敏感项目 |
+| **自动接受编辑** | 自动 | 询问 | 日常开发、信任代码改动 |
+| **Plan Mode** | 禁止 | 禁止 | 复杂任务规划、学习代码库 |
+
+**权限配置示例：**
 
 ```json
-// .claude/settings.json 中允许特定命令
+// .claude/settings.json - 允许特定命令免确认
 {
   "permissions": {
     "allow": [
       "Bash(npm test)",
-      "Bash(git status)"
+      "Bash(npm run lint)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git log --oneline -10)"
     ]
   }
 }
 ```
+
+```bash
+# 命令行指定权限模式启动
+claude --permission-mode plan      # Plan Mode 启动
+claude --permission-mode accept    # 自动接受编辑模式
+claude --permission-mode default   # 默认模式
+```
+
+**权限配置的作用域：**
+
+| 作用域 | 配置文件 | 优先级 |
+|-------|---------|-------|
+| 组织级 | `~/.claude/settings.json`（全局） | 低 |
+| 项目级 | `.claude/settings.json`（项目目录） | 中 |
+| 命令行 | `--permission-mode` 参数 | 高 |
+
+> 💬 hippo：我建议在项目级配置中添加常用安全命令（如测试、lint、git status），这样日常使用更流畅，同时保留对危险操作的确认。
 
 ---
 

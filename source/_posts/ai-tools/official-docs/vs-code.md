@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：在 VS Code 中使用 Claude Code
 date: 2026-03-14 23:00:00
-updated: 2026-03-25 10:00:00
+updated: 2026-03-27 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -223,7 +223,31 @@ start "vscode://anthropic.claude-code/open"
 vscode://anthropic.claude-code/open?prompt=review%20my%20changes
 ```
 
-### 2.11 Checkpoints 回滚功能
+### 2.11 Git Worktrees 并行任务
+
+使用 `--worktree`（`-w`）标志在隔离环境中启动 Claude：
+
+```bash
+claude --worktree feature-auth
+# 或简写
+claude -w feature-auth
+```
+
+每个 worktree 维护独立的文件状态，同时共享 git 历史。这可以防止多个 Claude 实例在处理不同任务时相互干扰。
+
+**典型场景：**
+
+```bash
+# 终端 1：在主分支修复 bug
+claude
+
+# 终端 2：在新 worktree 开发新功能
+claude -w feature-payment
+```
+
+两个实例互不干扰，可以同时进行不同的开发任务。
+
+### 2.12 Checkpoints 回滚功能
 
 扩展支持 checkpoints，可以追踪 Claude 的文件修改并回滚。悬停在任意消息上会出现回滚按钮：
 
@@ -231,7 +255,7 @@ vscode://anthropic.claude-code/open?prompt=review%20my%20changes
 - **Rewind code to here**：回退文件到此节点的状态，保留完整对话历史
 - **Fork conversation and rewind code**：分叉对话并回退代码
 
-### 2.12 CLI vs 扩展功能对比
+### 2.13 CLI vs 扩展功能对比
 
 | 功能 | CLI | VS Code 扩展 |
 |------|-----|--------------|
@@ -243,7 +267,7 @@ vscode://anthropic.claude-code/open?prompt=review%20my%20changes
 
 如果需要 CLI 独有功能，可以在 VS Code 集成终端（`` Ctrl+` `` 或 `` Cmd+` ``）中运行 `claude`。
 
-### 2.13 内置 IDE MCP 服务器
+### 2.14 内置 IDE MCP 服务器
 
 扩展运行时会启动一个本地 MCP 服务器，让 CLI 连接。这个服务器提供了两个工具：
 
@@ -344,4 +368,4 @@ VS Code 扩展让 Claude Code 的使用更直观：可视化 diff、Plan 模式�
 
 *本文精读自 [在 VS Code 中使用 Claude Code](https://code.claude.com/docs/zh-CN/vs-code)*
 
-*最后更新：2026-03-25*
+*最后更新：2026-03-27*

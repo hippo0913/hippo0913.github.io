@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Agent Skills（技能扩展）
 date: 2026-03-21 23:00:00
-updated: 2026-03-27 10:00:00
+updated: 2026-03-27 15:30:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -303,7 +303,9 @@ Research $ARGUMENTS thoroughly:
 
 ## 九、限制工具访问
 
-### 9.1 allowed-tools 字段
+### 9.1 allowed-tools 字段完整语法
+
+`allowed-tools` 字段支持多种格式：
 
 ```markdown
 ---
@@ -313,11 +315,37 @@ allowed-tools: Read, Grep, Glob
 ---
 ```
 
+**支持带参数的工具限制**：
+
+```markdown
+---
+name: gh-pr-helper
+description: Help with GitHub PR operations
+allowed-tools: Read, Bash(gh pr *), Bash(git *)
+---
+```
+
+上述配置只允许：
+- 所有 `Read` 操作
+- `gh pr` 开头的命令（如 `gh pr view`、`gh pr diff`）
+- `git` 开头的命令
+
+**常用 allowed-tools 组合**：
+
+| 场景 | allowed-tools 配置 |
+|------|-------------------|
+| 只读模式 | `Read, Grep, Glob` |
+| Git 操作 | `Read, Bash(git *), Bash(gh *)` |
+| 安全审查 | `Read, Grep, Glob, Bash(npm audit *)` |
+| 文档生成 | `Read, Write(*.md), Bash(markdown *)` |
+
 ### 9.2 权限控制语法
 
 控制 Claude 可以调用哪些 Skills：
 
 ```yaml
+# 在 /permissions 中添加规则
+
 # 禁用所有 Skills
 Skill
 
@@ -331,9 +359,63 @@ Skill(deploy *)
 
 权限语法：`Skill(name)` 精确匹配，`Skill(name *)` 带参数的前缀匹配。
 
+### 9.3 与 permissions 的交互
+
+`allowed-tools` 和权限设置协同工作：
+
+1. `allowed-tools` 定义 Skill 活动时**自动授权**的工具
+2. 其他工具仍遵循 `/permissions` 中的基线批准行为
+3. 内置命令如 `/compact`、`/init` 不能通过 Skill 工具获得
+
 ---
 
-## 十、多文件 Skill 组织
+## 十、Skill 内容类型
+
+根据调用方式，Skill 内容可以分为两类：
+
+### 10.1 参考内容（Reference Content）
+
+添加 Claude 应用于当前工作的知识，如约定、模式、风格指南：
+
+```markdown
+---
+name: api-conventions
+description: API design patterns for this codebase
+---
+
+When writing API endpoints:
+- Use RESTful naming conventions
+- Return consistent error formats
+- Include request validation
+```
+
+此类内容**内联运行**，Claude 可以将其与对话上下文一起使用。
+
+### 10.2 任务内容（Task Content）
+
+为 Claude 提供特定操作的分步说明，如部署、提交、代码生成：
+
+```markdown
+---
+name: deploy
+description: Deploy the application to production
+context: fork
+disable-model-invocation: true
+---
+
+Deploy the application:
+1. Run the test suite
+2. Build the application
+3. Push to the deployment target
+```
+
+**关键配置**：
+- 添加 `disable-model-invocation: true` 防止 Claude 自动触发
+- 考虑使用 `context: fork` 在隔离环境中运行
+
+---
+
+## 十一、多文件 Skill 组织
 
 复杂 Skill 可以包含多个文件：
 
@@ -359,7 +441,55 @@ my-skill/
 
 ---
 
-## 十一、常见问题
+## 十二、生成视觉输出
+
+Skills 可以捆绑并运行任何语言的脚本，为 Claude 提供单个提示中不可能的功能。一个强大的模式是生成视觉输出：在浏览器中打开的交互式 HTML 文件。
+
+### 12.1 示例：代码库可视化器
+
+创建一个交互式树视图，可以在其中展开和折叠目录、查看文件大小、按颜色识别文件类型。
+
+```markdown
+---
+name: codebase-visualizer
+description: Generate an interactive collapsible tree visualization of your codebase. Use when exploring a new repo, understanding project structure, or identifying large files.
+allowed-tools: Bash(python *)
+---
+
+# Codebase Visualizer
+
+Generate an interactive HTML tree view that shows your project's file structure with collapsible directories.
+
+## Usage
+
+Run the visualization script from your project root:
+
+```bash
+python ~/.claude/skills/codebase-visualizer/scripts/visualize.py .
+```
+
+This creates `codebase-map.html` in the current directory and opens it in your default browser.
+
+## What the visualization shows
+
+- **Collapsible directories**: Click folders to expand/collapse
+- **File sizes**: Displayed next to each file
+- **Colors**: Different colors for different file types
+- **Directory totals**: Shows aggregate size of each folder
+```
+
+### 12.2 视觉输出的应用场景
+
+| 场景 | 实现方式 |
+|------|---------|
+| 依赖关系图 | 使用脚本分析 import/require，生成 SVG 或 HTML |
+| 测试覆盖率报告 | 解析 coverage 数据，生成交互式图表 |
+| API 文档 | 扫描代码注释，生成可浏览的 HTML 文档 |
+| 数据库架构可视化 | 读取 schema，生成 ER 图 |
+
+---
+
+## 十三、常见问题
 
 ### Q1: Skill 未触发
 
@@ -385,7 +515,7 @@ export SLASH_COMMAND_TOOL_CHAR_BUDGET=20000
 
 ---
 
-## 十二、小结
+## 十四、小结
 
 Skills 是 Claude Code 的核心扩展机制，关键要点：
 
@@ -394,6 +524,8 @@ Skills 是 Claude Code 的核心扩展机制，关键要点：
 3. **参数**：支持 `$ARGUMENTS`、`$N`、会话变量
 4. **动态上下文**：`!`command` ` 预处理获取实时数据
 5. **Subagent**：`context: fork` + `agent` 在隔离中运行
+6. **allowed-tools**：支持带参数的工具限制，如 `Bash(gh *)`
+7. **内容类型**：参考内容 vs 任务内容，根据调用方式选择
 
 **下一篇**：[MCP（Model Context Protocol）](/2026/03/21/official-docs-mcp/) — 了解如何让 Claude 连接外部工具和数据源。
 
