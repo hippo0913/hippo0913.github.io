@@ -19,6 +19,7 @@
       "Bash(chmod:*)",
       "Bash(mkdir:*)",
       "Bash(sed *)",
+      "Bash(node .claude/scoring/*)",
       "WebSearch",
       "Read",
       "Edit",

@@ -1,0 +1,91 @@
+# 官方文档精读系列评分配置
+name: 官方文档精读
+description: Claude Code 官方文档精读系列文章的评分标准
+
+quantitative:
+  weight: 0.3
+  checks:
+    - id: codeBlocks
+      name: 代码块
+      checker: regex_count
+      pattern: '```[\w]*\n[\s\S]*?```'
+      threshold: 2
+      score: 20
+      operator: ">="
+
+    - id: configExamples
+      name: 配置示例
+      checker: code_lang_count
+      languages: [yaml, json, bash, toml]
+      threshold: 1
+      score: 15
+
+    - id: tables
+      name: 表格
+      checker: regex_count
+      pattern: '\|[-:]+.*\|'
+      threshold: 1
+      score: 15
+
+    - id: wordCount
+      name: 字数
+      checker: chinese_char_count
+      threshold: 1000
+      score: 20
+
+    - id: platitudes
+      name: 空话检测
+      checker: blacklist
+      patterns:
+        - '实践出真知'
+        - '不如自己动手试一次'
+        - '功能体系中的重要组成部分'
+        - '建议大家都先读文档再动手'
+        - '让我们一起.*吧'
+        - '以上就是.*的全部内容'
+        - '相信你.*掌握了'
+      threshold: 0
+      score: 15
+      operator: "<="
+
+    - id: frontMatter
+      name: Front Matter 完整性
+      checker: front_matter
+      required_fields: [title, date, tags, categories, description, cover]
+      threshold: 6
+      score: 15
+
+qualitative:
+  weight: 0.7
+  dimensions:
+    - id: contentDepth
+      name: 内容实质度
+      maxScore: 25
+      description: 每个小节是否有具体知识点而非泛泛而谈，概念解释是否清晰让读者能直接理解，是否引用了官方文档的具体内容而不是概括
+
+    - id: codeUsability
+      name: 代码实用性
+      maxScore: 25
+      description: 代码示例是否可以直接复制使用，配置参数是否有注释说明，是否覆盖了主题的核心使用场景
+
+    - id: personalExperience
+      name: 个人经验真实性
+      maxScore: 20
+      description: 实战经验部分是否有具体场景描述，踩坑描述是否可信（有具体错误信息、配置、解决步骤），建议是否实用而非空话
+
+    - id: structure
+      name: 结构可读性
+      maxScore: 15
+      description: 文章是否按模板结构组织，段落长度是否适中，是否有有效的过渡和总结
+
+    - id: accuracy
+      name: 技术准确性
+      maxScore: 15
+      description: 技术概念是否准确，代码示例是否正确，链接引用是否有效
+
+pass:
+  threshold: 70
+  maxIterations: 3
+
+source:
+  instruction: "使用 WebFetch 获取文章 Front Matter 中 source_url 指向的官方文档原文，从中提取核心概念、代码示例、配置格式和参数说明"

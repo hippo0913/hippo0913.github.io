@@ -1,0 +1,231 @@
+{
+  "profile": "official-doc",
+  "config": {
+    "passThreshold": 70,
+    "maxIterations": 3
+  },
+  "lastUpdated": "2026-03-31T06:39:14.822Z",
+  "summary": {
+    "completed": 0,
+    "failed": 0,
+    "pending": 27
+  },
+  "articles": [
+    {
+      "file": "source/_posts/ai-tools/official-docs/best-practices.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/browser-control.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/claude-code-on-the-web.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/claude-overview.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/claude-quickstart.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/claude-setup.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/cli-reference.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/common-workflows.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/desktop-quickstart.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/features-overview.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/github-actions.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/gitlab-ci-cd.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/hooks.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/how-claude-code-works.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/jetbrains.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/legal-and-compliance.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/mcp.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/memory.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/remote-control.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/settings.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/skills.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/slack.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/sub-agents.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/third-party-integrations.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/troubleshooting.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/vs-code.md",
+      "status": "pending",
+      "iterations": 0,
+      "scores": [],
+      "finalScore": null,
+      "lastAttempt": null
+    }
+  ]
+}
