@@ -4,11 +4,11 @@
     "passThreshold": 70,
     "maxIterations": 3
   },
-  "lastUpdated": "2026-03-31T06:39:14.822Z",
+  "lastUpdated": "2026-03-31T06:57:39.000Z",
   "summary": {
-    "completed": 0,
+    "completed": 1,
     "failed": 0,
-    "pending": 27
+    "pending": 26
   },
   "articles": [
     {
@@ -109,11 +109,11 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/hooks.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 89, "final": 92.3 } ],
+      "finalScore": 92.3,
+      "lastAttempt": "2026-03-31T06:57:39.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/how-claude-code-works.md",
