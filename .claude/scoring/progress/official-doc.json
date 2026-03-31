@@ -4,11 +4,11 @@
     "passThreshold": 70,
     "maxIterations": 3
   },
-  "lastUpdated": "2026-03-31T06:57:39.000Z",
+  "lastUpdated": "2026-03-31T07:50:00.000Z",
   "summary": {
-    "completed": 1,
+    "completed": 2,
     "failed": 0,
-    "pending": 26
+    "pending": 25
   },
   "articles": [
     {
@@ -85,11 +85,11 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/features-overview.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 85, "final": 89.5 } ],
+      "finalScore": 89.5,
+      "lastAttempt": "2026-03-31T07:50:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/github-actions.md",
