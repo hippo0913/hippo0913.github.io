@@ -208,5 +208,5 @@ Anthropic 在文章最后说了一句很值得品味的话：
 
 - [系列索引：Claude Code 从入门到上手](/2026/03/12/ai-tools/claude-code-series-index/)
 - [如何用好 Claude Code：我的最优实践总结](/2026/03/12/ai-tools/claude-code-best-practice/)
-- [Claude Code Hooks 实战：让 AI 学会自我检查](/2026/03/16/ai-tools/claude-code-hooks-practice/)
-- [Claude Code Sub-agents 实战：用好上下文隔离](/2026/03/20/ai-tools/claude-code-subagent-practice/)
+- [Claude Code Hooks 实战：任务完成自动通知](/2026/03/25/ai-tools/claude-code-hooks-practice/)
+- [Claude Code Subagent 实战：并行重写 20 篇博客](/2026/03/25/ai-tools/claude-code-subagent-practice/)
