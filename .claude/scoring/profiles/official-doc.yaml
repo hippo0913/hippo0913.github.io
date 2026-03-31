@@ -23,7 +23,7 @@ quantitative:
     - id: tables
       name: 表格
       checker: regex_count
-      pattern: '\|[-:]+.*\|'
+      pattern: '\|\s*[-:]+.*\|'
       threshold: 1
       score: 15
 
