@@ -37,7 +37,7 @@
 
 对每篇文章，执行以下循环（最多 `pass.maxIterations` 次）：
 
-#### 2.1 规划
+#### 2.1 规划（含研究）
 
 调用 Planner Agent：
 ```
@@ -50,6 +50,9 @@ prompt 中包含：
 Agent prompt 文件：.claude/agents/planner.md（替换 {{}} 模板变量）
 ```
 
+Planner 负责：读取文章 → 提取 source_url → WebFetch 获取官方文档 → 制定写作计划
+输出包含 sourceHighlights（关键概念、代码片段、配置格式），供 executor 直接使用。
+
 #### 2.2 执行
 
 调用 Executor Agent：
@@ -57,9 +60,11 @@ Agent prompt 文件：.claude/agents/planner.md（替换 {{}} 模板变量）
 使用 Agent tool，subagent_type 为 "general-purpose"
 prompt 中包含：
   - 文章路径
-  - planner 输出的写作计划 JSON
+  - planner 输出的完整写作计划 JSON（含 sourceHighlights）
 Agent prompt 文件：.claude/agents/doc-writer.md（替换 {{writing_plan}}）
 ```
+
+Executor 只负责：阅读模板 → 理解计划 → 写作 → 自检。不需要 WebFetch。
 
 #### 2.3 量化评分
 

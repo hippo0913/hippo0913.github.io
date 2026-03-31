@@ -4,20 +4,20 @@
     "passThreshold": 70,
     "maxIterations": 3
   },
-  "lastUpdated": "2026-03-31T08:10:00.000Z",
+  "lastUpdated": "2026-03-31T09:00:00.000Z",
   "summary": {
-    "completed": 3,
+    "completed": 4,
     "failed": 0,
-    "pending": 24
+    "pending": 23
   },
   "articles": [
     {
       "file": "source/_posts/ai-tools/official-docs/best-practices.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 86, "final": 90.2 } ],
+      "finalScore": 90.2,
+      "lastAttempt": "2026-03-31T09:00:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/browser-control.md",
