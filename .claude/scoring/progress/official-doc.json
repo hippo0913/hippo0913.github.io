@@ -4,11 +4,11 @@
     "passThreshold": 70,
     "maxIterations": 3
   },
-  "lastUpdated": "2026-03-31T07:50:00.000Z",
+  "lastUpdated": "2026-03-31T08:10:00.000Z",
   "summary": {
-    "completed": 2,
+    "completed": 3,
     "failed": 0,
-    "pending": 25
+    "pending": 24
   },
   "articles": [
     {
@@ -165,11 +165,11 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 85, "qual": 84, "final": 84 } ],
+      "finalScore": 84,
+      "lastAttempt": "2026-03-31T08:10:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/settings.md",
