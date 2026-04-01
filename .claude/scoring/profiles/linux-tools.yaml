@@ -1,9 +1,12 @@
-# 官方文档精读系列评分配置
-name: 官方文档精读
-description: Claude Code 官方文档精读系列文章的评分标准
+# Linux 工具教程系列评分配置
+name: Linux 工具教程
+description: Linux 环境配置和工具使用教程的评分标准
 
-articles_dir: source/_posts/ai-tools/official-docs
-template: doc-rewrite-template.md
+articles_dir: source/_posts/linux-tools
+template: linux-tools-template.md
+
+source:
+  instruction: "使用 Read 工具读取文章 Front Matter 中 source_file 字段指向的本地文件作为参考材料，从中提取核心步骤、代码示例、配置说明和验证方法"
 
 quantitative:
   weight: 0.3
@@ -43,7 +46,6 @@ quantitative:
         - '实践出真知'
         - '不如自己动手试一次'
         - '功能体系中的重要组成部分'
-        - '建议大家都先读文档再动手'
         - '让我们一起.*吧'
         - '以上就是.*的全部内容'
         - '相信你.*掌握了'
@@ -62,33 +64,30 @@ qualitative:
   weight: 0.7
   dimensions:
     - id: contentDepth
-      name: 内容实质度
+      name: 教程可操作性
       maxScore: 25
-      description: 每个小节是否有具体知识点而非泛泛而谈，概念解释是否清晰让读者能直接理解，是否引用了官方文档的具体内容而不是概括
+      description: 每个步骤是否有具体的命令和说明，读者能否跟着一步步做完，是否有前置条件和预期结果
 
     - id: codeUsability
       name: 代码实用性
       maxScore: 25
-      description: 代码示例是否可以直接复制使用，配置参数是否有注释说明，是否覆盖了主题的核心使用场景
+      description: 命令和配置是否可以直接复制执行，是否有注释说明，是否覆盖核心使用场景
 
     - id: personalExperience
-      name: 个人经验真实性
+      name: 踩坑经验真实性
       maxScore: 20
-      description: 实战经验部分是否有具体场景描述，踩坑描述是否可信（有具体错误信息、配置、解决步骤），建议是否实用而非空话
+      description: 是否有具体的报错信息和解决步骤，建议是否实用而非空话，经验描述是否可信
 
     - id: structure
       name: 结构可读性
       maxScore: 15
-      description: 文章是否按模板结构组织，段落长度是否适中，是否有有效的过渡和总结
+      description: 文章是否按合理的步骤顺序组织，段落长度是否适中，是否有有效的过渡和总结
 
     - id: accuracy
       name: 技术准确性
       maxScore: 15
-      description: 技术概念是否准确，代码示例是否正确，链接引用是否有效
+      description: 命令是否正确，依赖关系是否准确，版本号和路径是否有效
 
 pass:
   threshold: 70
   maxIterations: 3
-
-source:
-  instruction: "使用 WebFetch 获取文章 Front Matter 中 source_url 指向的官方文档原文，从中提取核心概念、代码示例、配置格式和参数说明"

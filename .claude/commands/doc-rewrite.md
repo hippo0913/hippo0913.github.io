@@ -25,11 +25,11 @@
 1. 读取 `.claude/scoring/profiles/{profile}.yaml` 获取评分标准
 2. 如果是 `status` 命令，读取进度文件并展示，然后停止
 3. 读取进度文件 `.claude/scoring/progress/{profile}.json`
-4. 如果进度文件不存在，扫描 `source/_posts/ai-tools/official-docs/*.md` 初始化
+4. 如果进度文件不存在，扫描 profile 中 `articles_dir` 指定目录下的 `*.md` 初始化
 
 ### 第一步：确定目标文章
 
-- **指定文章名**: 在 official-docs 目录下查找匹配的文件
+- **指定文章名**: 在 profile 的 `articles_dir` 目录下查找匹配的文件
 - **all**: 处理所有 `status=pending` 的文章
 - **留空**: 取第一篇 `status=pending` 的文章
 
@@ -61,6 +61,7 @@ Planner 负责：读取文章 → 提取 source_url → WebFetch 获取官方文
 prompt 中包含：
   - 文章路径
   - planner 输出的完整写作计划 JSON（含 sourceHighlights）
+  - profile 中 template 字段指定的模板文件路径
 Agent prompt 文件：.claude/agents/doc-writer.md（替换 {{writing_plan}}）
 ```
 

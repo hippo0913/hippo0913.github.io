@@ -1,0 +1,16 @@
+{
+  "profile": "linux-tools",
+  "config": { "passThreshold": 70, "maxIterations": 3 },
+  "lastUpdated": "2026-04-01T17:00:00Z",
+  "summary": { "completed": 1, "failed": 0, "pending": 0 },
+  "articles": [
+    {
+      "file": "source/_posts/linux-tools/vimplus-setup.md",
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "final": 90, "quant": 85, "qual": 92 } ],
+      "finalScore": 90,
+      "lastAttempt": "2026-04-01T17:00:00Z"
+    }
+  ]
+}
