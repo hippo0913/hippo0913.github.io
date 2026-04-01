@@ -1,34 +1,27 @@
 ---
 title: 精读官方文档：Desktop 快速开始
 date: 2026-03-15 23:00:00
-updated: 2026-03-27 12:00:00
+updated: 2026-03-31 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 16
-description: Claude Code Desktop 版本提供了图形化界面，支持可视化 diff 预览、实时应用预览、PR 监控自动合并、并行会话等功能，本文精读官方快速开始指南并补充实战经验。
+description: Claude Code Desktop 是命令行版本的图形界面增强版，支持可视化 diff 审查、嵌入式应用预览、PR 自动修复与合并、并行会话（Git worktree 隔离）和计划任务，本文精读官方快速开始指南并补充实战踩坑经验。
 cover: https://picsum.photos/seed/claude-desktop-quickstart/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/desktop-quickstart
 ---
 
 # 精读官方文档：Desktop 快速开始
 
-> hippo：这是 Claude Code 官方文档精读系列的一篇。
+> hippo：这是 Claude Code 官方文档精读系列的一篇。这一篇讲 Desktop 应用——一个把 CLI 版本包装成图形界面的桌面客户端，适合不想在终端里看 diff 的人。
 
 ---
 
 ## 一、这个功能是什么
 
-Claude Code Desktop 是 Anthropic 推出的桌面应用版本，让你无需终端也能使用 Claude Code。它提供了图形化界面，包括：
+Claude Code Desktop 是 Anthropic 推出的桌面应用，内置了 Claude Code 引擎，不需要单独安装 Node.js 也能用。它和 CLI 版本共享所有配置（CLAUDE.md、MCP servers、hooks、skills、settings），可以同时运行，不是替代关系。
 
-- **可视化差异审查**：修改代码后可以逐文件查看差异，支持行内评论
-- **实时应用预览**：内置开发服务器，Claude 可以直接看到运行效果
-- **PR 监控与自动合并**：监控 CI 检查结果，自动修复失败或合并
-- **并行会话**：多个任务同时进行，每个在独立的 Git worktree 中
-- **计划任务**：设置每天自动运行代码审查等任务
-- **远程运行能力**：将任务发送到云端，关闭应用后继续执行
-
-简单说，就是「命令行版 Claude Code 的图形界面增强版」。
+Desktop 在 CLI 基础上增加了几个图形化能力：可视化 diff 审查（逐文件看改了什么，还能加行内评论）、嵌入式应用预览（跑 dev server 让 Claude 直接看界面）、PR 状态监控（CI 失败自动修复、通过后自动合并）、并行会话（多个任务各自在独立 Git worktree 里跑）。一句话定位：CLI 的图形增强版，核心引擎完全一样。
 
 <!-- more -->
 
@@ -36,92 +29,63 @@ Claude Code Desktop 是 Anthropic 推出的桌面应用版本，让你无需终�
 
 ## 二、官方教程精读
 
-### 2.1 Desktop 应用的三个标签页
+### 2.1 三标签页与安装
 
-Desktop 应用包含三个标签页：
+Desktop 应用有三个标签页，分工不同：
 
-| 标签页 | 功能说明 | 适用场景 | 文件访问权限 |
-|--------|----------|----------|--------------|
-| **Chat** | 普通对话，无文件访问权限 | 类似 claude.ai 的日常问答 | 无 |
-| **Cowork** | 后台自主 Agent，在云端 VM 运行 | 长时间任务，可关闭应用后继续 | 独立云端环境 |
-| **Code** | 交互式编码助手，直接访问本地文件 | 代码修改、重构、调试 | 本地项目文件 |
+| 标签页 | 功能 | 适用场景 | 文件访问权限 |
+|---|---|---|---|
+| **Chat** | 纯对话，和 claude.ai 体验一致 | 日常问答、知识查询 | 无 |
+| **Cowork** | 云端自主 Agent，在远程 VM 运行 | 长时间任务，关掉应用后继续跑 | 独立云端环境 |
+| **Code** | 本地交互式编码助手 | 改代码、重构、调试 | 本地项目文件 |
 
-> 本文档重点介绍 **Code** 标签页。Chat 和 Cowork 在 Claude Desktop 支持文档中单独说明。
+本文重点讲 **Code** 标签页，这是 Claude Code 的核心使用场景。
 
-### 2.2 安装方式
-
-Desktop 应用内置了 Claude Code，**不需要单独安装 Node.js 或 CLI**。
-
-如果你想同时拥有终端和图形界面，可以安装 CLI 版本：
+**安装方式**：Desktop 应用内置了 Claude Code，下载安装即可。如果你也想在终端用 CLI，可以额外安装：
 
 ```bash
-# macOS/Linux - 使用 npm 安装
+# macOS / Linux
 npm install -g @anthropic-ai/claude-code
 
-# macOS - 使用 Homebrew
+# macOS 也可以用 Homebrew
 brew install claude-code
 ```
 
-```powershell
-# Windows - 使用 npm 安装
-npm install -g @anthropic-ai/claude-code
-```
+两个版本安装后会共享同一套配置，不需要额外设置。
 
-### 2.3 启动第一个会话
+### 2.2 核心功能速览
 
-1. 打开 Desktop 应用，选择 **Code** 标签页
-2. 选择一个项目文件夹
-3. 在输入框中给 Claude 一个任务
-
-就这么简单，Claude 会开始工作并等待你的审批。
-
-### 2.4 核心功能一览
-
-官方文档列出了多个实用功能，我用表格整理如下：
+打开 Code 标签页、选一个项目文件夹，就可以开始对话了。以下是日常最常用的几个功能：
 
 | 功能 | 触发方式 | 说明 |
-|------|----------|------|
-| 中断和纠正 | 点击停止按钮或直接输入修正 | 不用等 Claude 完成，随时介入 |
-| 添加上下文 | 输入 `@filename` 或拖拽文件 | 让 Claude 看到更多相关代码 |
-| 使用 Skills | 输入 `/` 或点击 + -> Slash commands | 调用可复用的命令模板 |
-| 代码审查 | 点击 `+12 -1` 指示器 | 逐文件查看 diff，添加行内评论 |
-| AI 自审 | 点击 Review code | 让 Claude 自己评估差异并留下内联建议 |
-| 权限模式 | 切换 Ask/Auto accept/Plan 模式 | 控制审批粒度 |
-| 插件扩展 | 点击 + -> Plugins | 安装 MCP 服务器、Skills 等 |
-| 应用预览 | 点击 Preview 下拉菜单 | 运行开发服务器，Claude 可以看到界面 |
-| PR 监控 | 打开 PR 后自动监控 | CI 失败时自动修复，通过后自动合并 |
-| 定时任务 | 设置 scheduled tasks | 每日代码审查、每周依赖检查等 |
-| 并行会话 | 侧边栏打开新会话 | 同时处理多个任务，各自独立 worktree |
+|---|---|---|
+| 中断纠正 | 点击停止按钮，直接输入修正 | 不用等 Claude 跑完，随时介入调整方向 |
+| 添加上下文 | 输入框输入 `@filename` 或拖拽文件 | 让 Claude 看到更多相关代码 |
+| Skills 复用 | 输入 `/` 或点击 + → Slash commands | 调用项目里预定义的命令模板 |
+| diff 审查 | 点击 `+12 -1` 变更指示器 | 逐文件查看改了什么，支持行内评论和 AI 自审 |
+| 权限模式 | 切换 Ask / Auto accept / Plan | 控制每次操作需要你审批的粒度 |
 
-### 2.5 权限模式详解
+权限模式决定了 Claude 操作前需要你确认的程度：
 
-权限模式决定了 Claude 操作时需要你审批的程度：
+| 模式 | 行为 | 推荐场景 |
+|---|---|---|
+| **Ask permissions** | 每次编辑和命令都要你批准 | 新用户、重要项目 |
+| **Auto accept edits** | 自动接受文件编辑，命令仍需确认 | 快速迭代开发 |
+| **Plan Mode** | 只分析出方案，不改代码不跑命令 | 大型重构前先规划 |
+| **Auto** | 后台安全检查自动验证，减少弹窗 | Team 计划用户 |
+| **Bypass permissions** | 无任何提示 | 仅限沙箱或虚拟机环境 |
 
-| 模式 | 设置键 | 行为 | 推荐场景 |
-|------|--------|------|----------|
-| **Ask permissions** | `default` | 每次编辑或运行命令前都需要你批准 | 新用户、重要项目 |
-| **Auto accept edits** | `acceptEdits` | 自动接受文件编辑，但运行终端命令前仍需询问 | 快速迭代开发 |
-| **Plan Mode** | `plan` | 只分析代码并创建计划，不修改文件或运行命令 | 大型重构前规划 |
-| **Auto** | `auto` | 后台安全检查验证一致性，减少权限提示 | Team 计划用户 |
-| **Bypass permissions** | `bypassPermissions` | 无任何权限提示 | 仅在沙箱或虚拟机中使用 |
+> Cowork（远程会话）支持 Auto accept edits 和 Plan Mode，不支持 Ask permissions。
 
-> 远程会话（Cowork）支持"自动接受编辑"和 Plan Mode，"询问权限"不可用。
+### 2.3 预览、PR 监控与并行会话
 
-### 2.6 预览您的应用
+这三个是 Desktop 相对 CLI 的差异化功能，值得单独展开。
 
-点击 **Preview** 下拉菜单可以直接在桌面中运行开发服务器。这个功能非常强大：
+**Preview（应用预览）**
 
-**Claude 可以做的事情：**
+点击 Preview 下拉菜单，Desktop 会在内置浏览器里跑你的 dev server。Claude 可以直接看到应用界面、测试 API、检查日志、截图对比，不需要你手动描述「页面长什么样」。
 
-- 启动开发服务器并打开嵌入式浏览器验证更改
-- 查看正在运行的应用界面
-- 测试 API 端点、查看服务器日志
-- 拍摄屏幕截图、检查 DOM、点击元素、填充表单
-- 自动迭代发现的问题
-
-**配置预览服务器：**
-
-Claude 会自动检测开发服务器设置，配置存储在 `.claude/launch.json`：
+Preview 的服务器配置放在 `.claude/launch.json`：
 
 ```json
 {
@@ -138,18 +102,7 @@ Claude 会自动检测开发服务器设置，配置存储在 `.claude/launch.js
 }
 ```
 
-**launch.json 配置字段说明：**
-
-| 字段 | 类型 | 必填 | 描述 |
-|------|------|------|------|
-| `name` | string | 是 | 服务器的唯一标识符 |
-| `runtimeExecutable` | string | 是 | 要运行的命令，如 `npm`、`yarn`、`node` |
-| `runtimeArgs` | string[] | 是 | 传递给命令的参数，如 `["run", "dev"]` |
-| `port` | number | 否 | 服务器监听端口，默认 3000 |
-| `cwd` | string | 否 | 相对于项目根目录的工作目录 |
-| `autoPort` | boolean | 否 | 端口冲突时自动查找空闲端口，默认 true |
-
-**Monorepo 多服务器示例：**
+如果你是 monorepo 项目，可以配置多个服务器，用 `cwd` 字段指定子目录：
 
 ```json
 {
@@ -175,65 +128,60 @@ Claude 会自动检测开发服务器设置，配置存储在 `.claude/launch.js
 }
 ```
 
-### 2.7 监控拉取请求状态
+launch.json 的关键字段：
 
-打开 PR 后，CI 状态栏会出现在会话中。Claude Code 使用 GitHub CLI 轮询检查结果。
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `name` | 是 | 服务器的唯一标识符 |
+| `runtimeExecutable` | 是 | 要运行的命令，如 `npm`、`yarn`、`node` |
+| `runtimeArgs` | 是 | 传给命令的参数数组，如 `["run", "dev"]` |
+| `port` | 否 | 监听端口，默认 3000 |
+| `cwd` | 否 | 相对项目根目录的工作目录，monorepo 用 |
+| `autoPort` | 否 | 端口冲突时自动找空闲端口，默认 true |
 
-**两大核心功能：**
+**PR 监控**
+
+打开 PR 后，会话里会出现 CI 状态栏。Claude 用 GitHub CLI 轮询检查结果：
 
 | 功能 | 触发条件 | 说明 |
-|------|----------|------|
-| **Auto-fix** | CI 检查失败 | Claude 自动读取失败输出并迭代修复 |
-| **Auto-merge** | 所有检查通过 | 自动合并 PR（使用压缩合并方式） |
+|---|---|---|
+| **Auto-fix** | CI 检查失败 | Claude 自动读错误日志并迭代修复 |
+| **Auto-merge** | 所有检查通过 | 自动用压缩合并方式合入 PR |
 
-**使用方法：**
+启用方式：在 CI 状态栏里打开 Auto-fix 和 Auto-merge 的开关。注意 Auto-merge 需要在 GitHub 仓库设置里先开启 "Allow auto-merge"。
 
-1. 在 CI 状态栏中找到 **Auto-fix** 和 **Auto-merge** 切换开关
-2. 启用后，Claude 会自动处理 CI 流程
-3. CI 完成时会收到桌面通知
+**并行会话**
 
-> Auto-merge 需要在你的 GitHub 仓库设置中启用 "Allow auto-merge" 才能工作
+侧边栏可以打开新的 Code 会话，每个会话在独立的 Git worktree 里运行，代码互不干扰。适合同时处理多个独立任务（比如一边改 bug 一边加新功能）。配合计划任务（scheduled tasks），还可以设置每天自动跑代码审查、每周检查依赖版本等。
 
-### 2.8 CLI 与 Desktop 功能对比
+### 2.4 CLI 与 Desktop 功能对照
 
-官方提供了完整的功能对照表，方便 CLI 用户了解 Desktop 的等效操作：
+Desktop 和 CLI 运行同一引擎，大部分操作都有等效方式：
 
 | 功能 | CLI 方式 | Desktop 方式 |
-|------|----------|--------------|
+|---|---|---|
 | 启动会话 | `claude` | 打开应用 → Code 标签 |
 | 指定目录 | `claude /path/to/project` | 选择项目文件夹 |
-| 自动接受编辑 | `claude --auto` | 权限模式选择 Auto accept edits |
-| Plan 模式 | `claude --plan` | 权限模式选择 Plan |
-| 添加文件 | 命令行参数或 `@file` | 输入框 `@filename` 或拖拽 |
+| 自动接受编辑 | `claude --auto` | 权限模式选 Auto accept edits |
+| Plan 模式 | `claude --plan` | 权限模式选 Plan |
+| 添加文件 | 命令行参数或 `@file` | 输入 `@filename` 或拖拽文件 |
 | 使用 Skills | `/skill-name` | 输入 `/` 或点击 + → Slash commands |
-| 查看差异 | 终端 diff 输出 | 可视化差异视图 |
+| 查看差异 | 终端 diff 输出 | 可视化差异视图（逐文件 + 行内评论） |
 | 后台任务 | 无 | Cowork 标签页 |
 
-**Desktop 暂不支持的功能：**
-
-- `--print` 标志（非交互模式输出）
-- `--output-format json`（JSON 格式输出）
-- `--resume`（恢复上次会话）
+Desktop 暂不支持的功能：`--print`（非交互输出）、`--output-format json`（JSON 格式）、`--resume`（恢复上次会话）。这些是 CI/脚本场景的 CLI 专属能力。
 
 ---
 
 ## 三、hippo 的实战经验
 
-> hippo：以下是我实际使用 Desktop 版本的踩坑经验：
+> hippo：以下是我用 Desktop 版本的真实踩坑记录。
 
-### 3.1 我遇到的问题
+### 3.1 踩坑记录与解决方案
 
-刚开始用 Desktop 版本时，我以为它只是 CLI 的「套壳」，结果发现有些功能用起来不太一样：
+**Preview 配置踩坑**
 
-1. **快捷键冲突**：Desktop 的某些快捷键和 IDE 冲突（比如 Cmd+K 在 VS Code 是删除行）
-2. **并行会话的 worktree 理解成本**：一开始没搞懂为什么开了两个窗口代码不一样
-3. **预览功能配置**：Preview 需要正确配置 dev server 命令才能工作
-
-### 3.2 我的解决方案
-
-**配置 Preview 的 dev server（替代方案）：**
-
-如果你的项目结构特殊，可以用 `settings.json` 配置预览：
+我的博客项目用 Hexo 框架，启动命令是 `yarn dev` 而不是常见的 `npm run dev`。Desktop 自动检测不到正确的启动命令，Preview 一直不工作。后来发现可以用 `settings.json` 做替代配置：
 
 ```json
 {
@@ -245,46 +193,34 @@ Claude 会自动检测开发服务器设置，配置存储在 `.claude/launch.js
 }
 ```
 
-这个配置告诉 Desktop：
-- 运行 `yarn dev` 启动开发服务器
-- 监听 4000 端口
-- 当看到包含 `Hexo is running` 的输出时认为服务已就绪
+这个配置的含义：运行 `yarn dev`、监听 4000 端口、当终端输出包含 `Hexo is running` 时认为服务就绪。如果你的 launch.json 方式不生效，试试这个 settings.json 替代方案。
 
-**并行会话的正确理解：**
+**并行会话的理解成本**
+
+一开始开了两个并行会话，发现两边代码不一样，以为出 bug 了。其实是 Desktop 用 Git worktree 做隔离——每个会话在自己的 worktree 里工作：
 
 ```bash
-# Desktop 会在 .claude/worktrees/ 下创建独立的 worktree
-# 每个会话有自己的分支，互不干扰
-
 # 查看当前 worktree 列表
 git worktree list
 
 # 输出示例：
-# /home/yy/project/.claude/worktrees/abc123  abc123-feature
+# /home/yy/project                  abc123 [master]
+# /home/yy/project/.claude/worktrees/xyz789  xyz789-feature
 # /home/yy/project/.claude/worktrees/def456  def456-bugfix
 ```
 
-**worktree 的好处是**：你可以同时开发两个功能，互不干扰。但要注意：
-- 每个 worktree 会占用额外的磁盘空间
-- 完成任务后记得清理不需要的 worktree
+每个 worktree 是完整的工作目录副本，改代码互不影响。但它们共享同一个远程仓库，推代码时要注意分支名别冲突。用完记得清理不用的 worktree，否则会占磁盘空间。
 
-**CLI 到 Desktop 会话迁移：**
+**CLI 到 Desktop 的会话迁移**
 
-在终端中运行 `/desktop` 命令可以将 CLI 会话移动到 Desktop：
+在终端里跑着跑着想切到 Desktop 看可视化 diff，可以在 CLI 里输入 `/desktop`，当前会话会迁移到 Desktop 打开。这个功能仅限 macOS 和 Windows。
 
-```bash
-# 在 CLI 中运行，会保存当前会话并在 Desktop 中打开
-/desktop
-```
+### 3.2 实用建议
 
-> 此命令仅在 macOS 和 Windows 上可用。迁移后 CLI 会话会自动退出。
-
-### 3.3 我的建议
-
-1. **CLI 和 Desktop 可以同时使用**：它们共享配置（CLAUDE.md、MCP servers、hooks、skills、settings）
-2. **重要操作先用 Plan 模式**：大改动前让 Claude 先出方案，确认后再执行
-3. **利用中断功能**：Claude 走偏时直接打断，不用等它跑完
-4. **用 Preview 验证前端改动**：让 Claude 自己看效果比描述问题更高效
+- **CLI + Desktop 同时开着**：配置完全共享，终端做快速命令，Desktop 做可视化审查，各取所长
+- **大改动前切 Plan 模式**：让 Claude 先输出方案，确认没问题再切回 Ask 或 Auto accept 执行
+- **发现方向偏了立刻打断**：不用等 Claude 跑完再改，点停止按钮直接输入修正指令，省 token 也省时间
+- **用 Preview 验证前端改动**：让 Claude 自己启动 dev server 看效果，比你用文字描述「按钮偏左了」高效得多
 
 ---
 
@@ -292,58 +228,48 @@ git worktree list
 
 **Q: Desktop 和 CLI 能同时用吗？**
 
-A: 可以。它们运行相同的引擎，共享所有配置。你可以同时打开两个，在同一个项目上工作。
+A: 可以。运行同一引擎，共享所有配置。你的 CLAUDE.md、MCP servers、hooks、skills 在两边都生效。甚至在同一个项目上同时开 CLI 和 Desktop 也没问题。
 
-**Q: 为什么我的 Preview 不工作？**
+**Q: Preview 不工作怎么排查？**
 
-A: 检查以下几点：
-1. 项目的 dev server 命令是否正确（`npm run dev` / `yarn dev`）
-2. 端口是否被占用
-3. `readyPattern` 是否匹配你的 dev server 输出格式
-4. 是否在正确的目录下
+A: 按这个清单逐项检查：
+1. dev server 命令是否正确（`npm run dev` 还是 `yarn dev`？）
+2. 端口是否被其他程序占用
+3. 如果用 settings.json 配置，`readyPattern` 是否匹配你的 dev server 输出
+4. 是否在正确的项目目录下打开的会话
+5. 如果 launch.json 不生效，试试上一节的 settings.json 替代方案
 
 **Q: Cowork 和 Code 有什么区别？**
 
-A: Cowork 是云端运行的自主 Agent，你关闭应用后它继续工作；Code 是本地的交互式助手，需要你实时审批每个操作。
+A: Cowork 把任务发到云端 VM 运行，关掉应用后任务继续执行，适合长时间、不需要你实时干预的工作。Code 在本地运行，每个操作都需要你审批（除非开了 Auto accept），适合需要精细控制的编码任务。
 
-**Q: 如何从 CLI 迁移到 Desktop？**
+**Q: 从 CLI 迁移到 Desktop 需要做什么？**
 
-A: 不需要迁移。Desktop 和 CLI 共享配置，你的设置会自动转移：
-
-**共享配置文件列表：**
+A: 不需要迁移。两边共享同一套配置文件：
 
 | 配置文件 | 位置 | 说明 |
-|---------|------|------|
-| `CLAUDE.md` | 项目根目录 | 项目级上下文和规则，两者共用 |
+|---|---|---|
+| `CLAUDE.md` | 项目根目录 | 项目级上下文和规则 |
 | `~/.claude.json` | 用户目录 | 全局 MCP 服务器配置 |
 | `.mcp.json` | 项目根目录 | 项目级 MCP 服务器配置 |
-| `~/.claude/settings.json` | 用户目录 | 全局设置（权限规则、允许的工具等） |
+| `~/.claude/settings.json` | 用户目录 | 全局设置（权限规则、允许工具） |
 | `.claude/settings.json` | 项目目录 | 项目级设置 |
-| `~/.claude/skills/` | 用户目录 | 全局 skills 目录 |
-| `.claude/skills/` | 项目目录 | 项目级 skills 目录 |
+| `.claude/skills/` | 项目目录 | 项目级 Skills |
 
 **Q: 并行会话会互相影响吗？**
 
-A: 不会。每个并行会话都在独立的 Git worktree 中运行，代码完全隔离。但它们共享同一个远程仓库，所以推送到远程时要注意分支管理。
+A: 不会。每个会话在独立的 Git worktree 里，代码完全隔离。但它们共享同一个远程仓库，推送到远程时要注意分支管理，避免互相覆盖。
 
 ---
 
 ## 五、小结
 
-Claude Code Desktop 把命令行版本的强大功能包装成了友好的图形界面，特别适合：
-- 不习惯终端操作的开发者
-- 需要可视化 diff 审查代码的场景
-- 想要并行处理多个任务的情况
-- 需要监控 PR 状态并自动处理的团队
+Desktop 是 CLI 的图形增强版——同样的引擎、同样的配置，多了可视化 diff、嵌入式预览、PR 监控和并行会话。如果你不习惯终端操作、需要直观地审查代码改动、或者想同时推进多个任务，Desktop 值得试试。已经在用 CLI 的用户也不用纠结选哪个，两个同时开着各取所长就行。
 
-如果你已经熟悉 CLI 版本，Desktop 可以无缝切换，配置完全共享。两个版本可以同时使用，各有优势：
-- **CLI**：适合快速命令、脚本集成、CI/CD 环境
-- **Desktop**：适合可视化审查、并行开发、PR 管理
-
-**下一篇**：[精读官方文档：权限模式详解](/2026/03/15/claude-code-permissions/) - 深入了解三种权限模式的使用场景。
+**下一篇**：[精读官方文档：权限模式详解](/2026/03/15/claude-code-permissions/) - 深入了解 Ask / Auto / Plan / Bypass 四种权限模式的使用场景和切换时机。
 
 ---
 
 *本文精读自 [开始使用桌面应用](https://code.claude.com/docs/zh-CN/desktop-quickstart)*
 
-*最后更新：2026-03-27*
+*最后更新：2026-03-31*

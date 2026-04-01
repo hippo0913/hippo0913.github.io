@@ -1,12 +1,12 @@
 ---
 title: 精读官方文档：Slack 中的 Claude Code
 date: 2026-03-07 23:00:00
-updated: 2026-03-27 10:00:00
+updated: 2026-03-31 10:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 24
-description: 在 Slack 里直接 @Claude 让它帮你写代码、修 bug、创建 PR。本文详解 Claude Code Slack 集成的工作原理、配置步骤和最佳实践。
+description: 在 Slack 里直接 @Claude 让它帮你写代码、修 bug、创建 PR。本文详解自动意图检测、双端协作架构、上下文收集机制和实战踩坑经验。
 cover: https://picsum.photos/seed/claude-slack/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/slack
 ---
@@ -21,9 +21,18 @@ source_url: https://code.claude.com/docs/zh-CN/slack
 
 想象一下：你在 Slack 频道里和同事讨论一个 bug，聊着聊着发现需要改代码。传统流程是打开 IDE、找到文件、改代码、提交 PR——至少十几分钟。
 
-现在，你只需要在 Slack 里 `@Claude 帮我在 user.ts 里加个 email 字段`，Claude 会自动识别这是个编码任务，在 claude.ai/code 上创建一个 Code Session，帮你完成代码修改，完成后 @你 并给你一个"创建 PR"的按钮。
+现在，你只需要在 Slack 里 `@Claude 帮我在 user.ts 里加个 email 字段`，Claude 会自动分析你的消息，判断这是个编码任务，然后在 claude.ai/code 上创建一个 Code Session（独立的编码会话），帮你完成代码修改，完成后 @你 并给你操作按钮。
 
-这就是 **Claude Code in Slack**：把 Claude Code 的编码能力嵌入到你的 Slack 工作流里，不用切换工具就能派活给 AI。
+这就是 **Claude Code in Slack** 的核心定位——**Slack 是派活入口和通知面板，真正的代码工作在 claude.ai/code 的 Web 端完成**。两者分工明确：Slack 负责接收指令和推送结果，Web 端负责执行编码和展示完整 diff。
+
+官方列出了 4 个典型用例：
+
+| 用例 | 场景 |
+|------|------|
+| Bug 调查修复 | 在 bug 讨论线程里直接让 Claude 定位并修复问题 |
+| 快速代码审查修改 | 审查 PR 时发现问题，直接让 Claude 改 |
+| 协作调试 | 多人讨论中让 Claude 参与分析和写代码 |
+| 并行任务执行 | 同时 @Claude 多次，创建多个独立 Session 并行处理 |
 
 <!-- more -->
 
@@ -31,153 +40,147 @@ source_url: https://code.claude.com/docs/zh-CN/slack
 
 ## 二、官方教程精读
 
-### 2.1 核心工作流程
+### 2.1 核心工作流程与自动检测
 
-整个流程可以概括为 6 个步骤：
+整个流程分为 6 步：
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  1. 你在 Slack @Claude 派活                                      │
-│     ↓                                                           │
-│  2. Claude 分析意图，判断是不是编码任务                            │
-│     ↓                                                           │
-│  3. 是编码任务 → 在 claude.ai/code 创建 Session                   │
-│     ↓                                                           │
-│  4. Claude 在 Session 里干活，Slack 收到进度更新                   │
-│     ↓                                                           │
-│  5. 干完了，@你 + 给你操作按钮                                    │
-│     ↓                                                           │
-│  6. 你点"View Session"看详情，或点"Create PR"直接提               │
-└─────────────────────────────────────────────────────────────────┘
+```text
+1. 你在 Slack @Claude 派活
+   ↓
+2. Claude 分析消息意图
+   ↓
+3. 判断为编码任务 → 在 claude.ai/code 创建 Session
+   ↓
+4. Claude 在 Session 里干活，Slack 收到进度更新
+   ↓
+5. 干完了，@你 + 给你操作按钮
+   ↓
+6. 你点按钮审查/建 PR，或去 Web 端继续对话
 ```
 
-**关键点**：Slack 只是"派活入口"和"通知面板"，真正的代码工作在 claude.ai/code 的 Web 端完成。
+**自动检测机制**是这里的核心。当你 @Claude 时，它不是简单地把消息转发给 Web 端，而是先分析消息内容：
 
-### 2.2 前置条件
+- **判断为编码任务**：比如"帮我在 auth.ts 加个日志"、"修复 login 函数的空指针 bug"——包含明确的文件名、函数名、代码操作关键词。Claude 会自动路由到 Web 端创建 Code Session。
+- **判断为普通问题**：比如"Claude，Go 和 Rust 哪个更适合写 CLI？"——这是知识问答，Claude 会直接在 Slack 里以聊天助手身份回复。
 
-不是所有人都能用，需要满足以下条件：
-
-| 要求 | 说明 |
-|------|------|
-| Claude 套餐 | Pro、Max、Teams 或 Enterprise（需要有 Claude Code 权限） |
-| Web 端访问 | 必须启用 claude.ai/code 的访问权限 |
-| GitHub 账号 | 已连接到 Claude Code，且至少授权了一个仓库 |
-| Slack 认证 | Slack 账号已关联到 Claude 账号 |
-
-> 💬 hippo：如果你的组织用的是 Enterprise 套餐，还需要确认管理员给你开了 Claude Code 权限（premium seats）。
-
-### 2.3 上下文收集机制
-
-Claude 会从 Slack 对话里抓取上下文，帮你更好地完成任务：
-
-**从 Thread（线程）里收集**：你在某个线程里 @Claude，它会读取整个线程的对话历史。
+**但自动检测不总是准确的。** 有时你想让 Claude 写代码，但它判断为普通聊天——这时候用 **Retry as Code** 按钮。点击后，Claude 会强制将这条消息重新作为编码任务处理，在 Web 端创建 Session。
 
 ```slack
-👤 同事A: 这个 API 返回 500 了
-👤 同事B: 看起来是 user_id 为空导致的
-👤 你: @Claude 帮我在 api/handler.go 加个 user_id 校验
+# 自动检测为编码任务（包含文件名+操作动词）
+@Claude 帮我在 api/handler.go 加个 user_id 校验，空值时返回 400
+
+# 自动检测为聊天（纯知识问答）
+@Claude Go 语言的 error handling 最佳实践是什么？
+
+# 手动触发编码任务（意图模糊时）
+@Claude 帮我处理一下刚才讨论的那个问题
+→ Claude 以聊天回复了？点 "Retry as Code" 强制作为编码任务
 ```
 
-Claude 会理解"500 错误"、"user_id 为空"这些上下文，在代码里加合适的校验逻辑。
+> 💬 hippo：Retry as Code 是个很容易被忽略的按钮。如果你确信自己的需求是编码任务，但 Claude 只给了文字回复，别急着重新输入，先试试这个按钮。
 
-**从 Channel（频道）里收集**：直接在频道里 @Claude（不是线程），它会看最近的频道消息找相关上下文。
+### 2.2 前置条件与首次配置
 
-### 2.4 仓库选择逻辑
+不是所有人都能直接用。你需要满足以下 4 个前置条件：
 
-Claude 会根据对话内容自动选择仓库。如果多个仓库都匹配，它会弹个下拉框让你选。
+| 要求 | 详情 |
+|---|---|
+| Claude 计划 | Pro、Max、Teams 或 Enterprise（需包含 Claude Code 高级席位） |
+| Web 端 Claude Code | 必须已启用 claude.ai/code 的访问权限 |
+| GitHub 账户连接 | 至少一个已认证的 GitHub 仓库连接到 Claude Code |
+| Slack 认证 | Slack 账户通过 Claude App 链接到 Claude 账户 |
 
-你也可以显式指定：
+配置步骤如下：
 
-```slack
-@Claude 在 hippo0913/blog 仓库里，帮我修复 footer 组件的样式问题
+**步骤 1：安装 Claude App**
+
+让 Slack 工作区管理员在 Slack App Directory 搜索 "Claude" 并安装。
+
+**步骤 2：连接账号（App Home）**
+
+```bash
+# 在 Slack 中操作
+1. 左侧边栏 → Apps → Claude
+2. 打开 Claude App Home 选项卡
+3. 点击 "Connect Account" 按钮
+4. 浏览器跳转到 claude.ai，登录并授权
+5. 返回 Slack，确认显示 "Connected" 状态
 ```
 
-### 2.5 首次配置步骤
+> 💬 hippo：App Home 不仅是连接入口，还是后续故障排除的起点。遇到问题时，先来这里看连接状态。
 
-> 💬 hippo：以下是详细的配置流程，按顺序操作即可。
+**步骤 3：启用 Web 端并连接仓库**
 
-**步骤 1：在 Slack 安装 Claude App**
-
-1. 让 Slack 工作区管理员在 Slack App Directory 搜索 "Claude" 并安装
-2. 安装完成后，Claude 会自动出现在你的工作区
-
-**步骤 2：连接 Claude 账号（Claude App Home）**
-
-1. 在 Slack 左侧边栏，点击 **Apps**（应用）
-2. 找到并点击 **Claude**
-3. 这会打开 **Claude App Home** 选项卡
-4. 点击 **Connect Account**（连接账号）按钮
-5. 浏览器会跳转到 claude.ai，登录你的 Claude 账号并授权
-6. 授权成功后，返回 Slack，你会看到 "Connected" 状态
-
-> 💬 hippo：如果 App Home 显示 "Disconnect" 按钮，说明你已经连接成功了。
-
-**步骤 3：确保 Web 端 Claude Code 已启用**
-
-1. 访问 [claude.ai/code](https://claude.ai/code)
-2. 确认你能正常访问 Code 界面（不是所有套餐都有这个权限）
-3. 在 Settings → Repositories 里连接至少一个 GitHub 仓库
+访问 claude.ai/code，确认能正常打开。然后在 Settings → Repositories 里连接至少一个 GitHub 仓库。
 
 **步骤 4：邀请 Claude 进入频道**
 
-安装 Claude App 不等于它能访问所有频道，需要显式邀请：
+安装 App 不等于它能访问所有频道，需要显式邀请：
 
 ```slack
 /invite @Claude
 ```
 
-> 💬 hippo：在频道里输入 `/invite @Claude` 然后回车，Claude 就会加入该频道。只有在 Claude 已加入的频道里，@Claude 才会触发 Code Session。
+只有在 Claude 已加入的频道里，@Claude 才会触发 Code Session。
 
-### 2.6 用户权限与访问控制
+### 2.3 上下文收集与仓库选择
 
-**用户级别**：
+Claude 怎么理解你的需求？靠两种上下文收集机制。
 
-| 权限项 | 说明 |
-|--------|------|
-| Session 归属 | 每个 Session 跑在你自己的 Claude 账号下 |
-| 用量限制 | 消耗的是你个人套餐的额度 |
-| 仓库访问 | 只能访问你自己连接的仓库 |
-| 历史记录 | Session 会出现在你 claude.ai/code 的历史里 |
-
-**工作区级别**：
-
-Slack 工作区管理员控制是否安装 Claude App。安装后，还需要**显式邀请 Claude 进入频道**：
+**线程模式**：你在某个线程里 @Claude，它会读取整个线程的对话历史。这是推荐的使用方式——在线程里讨论问题、积累上下文，最后 @Claude 派活。
 
 ```slack
-/invite @Claude
+👤 同事A: 这个 API 返回 500 了，日志显示 user_id 为空
+👤 同事B: 应该是 /api/user/:id 没做参数校验
+👤 你: @Claude 帮我在 api/handler.go 加个 user_id 校验，
+        空值时返回 400 而不是继续查库
 ```
 
-这个设计很关键：管理员可以通过"允许 Claude 进入哪些频道"来控制谁能用这个功能。
+Claude 会理解"500 错误"、"user_id 为空"、"参数校验"这些上下文，写出符合讨论意图的校验代码。
 
-### 2.8 消息操作按钮详解
+**频道模式**：直接在频道（非线程）里 @Claude，它会读取最近一段时间的频道消息找相关上下文。这种方式上下文精度不如线程模式，适合简单任务。
 
-Claude 在 Slack 里的回复会附带几个操作按钮，以下是每个按钮的使用场景：
+**仓库自动选择**：Claude 根据对话内容自动匹配仓库。如果多个仓库都匹配，会弹出下拉框让你选。你也可以显式指定仓库名避免选错：
+
+```slack
+@Claude 在 myorg/web-admin 仓库里，帮我在 auth.ts 的 login 函数加日志，
+记录用户名、登录时间、IP 地址，用 winston 的 info 级别，完成后不要创建 PR
+```
+
+### 2.4 权限、按钮与双端访问对比
+
+**用户级权限控制**：每个 Session 运行在你自己的 Claude 账户下，用量计入个人计划限制，只能访问个人连接的仓库，Session 历史出现在 claude.ai/code。管理员通过控制"允许 Claude 进入哪些频道"来管理使用范围。
+
+**4 个操作按钮详解**：
 
 | 按钮 | 功能 | 使用场景 |
-|------|------|----------|
-| **View Session** | 在浏览器中打开完整的 Claude Code 会话 | 想看完整 diff、继续对话、修改代码时使用 |
-| **Create PR** | 直接从会话的更改创建拉取请求 | 确认改动没问题，想快速提交 PR 时使用 |
-| **Retry as Code** | 将请求重试为 Claude Code 任务 | Claude 最初作为聊天助手响应但你想要编码会话时使用 |
-| **Change Repo** | 选择不同的存储库 | Claude 选错了仓库，需要手动切换时使用 |
+|---|---|---|
+| **View Session** | 在浏览器打开完整 Claude Code 会话 | 查看所有执行工作、完整 diff、继续会话或提其他请求 |
+| **Create PR** | 直接从会话更改创建拉取请求 | 确认改动没问题，想快速提交时 |
+| **Retry as Code** | 强制重试为编码任务 | Claude 最初作为聊天助手响应但你想要编码会话时 |
+| **Change Repo** | 切换到不同仓库 | Claude 选错仓库时，显示已连接仓库下拉列表 |
 
-**Change Repo 按钮使用场景详解**：
+**Slack 端 vs Web 端各自能做什么？** 这是理解整个集成的关键：
 
-这个按钮在以下情况特别有用：
+| 能力 | Slack 端 | Web 端（claude.ai/code） |
+|------|----------|--------------------------|
+| 发起编码任务 | 可以（@Claude） | 可以 |
+| 查看执行进度 | 简要状态更新 | 完整实时过程 |
+| 查看代码改动 | 摘要描述 | 完整 diff + 文件对比 |
+| 继续对话 | 需跳转 | 直接继续 |
+| 创建 PR | 点击按钮 | 完整 PR 配置 |
+| 修改代码 | 不支持 | 直接编辑 |
 
-1. **多个相似仓库**：你有 `frontend-app` 和 `frontend-admin`，Claude 选错了
-2. **仓库名不够明确**：对话上下文无法准确推断目标仓库
-3. **临时切换**：想在另一个仓库里执行类似任务
+> 💬 hippo：简单说，Slack 能做的只有"派活"和"点按钮"，要看具体改了什么代码，必须去 Web 端。
 
-> 💬 hippo：点击 Change Repo 后会显示下拉菜单，列出你所有已连接的 GitHub 仓库。选择正确的仓库后，Claude 会在新选的仓库里重新执行任务。
+**当前限制**：
 
-### 2.9 当前限制
-
-| 限制项 | 说明 |
-|--------|------|
-| 仅支持 GitHub | 暂不支持 GitLab、Bitbucket 等 |
-| 单 PR 限制 | 每个 Session 只能创建一个 PR |
-| 额度限制 | 使用你个人套餐的 rate limit |
-| Web 端依赖 | 没有 Web 端权限的人只能收到普通聊天回复 |
+| 限制 | 说明 |
+|------|------|
+| 仅 GitHub | 目前只支持 GitHub 仓库，暂不支持 GitLab/Bitbucket |
+| 一次一个 PR | 每个 Session 只能创建一个拉取请求 |
+| 速率限制 | Session 使用个人 Claude 计划的速率限制 |
+| 需要 Web 访问 | 没有 Web 端 Claude Code 权限的用户只会得到标准聊天响应 |
 
 ---
 
@@ -185,23 +188,11 @@ Claude 在 Slack 里的回复会附带几个操作按钮，以下是每个按钮
 
 > 💬 hippo：以下是我实际使用中的踩坑经验：
 
-### 3.1 我遇到的问题
-
-**问题 1：Claude 总是选错仓库**
+### 3.1 仓库选择踩坑
 
 我有多个前端项目，命名类似（`web-app`、`web-admin`、`web-mobile`），在 Slack 里说"改一下 web 项目"，Claude 经常选错。
 
-**问题 2：Thread 太长导致上下文丢失**
-
-有个 bug 讨论线程有 50+ 条消息，@Claude 时它似乎只读了前面一部分，解决方案完全不对。
-
-**问题 3：想看代码改动但只能看到摘要**
-
-Slack 里只显示"我完成了 xxx"，看不到具体改了哪些文件。
-
-### 3.2 我的解决方案
-
-**解决仓库选择问题**：在请求里加仓库全名。
+解决方案是**在请求中写全 org/repo-name**：
 
 ```slack
 # ❌ 容易选错
@@ -211,7 +202,11 @@ Slack 里只显示"我完成了 xxx"，看不到具体改了哪些文件。
 @Claude 在 myorg/web-admin 仓库，改登录页的验证逻辑
 ```
 
-**解决上下文丢失问题**：关键信息放在 @Claude 的那条消息里，不要指望它从历史消息里找。
+### 3.2 上下文丢失问题
+
+有个 bug 讨论线程有 50+ 条消息，@Claude 时它似乎只读了前面一部分，写出来的修复方案完全不对。
+
+解决方案是**关键信息写在请求里**，不要指望它从历史消息里找全：
 
 ```slack
 # ❌ 依赖历史上下文
@@ -222,15 +217,15 @@ Slack 里只显示"我完成了 xxx"，看不到具体改了哪些文件。
 getUserById 没处理 id 为 null 的情况，应该返回 404 而不是抛异常
 ```
 
-**解决看不到改动的问题**：养成习惯，收到完成通知后点"View Session"看完整 diff。
-
 ### 3.3 我的建议
 
-1. **把 Slack 当派活工具，Web 端当审查工具**：Slack 里下任务，Web 端看代码、改代码、继续对话。
+**1. 短任务用 Slack 派活 + Web 审查，长任务直接 Web 端**
 
-2. **短任务用 Slack，长任务用 Web**：改一行配置、加个字段——适合 Slack。重构模块、写新功能——直接去 Web 端。
+改一行配置、加个字段——适合 Slack。重构模块、写新功能——直接去 Web 端。判断依据是：如果你的请求能在一条消息里写清楚，就用 Slack；需要多轮讨论才能定义清楚的需求，直接去 Web 端更高效。
 
-3. **定义"完成标准"**：告诉 Claude 你期望的交付物。
+**2. 定义完成标准**
+
+告诉 Claude 你期望的交付物，而不是模糊的指令：
 
 ```slack
 # ❌ 模糊
@@ -241,6 +236,10 @@ getUserById 没处理 id 为 null 的情况，应该返回 404 而不是抛异�
 IP 地址，用 winston 的 info 级别，完成后不要创建 PR
 ```
 
+**3. 养成 View Session 的习惯**
+
+Slack 里只显示"我完成了 xxx"的摘要，看不到具体改了哪些文件。收到完成通知后，第一时间点 View Session 去看完整 diff，确认改动符合预期再建 PR。
+
 ---
 
 ## 四、常见问题与故障排除
@@ -249,79 +248,51 @@ IP 地址，用 winston 的 info 级别，完成后不要创建 PR
 
 **症状**：@Claude 后只收到普通聊天回复，没有创建 Code Session。
 
-**排查步骤**：
-
-| 步骤 | 操作 | 检查点 |
-|------|------|--------|
-| 1 | 打开 Claude App Home | 确认显示 "Connected" 状态，不是 "Connect Account" |
-| 2 | 访问 claude.ai/code | 确认你能正常访问，不是 403 或付费提示 |
-| 3 | 检查仓库连接 | 在 claude.ai/code 的 Settings → Repositories 里确认至少有一个仓库 |
-| 4 | 检查套餐权限 | 确认你的 Claude 套餐包含 Claude Code 访问权限 |
-
-**快速解决**：如果以上都 OK，点击消息下方的 **"Retry as Code"** 按钮强制以编码任务重试。
+| 问题 | 排查步骤 | 解决方案 |
+|------|----------|----------|
+| 连接断开 | 打开 Claude App Home 看状态 | 显示 "Connect Account" 则重新连接 |
+| Web 端无权限 | 访问 claude.ai/code | 如果 403 或付费提示，检查套餐是否包含 Code 权限 |
+| 仓库未连接 | claude.ai/code → Settings → Repositories | 确认至少有一个已连接仓库 |
+| 意图检测误判 | 查看 Claude 的回复类型 | 点击 **Retry as Code** 强制以编码任务重试 |
 
 ### 4.2 认证错误
 
 **症状**：提示认证失败、会话无法创建。
 
-**排查步骤**：
-
 ```bash
-# 步骤 1：断开并重新连接 Claude 账号
-1. 打开 Claude App Home
-2. 点击 "Disconnect" 断开连接
+# 故障排除步骤
+1. 打开 Slack → Apps → Claude → App Home
+2. 点击 Disconnect 断开连接
 3. 刷新页面
-4. 点击 "Connect Account" 重新连接
-5. 在浏览器里确认登录的是正确的 Claude 账号
-
-# 步骤 2：检查套餐
-1. 登录 claude.ai
-2. 进入 Settings → Plan
-3. 确认套餐包含 Claude Code 权限
-
-# 步骤 3：检查浏览器登录状态
-1. 在浏览器打开 claude.ai/code
-2. 确认你是登录状态，没有被登出
+4. 点击 Connect Account 重新连接
+5. 在浏览器确认登录正确的 Claude 账号
+6. 如果仍失败，检查 claude.ai → Settings → Plan 确认套餐权限
 ```
 
 > 💬 hippo：多账号用户容易踩坑——浏览器登录的是个人账号，但 Slack 关联的是工作账号。确保两边账号一致。
 
-### 4.3 仓库未显示或选择错误
-
-**症状**：下拉列表里找不到目标仓库，或者 Claude 自动选错了仓库。
+### 4.3 仓库未显示或选错
 
 | 问题 | 解决方案 |
 |------|----------|
 | 仓库没在列表里 | 去 claude.ai/code 的 Settings → Repositories 连接该仓库 |
 | 已连接但不显示 | 尝试断开并重新授权 GitHub 账户 |
-| Claude 选错了仓库 | 点击 **"Change Repo"** 按钮手动选择 |
+| Claude 选错了仓库 | 点击 Change Repo 按钮手动选择 |
 | 多次选错 | 在请求里显式指定仓库全名：`@Claude 在 org/repo-name 里...` |
 
-### 4.4 会话过期处理
-
-**症状**：想继续之前的对话，但提示会话已过期。
-
-**处理方式**：
-
-1. **历史记录可访问**：过期的 Session 仍然可以在 claude.ai/code 的历史记录里找到
-2. **继续对话**：从 claude.ai/code 打开历史 Session，可以继续对话
-3. **参考内容**：即使过期，你仍可以查看之前的代码改动和对话内容
-
-> 💬 hippo：Slack 里的 Session 通知会保留，点击 "View Session" 会跳转到 Web 端。即使会话过期，你仍然可以查看完整记录。
-
-### 4.5 其他常见问题
-
-**Q: 如何让团队成员也能看到我的 Session?**
-
-A: Teams 和 Enterprise 套餐下，从 Slack 创建的 Session 会自动对组织可见。在 claude.ai/code 的共享设置里可以调整。
-
-**Q: 任务执行中我想取消怎么办?**
-
-A: 点击"View Session"进入 Web 端，在 Session 里发送"停止"或直接关闭页面。
+### 4.4 其他常见问题
 
 **Q: 能同时跑多个任务吗?**
 
-A: 可以。每个 @Claude 请求会创建独立的 Session，互不影响。但要注意你的套餐并发限制。
+A: 可以。每个 @Claude 请求会创建独立的 Session，互不影响。适合并行处理多个小修改。
+
+**Q: 会话过期了怎么办?**
+
+A: 过期的 Session 仍然可以在 claude.ai/code 的历史记录里找到，你可以查看之前的代码改动，也可以从 Web 端继续对话。
+
+**Q: 团队成员能看到我的 Session 吗?**
+
+A: Teams 和 Enterprise 套餐下，Session 会自动对组织可见。个人套餐下的 Session 是私有的。
 
 ---
 
@@ -330,9 +301,9 @@ A: 可以。每个 @Claude 请求会创建独立的 Session，互不影响。但
 Claude Code in Slack 的核心价值是**降低编码任务的启动门槛**——在讨论 bug 的地方直接派活，不用切工具、不用开 IDE。
 
 记住三个要点：
-1. **明确指定仓库和文件**，避免选错
+1. **明确指定仓库和文件**，避免 Claude 选错
 2. **在请求里带够上下文**，不要依赖历史消息
-3. **用 Web 端审查改动**，Slack 只看摘要
+3. **用 Web 端审查改动**，Slack 只看摘要和点按钮
 
 **下一篇**：[精读官方文档：IDE 集成](/2026/03/07/ide-integration/)——在 VS Code / JetBrains 里直接用 Claude Code。
 
@@ -340,4 +311,4 @@ Claude Code in Slack 的核心价值是**降低编码任务的启动门槛**—�
 
 *本文精读自 [Claude Code in Slack 官方文档（中文版）](https://code.claude.com/docs/zh-CN/slack)*
 
-*最后更新：2026-03-27*
+*最后更新：2026-03-31*

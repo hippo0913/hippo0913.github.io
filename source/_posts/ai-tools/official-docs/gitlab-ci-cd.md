@@ -1,149 +1,63 @@
 ---
 title: 精读官方文档：Claude Code GitLab CI/CD
 date: 2026-03-08 23:00:00
-updated: 2026-03-27 12:00:00
+updated: 2026-03-31 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 23
-description: 在 GitLab CI/CD 中集成 Claude Code，实现 Issue 自动转 MR、代码自动修复、评论驱动的开发工作流。支持 Claude API、AWS Bedrock、Google Vertex AI 三种后端。
+description: 在 GitLab CI/CD 中集成 Claude Code，实现 Issue 自动转 MR、代码自动修复。支持 Claude API、AWS Bedrock、Google Vertex AI 三种后端，企业可按数据驻留需求选择。
 cover: https://picsum.photos/seed/claude-gitlab-ci-cd/1920/1080
 source_url: https://code.claude.com/docs/zh-CN/gitlab-ci-cd
 ---
 
 # 精读官方文档：Claude Code GitLab CI/CD
 
-> hippo：想象一下——在 Issue 里 @claude，它会自动分析需求、写代码、开 MR。这不是科幻，这是 GitLab CI/CD + Claude Code 的真实能力。
+> hippo：想象一下——在 Issue 里 `@claude`，它会自动分析需求、写代码、开 MR。这不是科幻，这是 GitLab CI/CD + Claude Code 的真实能力。
 
 ---
 
 ## 一、这个功能是什么
 
-Claude Code 可以集成到 GitLab CI/CD 中，让你通过简单的 `@claude` 提及来驱动 AI 完成编码任务：
+Claude Code 可以集成到 GitLab CI/CD 中，让你通过 `@claude` 提及来驱动 AI 完成编码任务。整个流程是：你在 Issue 或 MR 里 `@claude` 说需求 → GitLab 触发 CI 作业 → Claude Code 在隔离容器中分析代码、实现修改 → 自动创建 MR 提交结果。
+
+核心价值一览：
 
 | 能力 | 说明 |
-|------|------|
-| **即时 MR 创建** | 描述你的需求，Claude 会生成完整的 MR |
-| **自动化实现** | 用一条命令或提及将 Issue 转化为可工作的代码 |
-| **项目感知** | Claude 遵循 `CLAUDE.md` 指南和现有代码模式 |
-| **简单设置** | 向 `.gitlab-ci.yml` 添加一个作业和一个掩码变量 |
-| **企业就绪** | 支持 Claude API、AWS Bedrock 或 Google Vertex AI |
-| **默认安全** | 在你的 GitLab runners 中运行，遵循分支保护规则 |
+|---|---|
+| 即时 MR 创建 | 描述需求，Claude 直接生成完整 MR |
+| 自动化实现 | 一条命令将 Issue 转化为可工作的代码 |
+| 项目感知 | 读取仓库的 `CLAUDE.md`，遵循现有代码风格 |
+| 企业就绪 | 三种云后端可选，适配不同数据驻留需求 |
+| 默认安全 | 隔离容器执行，所有更改必须通过 MR 审查 |
 
 <!-- more -->
 
 ---
 
-## 二、工作原理详解
+## 二、官方教程精读
 
-Claude Code 使用 GitLab CI/CD 在隔离的作业中运行 AI 任务，并通过 MR 将结果提交回来。理解这个流程对于排查问题和优化配置至关重要。
+### 2.1 工作原理：三大核心机制
 
-### 2.1 整体架构
+理解 Claude Code 在 GitLab CI 中怎么运转，关键是把握三个机制。
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  触发事件        │ ──► │  CI/CD 作业     │ ──► │  结果提交        │
-│  @claude 评论    │     │  Claude Code    │     │  MR / 分支更新   │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-```
+**事件驱动编排**——GitLab 监听你配置的触发器（手动触发、MR 事件、webhook），当检测到 `@claude` 提及时，作业从线程收集评论和上下文，从仓库获取代码，构建结构化提示发送给 Claude。
 
-### 2.2 三大核心组件
-
-**1. 事件驱动的编排**
-
-GitLab 监听你选择的触发器：
-
-```yaml
-# 常见触发器配置
-rules:
-  - if: '$CI_PIPELINE_SOURCE == "web"'           # 手动触发
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # MR 事件
-  - if: '$CI_PIPELINE_SOURCE == "api"'           # API 触发（webhook）
-```
-
-当检测到 `@claude` 提及（在 Issue、MR 或审查线程中）时，作业会：
-- 从线程收集评论和上下文
-- 从仓库获取相关代码
-- 构建结构化提示发送给 Claude
-
-**2. 提供商抽象**
-
-Claude Code 支持三种后端，适应不同企业需求：
+**提供商抽象**——Claude Code 支持三种 AI 后端：
 
 | 提供商 | 认证方式 | 适用场景 |
-|--------|---------|---------|
-| **Claude API (SaaS)** | API Key | 快速入门、个人/小团队 |
-| **AWS Bedrock** | IAM + OIDC | AWS 深度用户、数据驻留要求 |
-| **Google Vertex AI** | Workload Identity Federation | GCP 原生环境、企业合规 |
+|---|---|---|
+| Claude API (SaaS) | API Key | 快速入门、个人和小团队 |
+| AWS Bedrock | IAM + OIDC（一种无需静态密钥的身份验证方式） | AWS 用户、数据驻留合规 |
+| Google Vertex AI | Workload Identity Federation（GCP 原生的无密钥认证） | GCP 环境、企业合规 |
 
-选择区域端点可降低延迟并满足数据主权要求。
+**沙箱执行**——每次交互都在受限容器中运行，Claude Code 强制工作区范围的权限限制写入，所有更改必须通过 MR 流程才能合入主分支。
 
-**3. 沙箱执行**
+### 2.2 快速设置：5 分钟跑起来
 
-每次交互都在具有严格规则的容器中运行：
+**第一步**：在 GitLab 项目中添加 CI/CD 变量。Settings → CI/CD → Variables，添加 `ANTHROPIC_API_KEY`，务必勾选 **Mask variable**（掩码）和 **Protected**（受保护）。
 
-```yaml
-# 安全配置示例
-claude:
-  image: node:24-alpine3.21  # 隔离的容器环境
-  timeout: 30m               # 限制执行时间
-  tags:
-    - restricted-network     # 可选：限制网络访问
-  variables:
-    GIT_STRATEGY: fetch      # 仅拉取必要代码
-```
-
-Claude Code 强制执行工作区范围的权限限制写入，所有更改必须通过 MR 流程。
-
-### 2.3 执行流程详解
-
-```
-用户评论 @claude
-       │
-       ▼
-┌──────────────────┐
-│ 1. Webhook 触发   │  GitLab 发送 comment 事件
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ 2. Pipeline 启动  │  CI 作业开始运行
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ 3. 上下文收集     │  读取 Issue/MR 内容、代码库
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ 4. Claude 执行    │  AI 分析并生成代码更改
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ 5. 结果提交       │  创建/更新分支，打开 MR
-└──────────────────┘
-```
-
----
-
-## 三、快速设置（5 分钟上手）
-
-### 3.1 添加掩码 CI/CD 变量
-
-1. 转到 **Settings** → **CI/CD** → **Variables**
-2. 点击 **Add variable**
-3. 填写以下信息：
-
-| 字段 | 值 |
-|------|------|
-| Key | `ANTHROPIC_API_KEY` |
-| Value | 你的 API 密钥（从 Anthropic Console 获取） |
-| Type | Variable |
-| Flags | 勾选 **Mask variable**（推荐勾选 **Protected**） |
-
-### 3.2 向 `.gitlab-ci.yml` 添加作业
+**第二步**：在 `.gitlab-ci.yml` 中添加以下作业：
 
 ```yaml
 stages:
@@ -162,9 +76,8 @@ claude:
     - apk add --no-cache git curl bash
     - curl -fsSL https://claude.ai/install.sh | bash
   script:
-    # 可选：如果提供了 GitLab MCP 服务器
     - /bin/gitlab-mcp-server || true
-    # 使用 AI_FLOW_* 变量（通过 web/API 触发器传入）
+    - echo "$AI_FLOW_INPUT for $AI_FLOW_CONTEXT on $AI_FLOW_EVENT"
     - >
       claude
       -p "${AI_FLOW_INPUT:-'Review this MR and implement the requested changes'}"
@@ -173,128 +86,25 @@ claude:
       --debug
 ```
 
-### 3.3 关键参数说明
+几个关键参数要理解：
 
 | 参数 | 说明 |
-|------|------|
-| `--permission-mode acceptEdits` | 允许 Claude 自动编辑文件（不询问确认） |
-| `--allowedTools` | 指定 Claude 可使用的工具集 |
-| `--debug` | 输出详细日志，便于排查问题 |
-| `AI_FLOW_INPUT` | 通过 webhook 传入的用户指令 |
+|---|---|
+| `-p` | 内联提示，`AI_FLOW_INPUT` 通过 webhook/API 传入用户指令 |
+| `--permission-mode acceptEdits` | 允许 Claude 自动编辑文件，不询问确认 |
+| `--allowedTools` | 工具白名单，`mcp__gitlab` 让 Claude 能操作 GitLab API |
+| `--debug` | 输出详细日志，排查问题必备 |
+| `AI_FLOW_INPUT` | webhook 传入的用户指令文本 |
+| `AI_FLOW_CONTEXT` | 触发上下文（Issue/MR 编号等） |
+| `AI_FLOW_EVENT` | 事件类型 |
 
-添加后，通过 **CI/CD** → **Pipelines** 手动运行测试，或从 MR 触发。
+`/bin/gitlab-mcp-server` 是 GitLab 提供的 MCP 服务器（一种让 AI 连接外部工具的标准协议），它让 Claude 具备操作 GitLab API 的能力——写评论、开 MR 都靠它。`|| true` 确保即使 MCP 服务器启动失败，后续脚本仍继续执行。
 
----
+### 2.3 企业部署：AWS Bedrock 与 Google Vertex AI
 
-## 四、典型用例
+企业环境可以完全在自己的云基础设施上运行 Claude Code，数据不经过 Anthropic。两种方案的共同特点是：**无静态密钥**，都通过 OIDC 信任链获取临时凭证。
 
-### 4.1 将 Issue 转化为 MR
-
-在 Issue 评论中：
-
-```text
-@claude implement this feature based on the issue description
-```
-
-Claude 会：
-- 分析 Issue 和代码库
-- 在分支中编写更改
-- 打开 MR 供审查
-
-### 4.2 获取实现帮助
-
-在 MR 讨论中：
-
-```text
-@claude suggest a concrete approach to cache the results of this API call
-```
-
-Claude 会提议更改，添加适当的缓存代码，并更新 MR。
-
-### 4.3 快速修复 Bug
-
-在 Issue 或 MR 评论中：
-
-```text
-@claude fix the TypeError in the user dashboard component
-```
-
-Claude 会定位错误、实现修复、更新分支或打开新 MR。
-
----
-
-## 五、企业部署：AWS Bedrock 和 Google Vertex AI
-
-企业环境可以选择在云基础设施上完全运行 Claude Code，无需将数据发送到 Anthropic SaaS。
-
-### 5.1 AWS Bedrock 配置
-
-**前置条件**：
-
-| 要求 | 说明 |
-|------|------|
-| AWS 账户 | 启用 Amazon Bedrock 并请求 Claude 模型访问 |
-| OIDC 配置 | GitLab 配置为 AWS IAM OIDC 身份提供商 |
-| IAM 角色 | 具有 Bedrock 权限和信任策略 |
-
-**步骤一：在 AWS 中配置 OIDC 身份提供商**
-
-```bash
-# 1. 创建 OIDC 提供商（如果不存在）
-aws iam create-open-id-connect-provider \
-  --url https://gitlab.com \
-  --client-id-list https://gitlab.com
-
-# 2. 记录提供商 ARN，格式如：
-# arn:aws:iam::123456789012:oidc-provider/gitlab.com
-```
-
-**步骤二：创建 IAM 角色和信任策略**
-
-创建信任策略文件 `trust-policy.json`：
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "arn:aws:iam::YOUR_ACCOUNT_ID:oidc-provider/gitlab.com"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "gitlab.com:sub": "project_path:your-group/your-project:ref_type:branch:ref:main"
-        }
-      }
-    }
-  ]
-}
-```
-
-```bash
-# 创建角色
-aws iam create-role \
-  --role-name GitLabClaudeCodeRole \
-  --assume-role-policy-document file://trust-policy.json
-
-# 附加 Bedrock 权限
-aws iam attach-role-policy \
-  --role-name GitLabClaudeCodeRole \
-  --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess
-```
-
-**步骤三：配置 GitLab CI/CD 变量**
-
-在 **Settings** → **CI/CD** → **Variables** 中添加：
-
-| 变量名 | 值 | 说明 |
-|--------|------|------|
-| `AWS_ROLE_TO_ASSUME` | `arn:aws:iam::YOUR_ACCOUNT_ID:role/GitLabClaudeCodeRole` | 角色ARN |
-| `AWS_REGION` | `us-west-2` | Bedrock 区域 |
-
-**作业配置**：
+**AWS Bedrock** 的核心流程是：GitLab CI 作业自带 JWT 令牌（`CI_JOB_JWT_V2`）→ 用这个令牌向 AWS STS 换取临时凭证 → 用临时凭证调用 Bedrock API。在 GitLab 中配置两个变量：`AWS_ROLE_TO_ASSUME`（IAM 角色 ARN）和 `AWS_REGION`（如 `us-west-2`）。
 
 ```yaml
 claude-bedrock:
@@ -306,7 +116,7 @@ claude-bedrock:
     - apk add --no-cache bash curl jq git python3 py3-pip
     - pip install --no-cache-dir awscli
     - curl -fsSL https://claude.ai/install.sh | bash
-    # 交换 GitLab OIDC 令牌获取 AWS 凭证
+    # 用 GitLab OIDC 令牌换 AWS 临时凭证
     - export AWS_WEB_IDENTITY_TOKEN_FILE="${CI_JOB_JWT_FILE:-/tmp/oidc_token}"
     - if [ -n "${CI_JOB_JWT_V2}" ]; then printf "%s" "$CI_JOB_JWT_V2" > "$AWS_WEB_IDENTITY_TOKEN_FILE"; fi
     - >
@@ -330,276 +140,128 @@ claude-bedrock:
     AWS_REGION: "us-west-2"
 ```
 
-### 5.2 Google Vertex AI 配置
+**Google Vertex AI** 使用 Workload Identity Federation（WIF）实现类似的无密钥认证。需要在 GCP 中配置 WIF Provider 信任 GitLab OIDC，然后通过服务账户模拟获取访问令牌。GitLab 中配置三个变量：`GCP_WORKLOAD_IDENTITY_PROVIDER`、`GCP_SERVICE_ACCOUNT` 和 `CLOUD_ML_REGION`。
 
-**前置条件**：
+三种后端的 CI/CD 变量对比：
 
-| 要求 | 说明 |
-|------|------|
-| GCP 项目 | 启用 Vertex AI API、IAM Credentials API、STS API |
-| WIF 配置 | Workload Identity Federation 信任 GitLab OIDC |
-| 服务账户 | 仅具有 Vertex AI 角色 |
-
-**步骤一：启用必要的 API**
-
-```bash
-gcloud services enable \
-  iam.googleapis.com \
-  sts.googleapis.com \
-  iamcredentials.googleapis.com \
-  aiplatform.googleapis.com \
-  --project=YOUR_PROJECT_ID
-```
-
-**步骤二：创建 Workload Identity Pool 和 Provider**
-
-```bash
-# 创建 Pool
-gcloud iam workload-identity-pools create gitlab-pool \
-  --location="global" \
-  --display-name="GitLab CI/CD Pool"
-
-# 创建 Provider（信任 GitLab OIDC）
-gcloud iam workload-identity-pools providers create-oidc gitlab-provider \
-  --location="global" \
-  --workload-identity-pool="gitlab-pool" \
-  --display-name="GitLab OIDC Provider" \
-  --issuer-uri="https://gitlab.com" \
-  --attribute-mapping="google.subject=assertion.sub"
-```
-
-**步骤三：创建服务账户并授权**
-
-```bash
-# 创建服务账户
-gcloud iam service-accounts create claude-code-sa \
-  --display-name="Claude Code Service Account"
-
-# 授予 Vertex AI 权限
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:claude-code-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/aiplatform.user"
-
-# 允许 WIF 模拟服务账户
-gcloud iam service-accounts add-iam-policy-binding \
-  claude-code-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com \
-  --member="principalSet://iam.googleapis.com/projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/gitlab-pool/*" \
-  --role="roles/iam.workloadIdentityUser"
-```
-
-**步骤四：配置 GitLab CI/CD 变量**
-
-| 变量名 | 值 | 说明 |
-|--------|------|------|
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider` | 提供商完整资源名 |
-| `GCP_SERVICE_ACCOUNT` | `claude-code-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com` | 服务账户邮箱 |
-| `CLOUD_ML_REGION` | `us-east5` | Vertex AI 区域 |
-
-**作业配置**：
-
-```yaml
-claude-vertex:
-  stage: ai
-  image: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'
-  before_script:
-    - apt-get update && apt-get install -y git && apt-get clean
-    - curl -fsSL https://claude.ai/install.sh | bash
-    # 通过 WIF 向 Google Cloud 认证
-    - >
-      gcloud auth login --cred-file=<(cat <<EOF
-      {
-        "type": "external_account",
-        "audience": "${GCP_WORKLOAD_IDENTITY_PROVIDER}",
-        "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-        "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT}:generateAccessToken",
-        "token_url": "https://sts.googleapis.com/v1/token"
-      }
-      EOF
-      )
-    - gcloud config set project "$(gcloud projects list --format='value(projectId)' --filter="name:${CI_PROJECT_NAMESPACE}" | head -n1)" || true
-  script:
-    - /bin/gitlab-mcp-server || true
-    - >
-      CLOUD_ML_REGION="${CLOUD_ML_REGION:-us-east5}"
-      claude
-      -p "${AI_FLOW_INPUT:-'Review and update code as requested'}"
-      --permission-mode acceptEdits
-      --allowedTools "Bash Read Edit Write mcp__gitlab"
-      --debug
-  variables:
-    CLOUD_ML_REGION: "us-east5"
-```
+| 变量 | Claude API | AWS Bedrock | Vertex AI |
+|---|---|---|---|
+| 认证变量 | `ANTHROPIC_API_KEY` | `AWS_ROLE_TO_ASSUME` | `GCP_WORKLOAD_IDENTITY_PROVIDER` |
+| 区域变量 | — | `AWS_REGION` | `CLOUD_ML_REGION` |
+| 额外变量 | — | — | `GCP_SERVICE_ACCOUNT` |
+| 是否需要掩码 | 是（API Key） | 否（OIDC） | 否（WIF） |
 
 ---
 
-## 六、常用参数和变量
+## 三、典型用例与高级配置
 
-| 参数/变量 | 说明 |
-|----------|------|
-| `prompt` / `-p` | 内联提供说明 |
-| `prompt_file` | 通过文件提供说明 |
-| `max_turns` | 限制来回迭代次数 |
-| `timeout_minutes` | 限制总执行时间 |
-| `ANTHROPIC_API_KEY` | Claude API 所需（不用于 Bedrock/Vertex） |
-| `AWS_REGION` | Bedrock 区域 |
-| `CLOUD_ML_REGION` | Vertex AI 区域 |
+### 3.1 三种典型用例
 
----
+**Issue 转 MR**——在 Issue 评论中：
 
-## 七、安全最佳实践
+```text
+@claude implement this feature based on the issue description
+```
 
-### 7.1 永远不要将 API 密钥提交到仓库
+Claude 会分析 Issue 和代码库，在分支中编写更改，打开 MR 供审查。
 
-始终使用 GitLab CI/CD 变量：
+**MR 讨论求助**——在 MR 讨论中：
 
-- 将 `ANTHROPIC_API_KEY` 添加为**掩码**变量
-- 如需保护，勾选 **Protected** 选项
-- 尽可能使用 OIDC（无长期密钥）
+```text
+@claude suggest a concrete approach to cache the results of this API call
+```
 
-### 7.2 限制作业权限
+Claude 会提议方案、添加代码、更新 MR。
+
+**快速修 Bug**——在 Issue 或 MR 评论中：
+
+```text
+@claude fix the TypeError in the user dashboard component
+```
+
+Claude 定位错误、实现修复、更新分支或开新 MR。
+
+### 3.2 自定义行为与性能优化
+
+**CLAUDE.md 是核心投入点**。在仓库根目录放一份 `CLAUDE.md`，写明编码标准、项目约定和安全要求，Claude 运行时会自动读取并遵循。
+
+自定义提示有两种方式：`-p` 内联传简短指令，`--prompt-file` 用文件传复杂指令（比如安全审查清单）。对于需要控制成本的团队，关键参数是 `--max-turns`（限制 AI 迭代次数）和 `--timeout_minutes`（限制执行时间）：
 
 ```yaml
 claude:
-  # 限制网络出口
-  tags:
-    - restricted-network
-  # 设置合理的超时
+  stage: ai
   timeout: 30m
-  # 使用特定的 runner
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'
-      when: manual
-```
-
-### 7.3 像审查任何贡献者一样审查 Claude 的 MR
-
-- 所有更改都通过 MR 流动
-- 分支保护和批准规则仍然适用
-- Claude Code 使用工作区范围的权限限制写入
-
----
-
-## 八、故障排除
-
-### 8.1 Claude 不响应 @claude 命令
-
-**检查清单**：
-
-- [ ] 管道是否被触发（手动、MR 事件或 webhook）
-- [ ] CI/CD 变量（`ANTHROPIC_API_KEY` 或云提供商设置）是否存在且未掩码
-- [ ] 评论是否包含 `@claude`（不是 `/claude`）
-- [ ] 提及触发器是否已配置
-
-### 8.2 作业无法写入评论或打开 MR
-
-**检查清单**：
-
-- [ ] `CI_JOB_TOKEN` 对项目是否有足够权限
-- [ ] 是否使用了具有 `api` 范围的项目访问令牌
-- [ ] `mcp__gitlab` 工具是否在 `--allowedTools` 中启用
-- [ ] 作业是否在 MR 上下文中运行或有足够的 `AI_FLOW_*` 变量
-
-### 8.3 身份验证错误
-
-| 提供商 | 排查步骤 |
-|--------|---------|
-| Claude API | 确认 `ANTHROPIC_API_KEY` 有效且未过期 |
-| AWS Bedrock | 验证 OIDC 配置、角色模拟、密钥名称；确认区域和模型可用性 |
-| Google Vertex | 验证 WIF 配置、服务账户权限；确认区域和模型可用性 |
-
----
-
-## 九、CLAUDE.md 配置建议
-
-在仓库根目录创建 `CLAUDE.md` 文件，定义：
-
-- 编码标准和风格指南
-- 审查标准
-- 项目特定规则和约定
-- 安全要求
-
-Claude 在运行时会读取此文件并遵循你的约定。
-
-### 9.1 自定义 Claude 行为的两种方式
-
-你可以通过以下两种主要方式指导 Claude：
-
-| 方式 | 说明 | 适用场景 |
-|------|------|---------|
-| **CLAUDE.md** | 定义编码标准、安全要求和项目约定 | 项目级通用规则 |
-| **自定义提示** | 通过 `prompt`/`prompt_file` 传递任务说明 | 特定作业的定制化指令 |
-
-**自定义提示示例**：
-
-```yaml
-script:
-  # 不同的作业使用不同的提示
-  - >
-    claude
-    -p "Review this code for security vulnerabilities and suggest fixes"
-    --permission-mode acceptEdits
-    --allowedTools "Bash Read Edit Write mcp__gitlab"
-```
-
-你也可以通过文件提供提示：
-
-```yaml
-script:
-  - claude --prompt-file ./prompts/review-security.md
-```
-
----
-
-## 十、CI 成本
-
-在 GitLab CI/CD 中使用 Claude Code 时，请注意相关成本：
-
-### 10.1 成本构成
-
-| 成本类型 | 说明 |
-|---------|------|
-| **GitLab Runner 时间** | Claude 在你的 GitLab runners 上运行并消耗计算分钟数，详情请参阅你的 GitLab 计划的 runner 计费 |
-| **API 成本** | 每次 Claude 交互根据提示和响应大小消耗令牌，令牌使用因任务复杂性和代码库大小而异，详情请参阅 Anthropic 定价 |
-
-### 10.2 成本优化建议
-
-| 建议 | 说明 |
-|------|------|
-| 使用特定的 `@claude` 命令 | 减少不必要的轮次，让 Claude 一次完成任务 |
-| 设置适当的 `max_turns` | 限制 AI 迭代次数，避免失控运行 |
-| 设置合理的作业超时 | 使用 `timeout_minutes` 限制总执行时间 |
-| 限制并发 | 控制并行运行的作业数量 |
-
-**优化配置示例**：
-
-```yaml
-claude:
-  stage: ai
-  timeout: 30m  # 限制总执行时间
   script:
     - >
       claude
       -p "${AI_FLOW_INPUT:-'Implement the requested changes'}"
       --permission-mode acceptEdits
-      --max-turns 10  # 限制迭代次数
+      --max-turns 10
+      --timeout-minutes 20
       --allowedTools "Bash Read Edit Write mcp__gitlab"
 ```
 
-### 10.3 成本估算参考
+常用参数和变量汇总：
 
-| 场景 | 预估令牌消耗 | 说明 |
-|------|------------|------|
-| 简单代码审查 | 5,000 - 15,000 tokens | 读取少量文件，生成评论 |
-| Bug 修复 | 10,000 - 30,000 tokens | 定位问题 + 生成修复 |
-| 功能实现 | 30,000 - 100,000+ tokens | 取决于代码库大小和复杂度 |
+| 参数/变量 | 说明 |
+|---|---|
+| `-p` | 内联提示文本 |
+| `--prompt-file` | 从文件读取提示 |
+| `--max-turns` | 限制 Claude 内部迭代次数（控制成本） |
+| `--timeout-minutes` | 限制总执行时间 |
+| `GIT_STRATEGY` | Git 拉取策略，推荐 `fetch`（增量） |
+| `GITLAB_ACCESS_TOKEN` | 可选，替代 `CI_JOB_TOKEN` 的项目访问令牌，需 `api` 范围 |
 
 ---
 
-## 一句话总结
+## 四、hippo 的实战经验
 
-**GitLab CI/CD + Claude Code = 在 Issue 里 @claude，AI 自动分析、写代码、开 MR——企业级安全，三种云后端可选。**
+> hippo：以下是我实际使用中踩过的坑和总结的建议。
+
+### 4.1 踩过的坑
+
+**@claude 不响应**——最常见的三个原因：管道压根没触发（检查 `rules` 里的 `CI_PIPELINE_SOURCE` 是否匹配）、API Key 变量被掩码了（掩码和"受保护"不冲突，但确认变量确实存在）、写成了 `/claude` 而不是 `@claude`（`/` 是斜杠命令，`@` 才是提及触发）。
+
+**作业无法写评论或开 MR**——`CI_JOB_TOKEN` 的默认权限可能不够。如果你发现 Claude 能跑但无法回写 GitLab，检查两点：`mcp__gitlab` 是否在 `--allowedTools` 中启用，以及是否需要配置 `GITLAB_ACCESS_TOKEN` 来替代默认的 job token。
+
+**OIDC 认证报错**——AWS Bedrock 的 OIDC 信任策略里 `project_path` 如果写错了项目路径（比如忘了 group 前缀），`AssumeRoleWithWebIdentity` 会直接失败，报错信息却只说"not authorized"。建议先用 AWS CloudTrail 查看实际的 `sub` claim 值，再回去对信任策略。
+
+### 4.2 我的使用建议
+
+**先用 Claude API 验证流程，再切企业后端。** API Key 方式配置最简单，先把整个 `@claude` 触发 → CI 执行 → MR 创建的链路跑通，确认没有问题后，再花时间配 Bedrock 或 Vertex AI 的 OIDC。否则一旦出错，你分不清是 Claude Code 的问题还是 OIDC 配置的问题。
+
+**CLAUDE.md 是投资回报率最高的配置。** 与其花时间调参数，不如把项目编码规范、测试要求、禁止操作写清楚。一份好的 `CLAUDE.md` 能让 Claude 的输出质量从"能用"变成"基本可以合入"。
+
+**始终人工审查 MR。** Claude 写的代码能跑不等于写对了。特别是涉及数据库操作、权限判断、并发处理的代码，一定要逐行看。把它当成一个水平不错但偶尔犯低级错误的实习生。
+
+---
+
+## 五、安全与成本
+
+**安全四原则**：不提交密钥到仓库（用 CI/CD 变量）、OIDC 优先（不存长期密钥）、限制作业权限（设 timeout、限制并发）、像审查人类贡献者一样审查 Claude 的 MR。
+
+成本由两部分构成：GitLab Runner 的计算分钟数 + AI API 的 Token 消耗。控制成本的有效手段：
+
+| 手段 | 说明 |
+|---|---|
+| `--max-turns` | 限制迭代次数，防止失控运行 |
+| `--timeout-minutes` | 硬性时间上限 |
+| 具体 `@claude` 指令 | 减少模糊需求带来的多余轮次 |
+| 复杂任务拆小 Issue | 单次任务越小，Token 消耗越可控 |
+
+不同场景的成本参考：
+
+| 场景 | 预估 Token 消耗 | 说明 |
+|---|---|---|
+| 简单代码审查 | 5,000 - 15,000 | 读少量文件，生成评论 |
+| Bug 修复 | 10,000 - 30,000 | 定位问题 + 生成修复 |
+| 功能实现 | 30,000 - 100,000+ | 取决于代码库大小 |
+
+---
+
+## 六、小结
+
+**GitLab CI/CD + Claude Code = 在 Issue 里 `@claude`，AI 自动分析、写代码、开 MR。** 三种云后端可选，OIDC 无静态密钥，MR 强制审查。先把基本流程跑通，写好 `CLAUDE.md`，然后逐步加码。
 
 **下一篇**：[精读官方文档：GitHub Actions 集成](./github-actions)
 
@@ -607,4 +269,4 @@ claude:
 
 *本文精读自 [Claude Code GitLab CI/CD 官方文档](https://code.claude.com/docs/zh-CN/gitlab-ci-cd)*
 
-*最后更新：2026-03-27*
+*最后更新：2026-03-31*

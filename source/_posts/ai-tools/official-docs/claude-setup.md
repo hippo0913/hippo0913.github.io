@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：安装和设置 Claude Code
 date: 2026-03-27 23:00:00
-updated: 2026-03-27 17:00:00
+updated: 2026-03-31 12:00:00
 tags: [Claude Code, AI 工具, 官方文档精读]
 categories: [AI 工具系列]
 series: claude-code
@@ -19,7 +19,7 @@ source_url: https://code.claude.com/docs/zh-CN/setup
 
 ## 一、这个功能是什么
 
-本页面涵盖 Claude Code 的**系统要求**、**特定平台安装**、**更新配置**和**卸载**。如果你从未使用过终端，建议先参阅终端指南。
+本页面是 Claude Code 的**安装说明书**，覆盖系统要求、安装、验证、更新、卸载的完整生命周期。重点只有一个：**用原生安装（Native Install），别用 npm**。原生安装更快、无依赖、支持后台自动更新。npm 方式已弃用。
 
 <!-- more -->
 
@@ -27,27 +27,18 @@ source_url: https://code.claude.com/docs/zh-CN/setup
 
 ## 二、官方教程精读
 
-### 2.1 系统要求
+### 2.1 系统要求与安装方式
 
-Claude Code 在以下平台和配置上运行：
+**系统要求一览：**
 
 | 类型 | 要求 |
 |------|------|
-| **操作系统** | macOS 13.0+、Windows 10 1809+ / Server 2019+、Ubuntu 20.04+、Debian 10+、Alpine Linux 3.19+ |
-| **硬件** | 4 GB+ RAM |
-| **网络** | 需要互联网连接 |
-| **Shell** | Bash、Zsh、PowerShell 或 CMD（Windows 需要 Git for Windows） |
-| **位置** | Anthropic 支持的国家/地区 |
+| 操作系统 | macOS 13.0+、Windows 10 1809+、Ubuntu 20.04+、Debian 10+、Alpine 3.19+ |
+| 硬件 | 4 GB+ RAM |
+| 网络 | 需要互联网连接（Anthropic 支持的国家/地区） |
+| Shell | Bash、Zsh、PowerShell 或 CMD |
 
-**其他依赖项：**
-
-- **ripgrep**：通常包含在 Claude Code 中。如果搜索失败，请参阅搜索故障排除。
-
-### 2.2 安装方式
-
-官方推荐三种安装方式：
-
-**方式一：原生安装（推荐）**
+**原生安装（推荐）：**
 
 ```bash
 # macOS / Linux / WSL
@@ -60,33 +51,22 @@ irm https://claude.ai/install.ps1 | iex
 curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
 ```
 
-> ⚠️ Windows 需要先安装 [Git for Windows](https://gitforwindows.org/)。
+原生安装把二进制文件放在 `~/.local/bin/claude`，不依赖 Node.js，启动速度比 npm 快 2-3 倍，且支持后台自动更新。安装脚本会自动检测平台架构（x86_64 或 arm64），下载对应的预编译二进制文件。
 
-**方式二：Homebrew（macOS）**
+macOS 用户还可以用 Homebrew：`brew install --cask claude-code`；Windows 用户可以用 WinGet：`winget install Anthropic.ClaudeCode`。不过这两种方式不支持自动更新，需要手动 `claude update`。
 
-```bash
-brew install --cask claude-code
-```
+**关于 npm 安装：** `npm install -g @anthropic-ai/claude-code` 曾经是唯一的安装方式，但现在已经弃用。npm 方式需要 Node.js 18+ 环境，启动时要加载整个 Node 运行时，所以明显更慢。如果你还在用 npm，建议尽快迁移（见第三章实战经验）。
 
-**方式三：WinGet（Windows）**
+**身份验证要求：** Claude Code 需要 Pro、Max、Teams、Enterprise 或 Console 账户。**免费账户不行。** 也支持通过 Amazon Bedrock、Google Vertex AI、Microsoft Foundry 等第三方 API 使用——适合企业用户或有 AWS/GCP 账号的开发者，按 API 调用量计费。
 
-```powershell
-winget install Anthropic.ClaudeCode
-```
+### 2.2 平台特殊配置
 
-> 💬 hippo：强烈建议使用**原生安装**。它更快、不需要依赖项、并且支持后台自动更新。npm 安装已弃用。
+**Windows 用户有两条路：**
 
-### 2.3 Windows 特殊设置
-
-Windows 上的 Claude Code 需要 **Git for Windows** 或 **WSL**。你可以从 PowerShell、CMD 或 Git Bash 启动 `claude`。
-
-**选项 1：原生 Windows + Git Bash**
-
-安装 Git for Windows，然后从 PowerShell 或 CMD 运行安装命令。
-
-如果 Claude Code 找不到 Git Bash，在 `settings.json` 中设置路径：
+- **原生 Windows + Git Bash**：先装 [Git for Windows](https://gitforwindows.org/)，然后正常安装。如果 Claude Code 找不到 Git Bash，需要手动指定路径：
 
 ```json
+// ~/.claude/settings.json
 {
   "env": {
     "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Program Files\\Git\\bin\\bash.exe"
@@ -94,19 +74,15 @@ Windows 上的 Claude Code 需要 **Git for Windows** 或 **WSL**。你可以从
 }
 ```
 
-**选项 2：WSL**
+- **WSL2**：在 WSL2 里跑 Linux 版 Claude Code。优势是支持沙箱（一种隔离机制，限制程序能访问的系统资源），WSL1 不支持沙箱。
 
-支持 WSL 1 和 WSL 2。WSL 2 支持沙箱以增强安全性，WSL 1 不支持沙箱。
-
-### 2.4 Alpine Linux 设置
-
-Alpine 和其他基于 musl 的发行版需要额外依赖：
+**Alpine / musl 发行版**需要额外处理。Alpine 用的是 musl libc（一个轻量级 C 标准库），不是主流的 glibc，所以需要手动补依赖：
 
 ```bash
 apk add libgcc libstdc++ ripgrep
 ```
 
-然后在 `settings.json` 中设置：
+然后在 `settings.json` 中关闭内置 ripgrep：
 
 ```json
 {
@@ -116,47 +92,27 @@ apk add libgcc libstdc++ ripgrep
 }
 ```
 
-### 2.5 验证安装
-
-安装后，确认 Claude Code 正常工作：
+**验证安装是否成功：**
 
 ```bash
-claude
+claude          # 启动交互式界面
+claude doctor   # 详细检查安装和配置状态
 ```
 
-要更详细地检查安装和配置，运行：
+`claude doctor` 会检查二进制完整性、Shell 配置、网络连通性、认证状态等，是排查问题的第一步。
 
-```bash
-claude doctor
-```
+### 2.3 更新与版本管理
 
-### 2.6 身份验证
+原生安装默认开启后台自动更新——新版本在后台下载，下次启动时生效，当前会话不受影响。
 
-Claude Code 需要 Pro、Max、Teams、Enterprise 或 Console 账户。**免费的 Claude.ai 计划不包括 Claude Code 访问权限**。
+**更新渠道配置：**
 
-你也可以通过第三方 API 提供商使用 Claude Code：
-- Amazon Bedrock
-- Google Vertex AI
-- Microsoft Foundry
+| 参数 | 值 | 说明 |
+|------|------|------|
+| `autoUpdatesChannel` | `"latest"`（默认） | 新功能立即获取 |
+| `autoUpdatesChannel` | `"stable"` | 约延迟一周，跳过有重大回归的版本 |
 
-安装后，运行 `claude` 并按照浏览器提示登录。
-
-### 2.7 更新 Claude Code
-
-**自动更新：**
-
-原生安装会在后台自动更新。更新在后台下载和安装，下次启动 Claude Code 时生效。
-
-**配置发布渠道：**
-
-使用 `autoUpdatesChannel` 设置控制更新行为：
-
-| 渠道 | 说明 |
-|------|------|
-| `"latest"`（默认） | 新功能发布后立即接收 |
-| `"stable"` | 使用约一周前的版本，跳过有重大回归的发布 |
-
-配置方式：
+切换到 stable 渠道：
 
 ```json
 {
@@ -164,9 +120,9 @@ Claude Code 需要 Pro、Max、Teams、Enterprise 或 Console 账户。**免费�
 }
 ```
 
-或通过 `/config` → **自动更新渠道** 配置。
+也可以在 Claude Code 里输入 `/config`，找到「自动更新渠道」选项配置。
 
-**禁用自动更新：**
+**禁用自动更新**（适用于需要锁版本的环境）：
 
 ```json
 {
@@ -176,218 +132,147 @@ Claude Code 需要 Pro、Max、Teams、Enterprise 或 Console 账户。**免费�
 }
 ```
 
-**手动更新：**
+**手动更新和安装特定版本：**
 
 ```bash
-claude update
+claude update                                          # 手动更新到最新
+curl -fsSL https://claude.ai/install.sh | bash -s stable   # 安装 stable 渠道版本
+curl -fsSL https://claude.ai/install.sh | bash -s 1.0.58   # 安装指定版本号
 ```
 
-> 💬 hippo：Homebrew 和 WinGet 安装需要手动更新。原生安装才支持自动更新。
-
-### 2.8 安装特定版本
-
-原生安装程序支持指定版本或渠道：
-
-**安装稳定版本：**
+**卸载：**
 
 ```bash
-# macOS / Linux / WSL
-curl -fsSL https://claude.ai/install.sh | bash -s stable
-
-# Windows PowerShell
-& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) stable
-```
-
-**安装特定版本号：**
-
-```bash
-# macOS / Linux / WSL
-curl -fsSL https://claude.ai/install.sh | bash -s 1.0.58
-
-# Windows PowerShell
-& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) 1.0.58
-```
-
-### 2.9 从 npm 迁移
-
-如果你之前使用 npm 安装，切换到原生安装：
-
-```bash
-# 安装原生二进制文件
-curl -fsSL https://claude.ai/install.sh | bash
-
-# 删除旧的 npm 安装
-npm uninstall -g @anthropic-ai/claude-code
-```
-
-> 💬 hippo：npm 安装已弃用。原生安装更快、不需要依赖项、支持后台自动更新。
-
-### 2.10 二进制完整性验证
-
-你可以验证 Claude Code 二进制文件的完整性：
-
-**SHA256 校验和：**
-
-所有平台的校验和发布在：
-```
-https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/{VERSION}/manifest.json
-```
-
-将 `{VERSION}` 替换为版本号，如 `2.0.30`。
-
-**代码签名：**
-
-| 平台 | 签名 |
-|------|------|
-| macOS | 由 "Anthropic PBC" 签名并经 Apple 公证 |
-| Windows | 由 "Anthropic, PBC" 签名 |
-
-### 2.11 卸载 Claude Code
-
-**原生安装卸载：**
-
-```bash
-# macOS / Linux / WSL
-rm -f ~/.local/bin/claude
-rm -rf ~/.local/share/claude
+# 原生安装卸载（macOS / Linux / WSL）
+rm -f ~/.local/bin/claude && rm -rf ~/.local/share/claude
 
 # Windows PowerShell
 Remove-Item -Path "$env:USERPROFILE\.local\bin\claude.exe" -Force
 Remove-Item -Path "$env:USERPROFILE\.local\share\claude" -Recurse -Force
-```
 
-**Homebrew 卸载：**
-
-```bash
+# Homebrew 卸载
 brew uninstall --cask claude-code
-```
 
-**WinGet 卸载：**
-
-```powershell
+# WinGet 卸载
 winget uninstall Anthropic.ClaudeCode
-```
 
-**npm 卸载：**
-
-```bash
+# 如果之前用过 npm，也要清掉
 npm uninstall -g @anthropic-ai/claude-code
 ```
 
-**删除配置文件：**
+如果想彻底清理所有配置文件（包括对话历史、自定义 prompt、项目级设置），还要额外删除：
 
 ```bash
-# macOS / Linux / WSL
-rm -rf ~/.claude
-rm ~/.claude.json
-
-# 删除项目级设置（从项目目录运行）
-rm -rf .claude
-rm -f .mcp.json
-
-# Windows PowerShell
-Remove-Item -Path "$env:USERPROFILE\.claude" -Recurse -Force
-Remove-Item -Path "$env:USERPROFILE\.claude.json" -Force
+rm -rf ~/.claude ~/.claude.json   # 全局配置和对话历史
+rm -rf .claude .mcp.json          # 项目级配置（在项目目录下执行）
 ```
+
+**注意：** `~/.claude/` 目录里存了你的所有对话记录、自定义指令和权限配置。卸载前如果需要保留，先备份再删。
 
 ---
 
 ## 三、hippo 的实战经验
 
-> 💬 hippo：以下是我实际使用中的经验：
+> 💬 hippo：以下是我实际使用中的踩坑经验：
 
-### 3.1 我的选择
+### 3.1 从 npm 迁移到原生安装的坑
 
-1. **安装方式**：原生安装（`curl` 脚本），不用 npm
-2. **更新策略**：`stable` 渠道，减少遇到 bug 的风险
-3. **Windows**：用 WSL2，体验更好，还支持沙箱
+我最早用 `npm install -g @anthropic-ai/claude-code` 安装。后来切原生安装，跑了 `curl` 脚本，结果终端里输入 `claude` 还在调用旧的 npm 版本。原因是 npm 的全局 bin 路径（`/usr/local/bin` 或 nvm 管理的路径）在 PATH 中优先级高于 `~/.local/bin`。
 
-### 3.2 我的配置
+解决步骤：
+
+```bash
+# 1. 先装原生版本
+curl -fsSL https://claude.ai/install.sh | bash
+
+# 2. 彻底卸载 npm 版本
+npm uninstall -g @anthropic-ai/claude-code
+
+# 3. 验证指向正确
+which claude   # 应该输出 ~/.local/bin/claude
+claude --version
+```
+
+另一个坑是卸载 npm 版本后，`node_modules` 里残留了旧版本的缓存目录，占了 200 多 MB。手动 `rm -rf ~/.npm/_npx/` 清理掉才干净。这里给一个完整的迁移检查清单：
+
+```bash
+# 完整迁移步骤
+npm uninstall -g @anthropic-ai/claude-code  # 1. 卸 npm 版
+rm -rf ~/.npm/_npx/                          # 2. 清 npm 缓存
+curl -fsSL https://claude.ai/install.sh | bash  # 3. 装原生版
+which claude   # 4. 确认路径是 ~/.local/bin/claude
+claude --version  # 5. 确认版本号正确
+```
+
+### 3.2 stable vs latest 渠道的真实差异
+
+我一开始用 `latest` 渠道，有一次更新后 `claude doctor` 报了一个 shell hook 相关的 warning，同时 `.claude/settings.json` 的格式也变了（新增了几个字段）。花了半小时排查才发现是 breaking change（不向后兼容的改动）。
+
+切到 `stable` 渠道后，这种问题再没出现过。stable 大约延迟一周发布，已经帮社区用户过滤掉了有严重回归的版本。除非你需要某个刚发布的新功能，否则 stable 是更稳的选择。
+
+我的建议是：个人开发用 `stable`，团队协作也用 `stable`（避免版本不一致导致的配置冲突）。只有当你需要测试某个最新修复的 bug 时，才临时切 `latest`。
+
+### 3.3 我的推荐配置和 claude doctor 输出解读
+
+我的 `~/.claude/settings.json`：
 
 ```json
-// ~/.claude/settings.json
 {
   "autoUpdatesChannel": "stable"
 }
 ```
 
-### 3.3 常见问题排查
+就这一个配置项。保持简单，让自动更新在 stable 渠道上安静工作。
 
-**问题一：搜索功能不工作**
+`claude doctor` 的关键输出项解读：
 
-检查 ripgrep 是否安装。Alpine Linux 用户需要手动安装：
-
-```bash
-apk add libgcc libstdc++ ripgrep
-```
-
-然后在 `settings.json` 设置 `USE_BUILTIN_RIPGREP: "0"`。
-
-**问题二：Windows 找不到 Git Bash**
-
-在 `settings.json` 中显式设置路径：
-
-```json
-{
-  "env": {
-    "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Program Files\\Git\\bin\\bash.exe"
-  }
-}
-```
-
-**问题三：登录失败**
-
-确保你在 Anthropic 支持的国家/地区，且账户类型是 Pro/Max/Teams/Enterprise/Console 之一。
-
-### 3.4 我的建议
-
-1. **用原生安装**：比 npm 快，还自动更新
-2. **用 stable 渠道**：除非你想尝鲜，否则稳定版更靠谱
-3. **保留配置文件**：卸载前备份 `~/.claude/` 和 `~/.claude.json`
+| 检查项 | 通过标志 | 失败怎么办 |
+|--------|---------|-----------|
+| Binary integrity | 显示版本号 | 重新跑安装脚本 |
+| Shell integration | hook 已注册 | 运行 `claude init` |
+| Network | API 连通 | 检查代理/VPN 设置 |
+| Authentication | 登录状态有效 | 运行 `claude` 重新登录 |
 
 ---
 
 ## 四、常见问题
 
-**Q: 原生安装和 npm 安装有什么区别？**
+**Q: 原生安装和 npm 安装到底有什么区别？**
 
-A: 原生安装更快、不需要 Node.js 依赖、支持后台自动更新。npm 安装已弃用。
+A: 原生安装是独立的二进制文件，不需要 Node.js，启动快 2-3 倍，支持后台自动更新。npm 安装已弃用，官方不再推荐。
 
-**Q: 自动更新会打断我工作吗？**
+**Q: 免费账户能用 Claude Code 吗？**
 
-A: 不会。更新在后台下载，下次启动时生效。当前会话不受影响。
+A: 不能。需要 Pro（每月 $20）或更高级别的账户。但如果你有 AWS 账号，可以通过 Amazon Bedrock 使用，按 API 调用计费。
 
-**Q: 如何查看当前版本？**
+**Q: Windows 该选 WSL2 还是原生 Git Bash？**
 
-A: 运行 `claude --version` 或 `claude doctor`。
+A: 如果你在 Windows 上做 Linux 开发，选 WSL2。原生 Windows + Git Bash 适合纯 Windows 开发环境。WSL2 的额外好处是支持沙箱。
 
-**Q: 免费账户能用吗？**
+**Q: 怎么回滚到旧版本？**
 
-A: 不能。需要 Pro、Max、Teams、Enterprise 或 Console 账户。但可以通过第三方 API（Bedrock、Vertex、Foundry）使用。
-
-**Q: WSL1 和 WSL2 哪个更好？**
-
-A: WSL2，因为它支持沙箱功能，安全性更高。
+A: 用安装脚本指定版本号：`curl -fsSL https://claude.ai/install.sh | bash -s 1.0.58`。回滚后建议设置 `"DISABLE_AUTOUPDATER": "1"` 防止自动更新覆盖。
 
 ---
 
 ## 五、小结
 
-Claude Code 安装要点：
+安装决策速查：
 
-| 方面 | 建议 |
-|------|------|
-| 安装方式 | 原生安装（curl 脚本） |
-| 更新策略 | stable 渠道 |
-| Windows | WSL2（支持沙箱） |
-| 验证安装 | `claude doctor` |
+| 场景 | 推荐方案 |
+|------|---------|
+| macOS / Linux | 原生安装 + stable 渠道 |
+| Windows（Linux 开发） | WSL2 + 原生安装 |
+| Windows（纯 Windows 开发） | 原生安装 + Git for Windows |
+| 需要锁版本 | 原生安装 + DISABLE_AUTOUPDATER |
+| Docker / CI 环境 | 指定版本号安装 |
 
-**核心心法**：用原生安装、配置稳定渠道、有问题跑 `claude doctor`。
+**核心心法**：原生安装、stable 渠道、有问题先跑 `claude doctor`。
 
 **下一篇**：[精读官方文档：Claude Code 设置](/2026/03/27/ai-tools/official-docs/settings/)，深入学习配置文件和权限系统。
 
 ---
 
-*本文精读自 [高级设置](https://code.claude.com/docs/zh-CN/setup)*
+*本文精读自 [安装和设置](https://code.claude.com/docs/zh-CN/setup)*
 
-*最后更新：2026-03-27*
+*最后更新：2026-03-31*

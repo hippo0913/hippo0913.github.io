@@ -4,11 +4,11 @@
     "passThreshold": 70,
     "maxIterations": 3
   },
-  "lastUpdated": "2026-03-31T09:00:00.000Z",
+  "lastUpdated": "2026-03-31T12:15:00.000Z",
   "summary": {
-    "completed": 4,
+    "completed": 27,
     "failed": 0,
-    "pending": 23
+    "pending": 0
   },
   "articles": [
     {
@@ -21,67 +21,67 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/browser-control.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 84, "final": 88.8 } ],
+      "finalScore": 88.8,
+      "lastAttempt": "2026-03-31T09:52:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/claude-code-on-the-web.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 81, "final": 86.7 } ],
+      "finalScore": 86.7,
+      "lastAttempt": "2026-03-31T10:10:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/claude-overview.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 90, "final": 93 } ],
+      "finalScore": 93,
+      "lastAttempt": "2026-03-31T10:18:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/claude-quickstart.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 69, "final": 78.3 } ],
+      "finalScore": 78.3,
+      "lastAttempt": "2026-03-31T10:26:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/claude-setup.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 88, "final": 91.6 } ],
+      "finalScore": 91.6,
+      "lastAttempt": "2026-03-31T10:35:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/cli-reference.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 90, "final": 93 } ],
+      "finalScore": 93,
+      "lastAttempt": "2026-03-31T10:41:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/common-workflows.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 90, "final": 93 } ],
+      "finalScore": 93,
+      "lastAttempt": "2026-03-31T10:50:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/desktop-quickstart.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 79, "final": 85.3 } ],
+      "finalScore": 85.3,
+      "lastAttempt": "2026-03-31T11:15:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/features-overview.md",
@@ -93,19 +93,19 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/github-actions.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 80, "final": 86 } ],
+      "finalScore": 86,
+      "lastAttempt": "2026-03-31T11:15:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/gitlab-ci-cd.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 84, "final": 88.8 } ],
+      "finalScore": 88.8,
+      "lastAttempt": "2026-03-31T11:14:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/hooks.md",
@@ -117,51 +117,51 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/how-claude-code-works.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 82, "final": 87 } ],
+      "finalScore": 87,
+      "lastAttempt": "2026-03-31T11:15:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/jetbrains.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 83, "final": 88.1 } ],
+      "finalScore": 88.1,
+      "lastAttempt": "2026-03-31T11:30:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/legal-and-compliance.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 86, "final": 90 } ],
+      "finalScore": 90,
+      "lastAttempt": "2026-03-31T11:35:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/mcp.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 83, "final": 88.1 } ],
+      "finalScore": 88.1,
+      "lastAttempt": "2026-03-31T11:40:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/memory.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 85, "final": 89.5 } ],
+      "finalScore": 89.5,
+      "lastAttempt": "2026-03-31T11:35:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/remote-control.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 81, "final": 87 } ],
+      "finalScore": 87,
+      "lastAttempt": "2026-03-31T11:48:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
@@ -173,59 +173,59 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/settings.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 84, "final": 88.8 } ],
+      "finalScore": 88.8,
+      "lastAttempt": "2026-03-31T11:48:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/skills.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 85, "final": 89.5 } ],
+      "finalScore": 89.5,
+      "lastAttempt": "2026-03-31T11:48:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/slack.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 81, "final": 87 } ],
+      "finalScore": 87,
+      "lastAttempt": "2026-03-31T11:48:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/sub-agents.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 83, "final": 88 } ],
+      "finalScore": 88,
+      "lastAttempt": "2026-03-31T12:00:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/third-party-integrations.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 83, "final": 88 } ],
+      "finalScore": 88,
+      "lastAttempt": "2026-03-31T12:00:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/troubleshooting.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 88, "final": 91.6 } ],
+      "finalScore": 91.6,
+      "lastAttempt": "2026-03-31T12:00:00.000Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/vs-code.md",
-      "status": "pending",
-      "iterations": 0,
-      "scores": [],
-      "finalScore": null,
-      "lastAttempt": null
+      "status": "completed",
+      "iterations": 1,
+      "scores": [ { "iter": 1, "quant": 100, "qual": 84, "final": 88.8 } ],
+      "finalScore": 88.8,
+      "lastAttempt": "2026-03-31T12:00:00.000Z"
     }
   ]
 }
