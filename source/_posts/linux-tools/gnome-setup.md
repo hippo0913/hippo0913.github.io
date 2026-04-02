@@ -164,13 +164,6 @@ sudo rm -rf /usr/share/gnome-shell/extensions/<UUID>    # 系统安装
 | Compiz magic lamp | 最小化果冻效果 | 手动安装 |
 | Lock screen background | 锁屏壁纸自定义 | 手动安装 |
 
-**已禁用的扩展及原因**：
-
-| 扩展 | 原因 |
-|------|------|
-| Screenshot Window Sizer | 开发者专用截图尺寸工具 |
-| Impatience | 用 `GNOME_SHELL_ANIMATION_SPEED_FACTOR=0.75` 替代，少一个扩展开销 |
-
 ---
 
 ## 六、常用 gsettings 配置
