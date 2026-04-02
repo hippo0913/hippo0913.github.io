@@ -7,19 +7,19 @@ tags:
   - 环境配置
 categories:
   - Linux 工具
-description: 基于 Ubuntu 22.04 / GNOME 42.9 / X11 的桌面环境完整配置流程，涵盖 zram 内存优化、GNOME 扩展推荐、主题外观、常用 gsettings 配置和踩坑经验。
+description: 基于 Ubuntu 22.04 / GNOME 42.9 / X11 的桌面环境配置指南，涵盖 GNOME 扩展推荐、主题外观、常用 gsettings 配置和踩坑经验。
 cover: https://picsum.photos/seed/gnome-setup/1920/1080
 ---
 
-> hippo：装完 Ubuntu 桌面不调教一下总觉得差点意思。这篇记录我从系统优化到扩展安装的完整流程，按顺序跑下来就能得到一个顺手又好看的 GNOME 桌面。
+> hippo：装完 Ubuntu 桌面不调教一下总觉得差点意思。这篇记录我配置 GNOME 桌面的完整流程，按顺序跑下来就能得到一个顺手又好看的桌面。
 
 ---
 
 ## 一、这是什么东西
 
-GNOME 是 Ubuntu 的默认桌面环境，开箱可用但有些地方不够趁手：swap 策略保守导致内存压力大时卡顿、没有系统监控、窗口切换不好看、扩展管理全靠手动……
+GNOME 是 Ubuntu 的默认桌面环境，开箱可用但有些地方不够趁手：没有系统监控、窗口切换不好看、扩展管理全靠手动……
 
-本文覆盖从系统级优化到桌面美化的完整流程，基于我的实际环境（Ubuntu 22.04 LTS / GNOME 42.9 / X11 / i7-12700KF / 32GB RAM），照着做就能配出一套顺手的桌面。
+本文覆盖 GNOME 桌面环境的外观美化、扩展安装和常用配置，基于我的实际环境（Ubuntu 22.04 LTS / GNOME 42.9 / X11），照着做就能配出一套顺手的桌面。
 
 <!-- more -->
 
@@ -45,79 +45,7 @@ gnome-extensions list
 
 ---
 
-## 三、系统级优化
-
-### 3.1 zram 压缩 swap
-
-**原理**：zram 在内存中创建压缩块设备作为 swap，把不活跃的内存页压缩存储，等效增加可用内存。对 32GB 内存的机器，8GB zram 足够应对突发内存压力。
-
-```bash
-sudo apt install systemd-zram-generator
-```
-
-创建配置文件 `/etc/systemd/zram-generator.conf`：
-
-```ini
-[zram0]
-host-memory-limit = none
-zram-fraction = 0.5
-max-zram-size = 8192
-compression-algorithm = zstd
-swap-priority = 100
-```
-
-| 参数 | 值 | 说明 |
-|------|-----|------|
-| host-memory-limit | none | 不限制，任何内存大小都创建 zram |
-| zram-fraction | 0.5 | zram 大小 = RAM x 0.5（32GB → 16GB，但受 max 限制） |
-| max-zram-size | 8192 | 上限 8GB（32GB x 0.5 = 16GB，取 min = 8GB） |
-| compression-algorithm | zstd | 压缩比高、速度适中 |
-| swap-priority | 100 | 高于磁盘 swap（默认 -2），系统优先用 zram |
-
-启动并验证：
-
-```bash
-sudo systemctl enable --now systemd-zram-setup@zram0.service
-swapon --show
-# 期望输出：
-# NAME       TYPE      SIZE USED PRIO
-# /dev/zram0 partition   8G xxx   100
-
-# 查看压缩效果
-zramctl
-```
-
-**注意**：zstd 压缩比约 2:1 ~ 3:1，8GB zram 实际可存储约 16-24GB 数据。开机自动生效，无需手动操作。
-
-### 3.2 HDD I/O 调度器
-
-NVMe 不需要调调度器（`none` 即可），机械硬盘建议用 bfq：
-
-```bash
-# 查看当前调度器
-lsblk -d -o NAME,ROTA,TYPE,SCHED
-
-# 永久修改：创建 udev 规则
-cat << 'EOF' | sudo tee /etc/udev/rules.d/60-ioscheduler.rules
-# NVMe 保持 none
-ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
-# 机械硬盘用 bfq
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
-EOF
-```
-
-### 3.3 禁用 apport（崩溃报告）
-
-开发环境不需要崩溃弹窗：
-
-```bash
-sudo systemctl disable apport-autoreport.timer
-sudo systemctl disable apport-autoreport.path
-sudo systemctl disable apport-forward.socket
-echo "enabled=0" | sudo tee /etc/default/apport
-```
-
-### 3.4 动画加速
+## 三、动画加速
 
 通过环境变量加速窗口动画，不需要额外装扩展：
 
@@ -328,7 +256,7 @@ gsettings get org.gnome.desktop.interface color-scheme >> ~/gnome-settings.backu
 gsettings get org.gnome.desktop.wm.preferences button-layout >> ~/gnome-settings.backup
 ```
 
-还原时按本文顺序重新执行即可：zram → 环境变量 → 外观设置 → 安装扩展 → gsettings 配置。
+还原时按本文顺序重新执行即可：外观设置 → 安装扩展 → gsettings 配置。
 
 ---
 
