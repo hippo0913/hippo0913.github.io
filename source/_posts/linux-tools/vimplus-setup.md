@@ -1,7 +1,7 @@
 ---
-title: Ubuntu 重装后 vimplus 一键还原指南
+title: Ubuntu vimplus 安装配置指南
 date: 2026-04-01 15:30:00
-updated: 2026-04-01 15:30:00
+updated: 2026-04-02 10:00:00
 tags:
   - Vim
   - vimplus
@@ -9,12 +9,11 @@ tags:
   - 环境配置
 categories:
   - Linux 工具
-description: 重装 Ubuntu 后快速恢复 vimplus 开发环境，从备份还原到插件配置的完整流程，包含踩坑经验和验证清单。
+description: 在 Ubuntu 上从零安装 vimplus，打造开箱即用的 Vim C/C++ 开发环境，包含依赖安装、插件配置、踩坑经验和验证清单。
 cover: https://picsum.photos/seed/vimplus-setup/1920/1080
-source_file: SETUP.md
 ---
 
-> hippo：每次重装 Ubuntu 最头疼的就是重配 Vim 开发环境。vimplus 帮我省了大量时间，但重装后还原还是有些细节容易忘。这篇把完整流程记录下来，下次重装照着跑就行。
+> hippo：想用 Vim 写 C/C++ 但不想一个一个配插件？vimplus 一键搞定。这篇记录完整的安装流程，照着跑就能得到一个趁手的开发环境。
 
 ---
 
@@ -22,35 +21,15 @@ source_file: SETUP.md
 
 [vimplus](https://github.com/chxuan/vimplus) 是 chxuan 开发的一键 Vim C/C++ 开发环境配置方案。它预装了 NERDTree（文件树浏览器）、LeaderF（模糊搜索）、coc.nvim（代码智能补全）等插件，装完就能当轻量 IDE 用。
 
-为什么需要这篇？因为 vimplus 的官方安装脚本是一键搞定，但重装系统后的还原并不等于重新跑一遍安装脚本——你的自定义配置、插件偏好、coc 扩展都在之前的目录里。与其从头配，不如把备份好的环境直接搬回来。
+本文覆盖从安装依赖到最终验证的完整流程，同时记录了实际使用中遇到的坑和解决办法。
 
 <!-- more -->
 
 ---
 
-## 二、准备工作
+## 二、安装系统依赖
 
-### 2.1 重装前备份
-
-重装之前，先把这几个关键文件打包带走：
-
-```bash
-# 打包 vimplus 主目录（包含 .vimrc 和所有插件配置）
-tar czf vimplus-backup.tar.gz -C ~ .vimplus
-
-# 单独备份自定义配置（这些文件可能比 .vimplus 内的版本更新）
-cp ~/.vimrc.custom.config ~/vimplus-custom-config.backup
-cp ~/.vimrc.custom.plugins ~/vimplus-custom-plugins.backup
-
-# 备份 coc.nvim 的语言服务器配置
-cp ~/.vim/coc-settings.json ~/coc-settings.backup
-```
-
-为什么要单独备份 `.vimrc.custom.config` 和 `.vimrc.custom.plugins`？因为 vimplus 安装时会在 `.vimplus` 目录里放一份默认的 custom 文件，但你日常修改的是 `~/.vimrc.custom.config` 和 `~/.vimrc.custom.plugins`，它们的优先级更高，内容也可能比 `.vimplus` 内的版本更新。恢复时优先用独立备份的版本。
-
-### 2.2 安装系统依赖
-
-重装完系统，先把基础依赖装好。这些是 vimplus 及其插件运行必需的：
+先把基础依赖装好。这些是 vimplus 及其插件运行必需的：
 
 ```bash
 sudo apt update
@@ -74,7 +53,9 @@ sudo apt install -y \
 | vim | 编辑器本体 |
 | terminator | 终端模拟器（可选，但推荐用来替代默认终端） |
 
-### 2.3 安装 Node.js、yarn、clangd、glow
+---
+
+## 三、安装 Node.js、yarn、clangd、glow
 
 vimplus 的几个关键插件有额外的运行时依赖：
 
@@ -104,45 +85,35 @@ glow --version    # 任意版本即可
 
 ---
 
-## 三、分步还原
+## 四、安装 vimplus
 
-### 3.1 恢复 vimplus 目录并建立配置链接
-
-先把备份的 `.vimplus` 解压到 home 目录，然后建立必要的符号链接：
+### 4.1 运行一键安装脚本
 
 ```bash
-# 解压备份到 home 目录
-tar xzf vimplus-backup.tar.gz -C ~
-
-# 建立 .vimrc 符号链接（vimplus 的配置通过符号链接管理）
-rm -f ~/.vimrc
-ln -s ~/.vimplus/.vimrc ~/.vimrc
-
-# 恢复自定义配置（优先使用独立备份的版本）
-rm -f ~/.vimrc.custom.plugins
-cp ~/vimplus-custom-plugins.backup ~/.vimrc.custom.plugins
-cp ~/vimplus-custom-config.backup ~/.vimrc.custom.config
-
-# 建立 Vim 运行时目录的符号链接
-mkdir -p ~/.vim
-ln -sf ~/.vimplus/colors ~/.vim/colors
-ln -sf ~/.vimplus/ftplugin ~/.vim/ftplugin
-ln -sf ~/.vimplus/autoload ~/.vim/autoload
-
-# 恢复 coc-settings.json
-mkdir -p ~/.vim
-cp ~/coc-settings.backup ~/.vim/coc-settings.json
+git clone https://github.com/chxuan/vimplus.git ~/.vimplus
+cd ~/.vimplus
+./install.sh
 ```
 
-这里解释一下几个链接的作用：
+安装脚本会自动完成以下操作：
+- 在 `~/.vimplus` 目录下创建插件配置
+- 建立 `~/.vimrc` 符号链接指向 `~/.vimplus/.vimrc`
+- 生成 `.vimrc.custom.config` 和 `.vimrc.custom.plugins` 两个自定义配置文件
 
-- `.vimrc → ~/.vimplus/.vimrc`：Vim 启动时读取的主配置，vimplus 通过这个符号链接加载它的预设配置
-- `colors/ftplugin/autoload`：分别提供配色方案、文件类型插件、自动加载脚本，链接到 `.vimplus` 目录保证路径一致
-- `.vimrc.custom.config` 和 `.vimrc.custom.plugins`：vimplus 的 `.vimrc` 会 source 这两个文件，你的个人配置都放这里，不会和上游冲突
+脚本执行完毕后，Vim 的插件管理框架就绑好了。接下来需要安装插件本体。
 
-### 3.2 安装字体和插件
+### 4.2 安装 Vim 插件
 
-vimplus 使用 Nerd Font（打补丁的等宽字体，包含编程图标）。把它安装到用户字体目录：
+```bash
+# 批量安装所有插件
+vim -c "PlugInstall" -c "q" -c "q"
+```
+
+这条命令会打开 Vim，自动执行 `:PlugInstall` 安装 `.vimrc` 中声明的所有插件，安装完自动退出。
+
+### 4.3 安装 Nerd Font
+
+vimplus 使用 Nerd Font（打补丁的等宽字体，包含编程图标）。安装到用户字体目录：
 
 ```bash
 # 安装 Nerd Font 到用户字体目录
@@ -153,20 +124,13 @@ fc-cache -vf ~/.local/share/fonts
 
 然后在终端的偏好设置里把字体改成 `Droid Sans Mono Nerd Font`，否则文件树和状态栏的图标会显示为方块。
 
-接下来安装所有 Vim 插件：
+---
 
-```bash
-# 批量安装所有插件
-vim -c "PlugInstall" -c "q" -c "q"
-```
-
-这条命令会打开 Vim，自动执行 `:PlugInstall` 安装 `.vimrc` 中声明的所有插件，安装完自动退出。
-
-### 3.3 配置 coc.nvim
+## 五、配置 coc.nvim
 
 [coc.nvim](https://github.com/neoclide/coc.nvim) 是 Vim 的 LSP 客户端（Language Server Protocol，一种让编辑器连接语言服务器的标准协议）。它配合 clangd 提供 C/C++ 的智能补全、跳转到定义、实时诊断等功能。
 
-先确认 `coc-settings.json` 已恢复。如果没有备份，创建一个最小配置：
+先创建 coc 的配置文件（如果安装脚本没有自动生成）：
 
 ```bash
 cat > ~/.vim/coc-settings.json << 'EOF'
@@ -194,9 +158,9 @@ vim test.c
 
 ---
 
-## 四、踩坑经验
+## 六、踩坑经验
 
-### 4.1 markdown-preview.nvim 报 yarn 错误
+### 6.1 markdown-preview.nvim 报 yarn 错误
 
 `PlugInstall` 安装 markdown-preview.nvim 时，大概率会报类似这样的错误：
 
@@ -214,11 +178,7 @@ cd ~/.vim/plugged/markdown-preview.nvim && yarn install && cd app && yarn instal
 
 构建完成后，用 `,mp` 快捷键（或在 Vim 中输入 `:MarkdownPreview`）就可以在浏览器里预览 Markdown 文件了。
 
-### 4.2 自定义配置恢复顺序
-
-前面提到 `.vimrc.custom.config` 要优先用独立备份。原因是 vimplus 的 `.vimplus` 目录里有一份默认的 `.vimrc.custom.config`，但你在日常使用中修改的版本在 `~/.vimrc.custom.config`。如果直接解压 `.vimplus` 然后忘记覆盖，就会丢失你的自定义配置（比如相对行号、鼠标支持、高亮当前列等设置）。
-
-### 4.3 字体不生效
+### 6.2 字体不生效
 
 装完 Nerd Font 并在终端设置里选了字体，但图标还是方块？需要确认两件事：
 
@@ -227,9 +187,9 @@ cd ~/.vim/plugged/markdown-preview.nvim && yarn install && cd app && yarn instal
 
 ---
 
-## 五、验证清单
+## 七、验证清单
 
-还原完成后，打开一个 C/C++ 文件，逐项验证：
+安装完成后，打开一个 C/C++ 文件，逐项验证：
 
 | 功能 | 快捷键/命令 | 预期结果 |
 |---|---|---|
@@ -244,15 +204,13 @@ cd ~/.vim/plugged/markdown-preview.nvim && yarn install && cd app && yarn instal
 | 终端 Markdown | `,mv` | 终端内用 glow 渲染 Markdown |
 | 多光标编辑 | `Ctrl+n` 选中 → `c` 修改 | 支持多光标同时编辑 |
 
-如果所有功能都正常，恭喜，环境还原完成。
+如果所有功能都正常，开发环境就配置完成了。
 
 ---
 
-## 六、小结
+## 八、扩展其他语言
 
-重装后还原 vimplus 环境，核心就是三步：**备份还原 → 建立链接 → PlugInstall**。只要备份了 `.vimplus` 目录和三个自定义配置文件，重装后 10 分钟内就能恢复熟悉的开发环境。
-
-如果想扩展其他语言支持，可以装更多 coc 扩展：
+如果想支持更多语言，装对应的 coc 扩展即可：
 
 | 扩展名 | 语言 | 安装命令 |
 |---|---|---|
@@ -264,4 +222,35 @@ cd ~/.vim/plugged/markdown-preview.nvim && yarn install && cd app && yarn instal
 
 ---
 
-*最后更新：2026-04-01*
+## 九、备份与迁移
+
+配置好之后，建议备份以下文件，方便以后在新机器上快速还原：
+
+```bash
+# 打包 vimplus 主目录
+tar czf vimplus-backup.tar.gz -C ~ .vimplus
+
+# 备份自定义配置和 coc 配置
+cp ~/.vimrc.custom.config ~/vimplus-custom-config.backup
+cp ~/.vimrc.custom.plugins ~/vimplus-custom-plugins.backup
+cp ~/.vim/coc-settings.json ~/coc-settings.backup
+```
+
+还原时解压并恢复符号链接即可：
+
+```bash
+tar xzf vimplus-backup.tar.gz -C ~
+rm -f ~/.vimrc && ln -s ~/.vimplus/.vimrc ~/.vimrc
+cp ~/vimplus-custom-plugins.backup ~/.vimrc.custom.plugins
+cp ~/vimplus-custom-config.backup ~/.vimrc.custom.config
+mkdir -p ~/.vim
+ln -sf ~/.vimplus/colors ~/.vim/colors
+ln -sf ~/.vimplus/ftplugin ~/.vim/ftplugin
+ln -sf ~/.vimplus/autoload ~/.vim/autoload
+cp ~/coc-settings.backup ~/.vim/coc-settings.json
+vim -c "PlugInstall" -c "q" -c "q"
+```
+
+---
+
+*最后更新：2026-04-02*
