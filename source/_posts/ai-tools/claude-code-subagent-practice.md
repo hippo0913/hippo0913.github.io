@@ -2,10 +2,7 @@
 title: Claude Code Subagent 实战：并行重写 20 篇博客
 date: 2026-03-25 16:30:00
 updated: 2026-03-25 16:30:00
-tags:
-  - Claude Code
-  - AI 工具
-  - 实战案例
+tags: [Claude Code, 实战案例]
 categories:
   - AI 工具系列
 series: claude-code

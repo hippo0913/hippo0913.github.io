@@ -2,7 +2,7 @@
 title: 如何用好 Claude Code：我的最优实践总结
 date: 2026-03-12 19:48:00
 updated: 2026-03-12 19:48:00
-tags: [Claude Code, AI 工具]
+tags: [Claude Code, 实战案例]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 1

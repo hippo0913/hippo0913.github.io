@@ -2,7 +2,7 @@
 title: Claude Code 的超能力引擎：深入理解 Agent Harness
 date: 2026-03-31 10:00:00
 updated: 2026-03-31 10:00:00
-tags: [Claude Code, Agent Harness, AI 编程, 上下文工程]
+tags: [Claude Code, 实战案例]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 9

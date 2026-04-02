@@ -11,7 +11,7 @@
 title: 精读官方文档：{主题名称}
 date: {YYYY-MM-DD HH:mm:ss}
 updated: {YYYY-MM-DD HH:mm:ss}
-tags: [Claude Code, AI 工具, 官方文档精读]
+tags: [Claude Code, {入门|工具集成|扩展定制|实战案例}]
 categories: [AI 工具系列]
 series: claude-code
 series_index: {序号}

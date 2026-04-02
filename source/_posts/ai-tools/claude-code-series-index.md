@@ -2,7 +2,7 @@
 title: AI 工具系列：Claude Code 从入门到上手
 date: 2026-03-12 19:48:00
 updated: 2026-03-12 19:48:00
-tags: [Claude Code, AI 工具]
+tags: [Claude Code, 入门]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 0

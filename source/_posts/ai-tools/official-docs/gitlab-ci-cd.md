@@ -2,7 +2,7 @@
 title: 精读官方文档：Claude Code GitLab CI/CD
 date: 2026-03-08 23:00:00
 updated: 2026-03-31 12:00:00
-tags: [Claude Code, AI 工具, 官方文档精读]
+tags: [Claude Code, 工具集成]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 23

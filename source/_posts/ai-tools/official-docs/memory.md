@@ -2,7 +2,7 @@
 title: 精读官方文档：Claude 如何记住你的项目
 date: 2026-03-22 23:00:00
 updated: 2026-03-31 15:30:00
-tags: [Claude Code, AI 工具, 官方文档精读]
+tags: [Claude Code, 扩展定制]
 categories: [AI 工具系列]
 series: claude-code
 series_index: 9
