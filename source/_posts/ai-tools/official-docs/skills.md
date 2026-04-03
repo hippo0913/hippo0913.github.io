@@ -255,7 +255,7 @@ Skills 是 Claude Code 最核心的扩展机制，掌握三个关键点就够用
 
 建议从简单的参考内容类 Skill 开始（比如团队编码规范），熟练后再做任务类的 Skill（比如自动化部署）。 Skills 写得好不好，关键看 `description` 写得够不够精确——它直接决定了 Claude 什么时候自动加载你的 Skill。
 
-**下一篇**：[MCP（Model Context Protocol）](/2026/03/21/official-docs-mcp/) — 了解如何让 Claude 连接外部工具和数据源。
+**下一篇**：[MCP（Model Context Protocol）](/2026/03/18/ai-tools/official-docs/mcp/) — 了解如何让 Claude 连接外部工具和数据源。
 
 ---
 

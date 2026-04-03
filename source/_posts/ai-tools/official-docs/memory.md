@@ -286,7 +286,7 @@ claude --append-system-prompt "输出必须是 JSON 格式，不要包含 markdo
 
 **CLAUDE.md 是你给 Claude 的"员工手册"，自动记忆是 Claude 自己的"工作笔记"**——两者配合使用，让 Claude 越用越懂你。
 
-**下一篇**：[精读官方文档：使用 Skills 扩展 Claude](/2026/03/22/ai-tools/official-docs/skills/)，把常用工作流打包成可复用的命令。
+**下一篇**：[精读官方文档：使用 Skills 扩展 Claude](/2026/03/21/ai-tools/official-docs/skills/)，把常用工作流打包成可复用的命令。
 
 ---
 

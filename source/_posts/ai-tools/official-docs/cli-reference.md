@@ -289,7 +289,7 @@ CLI 是 Claude Code 的万能入口。掌握关键命令和标志后，你能：
 - 在 CI 中稳定运行（`--max-turns` 限轮次、`--max-budget-usd` 限预算、`--fallback-model` 降级）
 - 隔离开发（`-w` worktree、`--strict-mcp-config`）
 
-**下一篇**：[MCP 配置](/ai-tools/official-docs/mcp) - 了解如何通过 MCP 协议扩展 Claude Code 的能力边界。
+**下一篇**：[MCP 配置](/2026/03/18/ai-tools/official-docs/mcp/) - 了解如何通过 MCP 协议扩展 Claude Code 的能力边界。
 
 ---
 

@@ -169,7 +169,7 @@ A: 运行 `/mcp` 选择 `claude-in-chrome`，能看到导航、点击、输入�
 
 Chrome 集成让 Claude Code 从"终端里的编程助手"升级为"能看到屏幕的全栈助手"，Web 开发的"编码 → 测试 → 修复"闭环终于在一个对话里完成了。关键是确保版本达标、首次启用后重启 Chrome、长时间不用后记得重新连接。
 
-**下一篇**：[精读官方文档：VS Code 扩展](/2026/03/19/ai-tools/official-docs/vs-code/)
+**下一篇**：[精读官方文档：VS Code 扩展](/2026/03/14/ai-tools/official-docs/vs-code/)
 
 ---
 

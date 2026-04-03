@@ -272,7 +272,7 @@ A: 会话中输入 `/` 可以看到所有可用 Skill 的列表。如果 Skill �
 | Hook | 事件触发的"自动化脚本" | 保存后 lint、提交前检查 |
 | Plugin | 打包分发的"工具箱" | 跨仓库复用、marketplace 发布 |
 
-**下一步**：[精读官方文档：CLAUDE.md](/2026/03/05/ai-tools/official-docs/claude-md/)，深入学习如何写好项目的"说明书"。
+**下一步**：[精读官方文档：Claude 如何记住你的项目](/2026/03/22/ai-tools/official-docs/memory/)，深入学习 CLAUDE.md 和项目记忆系统。
 
 ---
 

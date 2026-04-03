@@ -289,7 +289,7 @@ Common Workflows 是 Claude Code 使用频率最高的文档之一。16 种工�
 3. **Git Worktrees**：并行开发不冲突，支持自动创建和清理
 4. **Unix 管道集成**：把 Claude 塞进 CI 脚本，实现自动审查
 
-**下一篇**：[精读官方文档：Subagents 子代理](/2026/03/25/claude-code-subagents/) —— 让专门的 AI 做专门的事。
+**下一篇**：[精读官方文档：Subagents 子代理](/2026/03/19/ai-tools/official-docs/sub-agents/) —— 让专门的 AI 做专门的事。
 
 ---
 

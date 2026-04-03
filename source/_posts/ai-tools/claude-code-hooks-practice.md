@@ -321,7 +321,7 @@ curl -X POST "https://open.feishu.cn/open-apis/bot/v2/hook/你的地址" \
 
 ## 相关文章
 
-- [精读官方文档：Hooks 参考](/2026/03/20/ai-tools/official-docs/hooks/) - 完整的 Hooks 官方文档精读
+- [精读官方文档：Hooks 参考](/2026/03/27/ai-tools/official-docs/hooks/) - 完整的 Hooks 官方文档精读
 - [Claude Code 最佳实践](/2026/03/12/ai-tools/claude-code-best-practice/) - 我的原创实践经验
 
 ---

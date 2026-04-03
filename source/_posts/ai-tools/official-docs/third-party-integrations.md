@@ -203,7 +203,7 @@ Claude Code 的企业部署方案本质上是三种能力的组合：**模型来
 
 别忘了固定模型版本——这是云提供商部署最容易踩的坑。
 
-**下一篇**：[精读官方文档：Amazon Bedrock 配置详解](/2026/03/06/amazon-bedrock/)
+**系列导航**：返回 [Claude Code 官方文档精读系列索引](/2026/03/12/ai-tools/claude-code-series-index/)
 
 ---
 

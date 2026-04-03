@@ -269,7 +269,7 @@ A: 用安装脚本指定版本号：`curl -fsSL https://claude.ai/install.sh | b
 
 **核心心法**：原生安装、stable 渠道、有问题先跑 `claude doctor`。
 
-**下一篇**：[精读官方文档：Claude Code 设置](/2026/03/27/ai-tools/official-docs/settings/)，深入学习配置文件和权限系统。
+**下一篇**：[精读官方文档：Claude Code 设置](/2026/03/17/ai-tools/official-docs/settings/)，深入学习配置文件和权限系统。
 
 ---
 

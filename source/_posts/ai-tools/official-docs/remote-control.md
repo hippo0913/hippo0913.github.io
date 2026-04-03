@@ -210,7 +210,7 @@ Claude Code 提供了多种在离开终端时继续工作的方式，按需选�
 
 Remote Control 让你用手机或浏览器「遥控」本地 Claude Code 会话，会话始终在本地执行，完整保留你的文件系统、MCP 配置和项目设置。推荐服务器模式用于长期任务，交互模式用于边用边控。
 
-**下一篇**：[精读官方文档：Channels 消息通道](/ai-tools/official-docs/channels/)
+**系列导航**：返回 [Claude Code 官方文档精读系列索引](/2026/03/12/ai-tools/claude-code-series-index/)
 
 ---
 

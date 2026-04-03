@@ -305,7 +305,7 @@ Claude Code in Slack 的核心价值是**降低编码任务的启动门槛**—�
 2. **在请求里带够上下文**，不要依赖历史消息
 3. **用 Web 端审查改动**，Slack 只看摘要和点按钮
 
-**下一篇**：[精读官方文档：IDE 集成](/2026/03/07/ide-integration/)——在 VS Code / JetBrains 里直接用 Claude Code。
+**下一篇**：[精读官方文档：在 VS Code 中使用 Claude Code](/2026/03/14/ai-tools/official-docs/vs-code/)——在 VS Code 里直接用 Claude Code。
 
 ---
 

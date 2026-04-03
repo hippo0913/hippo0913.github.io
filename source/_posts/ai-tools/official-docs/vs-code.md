@@ -366,7 +366,7 @@ A: 扩展的本地存储在 `~/.vscode/globalStorage/anthropic.claude-code`，�
 
 VS Code 扩展是 Claude Code 的推荐使用方式：可视化 diff 让改动一目了然，Plan 模式让 AI 辅助编程更可控，@-mentions 让上下文传递更精准。记住几个核心快捷键：`Cmd+Esc` 切换焦点、`Option+K` 插入文件引用、`Cmd+Shift+Esc` 开新标签页。CLI 和扩展互为补充——高级功能用 CLI，日常编码用扩展。
 
-**下一篇**：继续阅读 [Checkpoints 回滚功能精读](/2026/03/14/checkpoints/)。
+**系列导航**：返回 [Claude Code 官方文档精读系列索引](/2026/03/12/ai-tools/claude-code-series-index/)
 
 ---
 

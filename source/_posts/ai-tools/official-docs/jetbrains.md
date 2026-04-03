@@ -125,7 +125,7 @@ JetBrains 终端有个默认行为：按 ESC 会把焦点从终端切回编辑�
 
 **WSL 环境**
 
-Windows Subsystem for Linux 环境可能需要额外配置终端、网络模式和防火墙规则，详细步骤参考官方 [WSL 故障排除指南](https://code.claude.com/docs/zh-CN/wsl)。
+Windows Subsystem for Linux 环境可能需要额外配置终端、网络模式和防火墙规则，详细步骤参考官方 [WSL 故障排除指南](https://code.claude.com/docs/zh-CN/setup)。
 
 **安全风险：auto-edit 模式**
 
@@ -167,7 +167,7 @@ Windows Subsystem for Linux 环境可能需要额外配置终端、网络模式�
 2. 检查插件在 IDE 设置中是否启用（`Settings` → `Plugins` → `Installed`）
 3. 完全重启 IDE（有时需要重启两次才能生效）
 4. 远程开发场景：确认插件安装在远程主机（`Settings` → `Plugin (Host)`）
-5. WSL 用户：参考 [WSL 故障排除指南](https://code.claude.com/docs/zh-CN/wsl)
+5. WSL 用户：参考 [WSL 故障排除指南](https://code.claude.com/docs/zh-CN/setup)
 
 ### 命令未找到
 
@@ -188,7 +188,7 @@ JetBrains 插件的核心价值是 **Diff 查看器集成** 和 **自动上下�
 
 几点提醒：从内置终端启动是关键，ESC 键冲突记得修复，远程开发装对位置，auto-edit 模式谨慎使用。
 
-**下一篇**：[精读官方文档：VS Code](/2026/03/12/vscode/)
+**下一篇**：[精读官方文档：VS Code](/2026/03/14/ai-tools/official-docs/vs-code/)
 
 ---
 

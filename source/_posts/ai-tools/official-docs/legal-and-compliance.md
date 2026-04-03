@@ -40,8 +40,8 @@ Claude Code 不是开源软件。它的使用受两套条款约束，取决于�
 
 | 用户类型 | 适用条款 | 获取方式 |
 |---|---|---|
-| Team、Enterprise、Claude API 用户 | [商业条款](https://www.anthropic.com/commercial-terms) | Anthropic Console 或企业签约 |
-| Free、Pro、Max 用户 | [消费者服务条款](https://www.anthropic.com/consumer-terms) | claude.ai 或 Claude Code 登录 |
+| Team、Enterprise、Claude API 用户 | [商业条款](https://www.anthropic.com/terms) | Anthropic Console 或企业签约 |
+| Free、Pro、Max 用户 | [消费者服务条款](https://www.anthropic.com/terms) | claude.ai 或 Claude Code 登录 |
 
 关键概念是 **1P（First Party）** 和 **3P（Third Party）** 的区别：
 
@@ -163,7 +163,7 @@ A: 是的，Claude Code 的 API 请求最终还是会到 Anthropic 的服务。�
 
 **Q: 发现安全漏洞怎么报告？**
 
-A: 通过 Anthropic 的 [HackerOne](https://hackerone.com/anthropic) 页面提交。不要公开披露漏洞，这样可以走正规的漏洞赏金流程，还能拿到赏金。
+A: 通过 Anthropic 的 [HackerOne](https://hackerone.com/anthropic-vdp) 页面提交。不要公开披露漏洞，这样可以走正规的漏洞赏金流程，还能拿到赏金。
 
 ---
 
@@ -171,7 +171,7 @@ A: 通过 Anthropic 的 [HackerOne](https://hackerone.com/anthropic) 页面提�
 
 Claude Code 的法律和合规框架可以浓缩为三句话：两套条款对应两类用户，商业协议自动覆盖无需额外签约，医疗行业需要 BAA + ZDR 组合。但最容易被忽略的身份验证限制——OAuth 令牌只许在 Claude Code 和 Claude.ai 里用，别的地方一律不行——恰恰是违规风险最高的地方。
 
-**系列导航**：返回 [Claude Code 官方文档精读系列索引](/2026/02/15/claude-code-series-index/)
+**系列导航**：返回 [Claude Code 官方文档精读系列索引](/2026/03/12/ai-tools/claude-code-series-index/)
 
 ---
 

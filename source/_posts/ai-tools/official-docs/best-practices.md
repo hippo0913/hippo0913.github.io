@@ -351,7 +351,7 @@ Claude 犯错 -> 我纠正 -> 它又犯错 -> 我再纠正 -> context 全是错�
 
 ---
 
-**下一篇**：[精读官方文档：常见工作流程](/2026/03/23/ai-tools/official-docs/common-workflows/)，调试、测试、PR 的分步配方。
+**下一篇**：[精读官方文档：常见工作流程](/2026/03/25/ai-tools/official-docs/common-workflows/)，调试、测试、PR 的分步配方。
 
 ---
 
