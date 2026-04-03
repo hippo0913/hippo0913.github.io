@@ -55,6 +55,15 @@ cover: https://picsum.photos/seed/ai-tools-claude/1920/1080
 |---|------|------|
 | 1 | [如何用好 Claude Code：我的最优实践总结](/2026/03/12/ai-tools/claude-code-best-practice/) | 结合官方最佳实践和真实踩坑经验，整理出的 Claude Code 使用方法。涵盖心智模型、六大工具的本质与决策树、完整项目结构和 SOP。 |
 
+### 实战系列
+
+| # | 文章 | 简介 |
+|---|------|------|
+| - | [Claude Code CLI 实战速查手册](/2026/04/03/ai-tools/claude-code-cli-cheatsheet/) | 按 8 大场景组织的 CLI 命令速查，日常开发、脚本自动化、CI/CD 直接抄命令。 |
+| - | [Claude Code Hooks 实战：任务完成自动通知](/2026/03/25/ai-tools/claude-code-hooks-practice/) | 用 Hooks 实现任务完成后的桌面通知和飞书通知。 |
+| - | [Claude Code Subagent 实战：并行重写 20 篇博客](/2026/03/26/ai-tools/claude-code-subagent-practice/) | 并行重写 20 篇博客文章的实践经验。 |
+| - | [Claude Code 的超能力引擎：深入理解 Agent Harness](/2026/03/27/ai-tools/claude-code-harness-engineering/) | 深入理解 Agent Harness 架构。 |
+
 ### 官方文档精读系列
 
 | # | 文章 | 简介 |
@@ -91,11 +100,10 @@ cover: https://picsum.photos/seed/ai-tools-claude/1920/1080
 
 ## 后续更新
 
-- 实战案例分析（待更新）
 - 高阶技巧与调优（待更新）
 
 **持续更新中，敬请期待。**
 
 ---
 
-*最后更新：2026-03-12*
+*最后更新：2026-04-03*
