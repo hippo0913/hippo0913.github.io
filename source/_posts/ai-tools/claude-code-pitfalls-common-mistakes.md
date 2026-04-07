@@ -66,7 +66,7 @@ git restore path/to/deprecated-config/
 - 不可逆操作必须确认（删除、覆写不可恢复的内容）
 ```
 
-### 翻车 6：在错误的项目目录里干活
+### 翻车 2：在错误的项目目录里干活
 
 同时开了两个终端，一个是博客项目，一个是工作项目。在错误的窗口启动 Claude，它乖乖地在工作项目里创建了博客相关的文件。
 
@@ -89,7 +89,7 @@ pwd && ls package.json _config.yml 2>/dev/null && claude
 
 ## 二、会话管理翻车：上下文溢出 + 无限循环
 
-### 翻车 2：上下文溢出导致"幽灵编辑"
+### 翻车 3：上下文溢出导致"幽灵编辑"
 
 长会话里让 Claude 改配置文件 A，它把改动写到了文件 B。会话已经几十轮，它"忘了"当前该处理哪个文件。
 
@@ -139,7 +139,7 @@ claude --max-turns 10 "修复 src/auth.test.ts 的测试失败"
 
 ## 三、安全翻车：密钥泄露
 
-### 翻车 3：把密钥推到了 GitHub
+### 翻车 5：把密钥推到了 GitHub
 
 让 Claude 写飞书通知脚本，它把 webhook 地址硬编码在代码里然后 `git push`。`.gitignore` 只拦了 `.env`，密钥写在 `.js` 文件里拦不住。
 
@@ -177,7 +177,7 @@ git --no-pager diff HEAD~1 | grep -iE '(api_key|secret|token|password|webhook)' 
 
 ## 四、编排翻车：Subagent 批量任务
 
-### 翻车 5：批量任务状态不一致
+### 翻车 6：批量任务状态不一致
 
 用 Subagent 并行处理 20 篇文章重写，部分 agent 因 API 速率限制（429 错误）失败，编排器没正确处理，导致一半旧版一半新版。
 
@@ -220,12 +220,12 @@ done
 
 | 翻车 | 根因 | 救急命令 | 预防配置 |
 |------|------|----------|----------|
-| 删错文件 | 理解不够深 | `git restore <path>` | PreToolUse Hook 拦截 `rm -rf` |
-| 幽灵编辑 | 上下文溢出 | 手动修正错误文件 | `/compact` + prompt 带完整路径 |
-| 密钥泄露 | 安全意识缺失 | 立即轮换密钥 + `git filter-branch` | 环境变量 + `git diff` 检查 |
-| 无限循环 | 修症状不修根因 | `Esc` 打断 | `--max-turns 10` + prompt 引导分析 |
-| 批量翻车 | 缺少错误处理 | 进度文件回滚 | 分批 3 篇 + JSON 进度文件 |
-| 干错项目 | 工作目录搞混 | 删掉错误文件 | CLAUDE.md 写项目名 + `pwd` 确认 |
+| 1. 删错文件 | 理解不够深 | `git restore <path>` | PreToolUse Hook 拦截 `rm -rf` |
+| 2. 干错项目 | 工作目录搞混 | 删掉错误文件 | CLAUDE.md 写项目名 + `pwd` 确认 |
+| 3. 幽灵编辑 | 上下文溢出 | 手动修正错误文件 | `/compact` + prompt 带完整路径 |
+| 4. 无限循环 | 修症状不修根因 | `Esc` 打断 | prompt 引导分析根因 |
+| 5. 密钥泄露 | 安全意识缺失 | 立即轮换密钥 | 环境变量 + `git diff` 检查 |
+| 6. 批量翻车 | 缺少错误处理 | 进度文件回滚 | 分批 3 篇 + JSON 进度文件 |
 
 这些翻车的共同点：**不是 Claude 不行，是约束没到位**。下一篇讲怎么写好 CLAUDE.md 和 prompt，让 Claude Code 在你画的圈子里高效干活。
 
