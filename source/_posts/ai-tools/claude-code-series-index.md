@@ -98,12 +98,12 @@ cover: https://picsum.photos/seed/ai-tools-claude/1920/1080
 
 ---
 
-## 后续更新
+## 进阶阅读
 
-- 高阶技巧与调优（待更新）
+如果你已经读完了本系列，推荐继续阅读：
 
-**持续更新中，敬请期待。**
+👉 [Claude Code 实战进阶](/2026/04/07/ai-tools/claude-code-advanced-series-index/) — 真实项目实战、踩坑避坑、日常使用心法。适合已经上手 Claude Code、想进一步提高效率的开发者。
 
 ---
 
-*最后更新：2026-04-03*
+*最后更新：2026-04-07*

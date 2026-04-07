@@ -154,6 +154,7 @@ git push
 ## 当前系列规划
 
 - 《Claude Code 入门到上手》系列（已完结）
+- 《Claude Code 实战进阶》系列（连载中）
 
 ---
 
