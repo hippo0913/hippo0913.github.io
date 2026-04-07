@@ -1,0 +1,109 @@
+# 实战进阶系列评分配置
+name: 实战进阶
+description: Claude Code 实战进阶系列文章的评分标准（踩坑避坑、使用心法、项目实战）
+
+articles_dir: source/_posts/ai-tools
+template: advanced-practice-template.md
+
+# 只匹配实战进阶系列的文章
+file_pattern: "^claude-code-(pitfalls|mindset|real-project)-"
+
+quantitative:
+  weight: 0.3
+  checks:
+    - id: codeBlocks
+      name: 代码块
+      checker: regex_count
+      pattern: '```[\w]*\n[\s\S]*?```'
+      threshold: 2
+      score: 20
+      operator: ">="
+
+    - id: configExamples
+      name: 配置/命令示例
+      checker: code_lang_count
+      languages: [yaml, json, bash, go, markdown]
+      threshold: 1
+      score: 15
+
+    - id: tables
+      name: 表格
+      checker: regex_count
+      pattern: '\|\s*[-:]+.*\|'
+      threshold: 1
+      score: 15
+
+    - id: wordCount
+      name: 字数
+      checker: chinese_char_count
+      threshold: 1000
+      score: 20
+
+    - id: platitudes
+      name: 空话检测
+      checker: blacklist
+      patterns:
+        - '实践出真知'
+        - '不如自己动手试一次'
+        - '让我们一起.*吧'
+        - '以上就是.*的全部内容'
+        - '相信你.*掌握了'
+        - '功能体系中的重要组成部分'
+        - '建议大家都先读文档再动手'
+        - '希望这篇文章.*帮助你'
+      threshold: 0
+      score: 15
+      operator: "<="
+
+    - id: frontMatter
+      name: Front Matter 完整性
+      checker: front_matter
+      required_fields: [title, date, tags, categories, description, cover]
+      threshold: 6
+      score: 15
+
+qualitative:
+  weight: 0.7
+  dimensions:
+    - id: technicalAccuracy
+      name: 技术准确性
+      maxScore: 30
+      description: |
+        评估重点：检查文章中所有命令、路径、配置项、参数名是否正确，代码示例能否实际运行。
+        高分标准（≥80%）：所有命令和参数可复制执行无报错，路径与实际项目结构一致，配置项名称和格式正确，代码块注明了语言类型，版本相关的说明标注了适用版本。
+        低分标准（≤40%）：存在无法执行的命令，路径或文件名明显错误，配置项拼写错误或格式不对，代码块未标注语言。
+        扣分点：(1) 命令参数错误或缺失 -5 分/处；(2) 文件路径与项目实际结构不符 -5 分/处；(3) 配置项 key 拼错或值类型错误 -5 分/处；(4) 代码示例逻辑错误导致无法运行 -8 分/处。
+
+    - id: practicality
+      name: 可操作性
+      maxScore: 30
+      description: |
+        评估重点：检查解决方案是否可以直接照做，步骤是否有明确的操作指令而非模糊建议。
+        高分标准（≥80%）：解决方案附带完整的可复制命令，操作步骤有编号且顺序正确，前置条件（环境、版本、依赖）明确说明，遇到常见问题有对应的排错提示，读者看完就能照做。
+        低分标准（≤40%）：只有"你可以试试""建议配置"等模糊表述，步骤缺少关键细节导致读者需要自行补充，没有说明前置条件，解决方案无法直接复现。
+        扣分点：(1) 关键步骤缺少具体命令或参数 -5 分/处；(2) 未说明前置条件导致操作失败 -5 分；(3) 步骤顺序混乱或逻辑跳跃 -5 分；(4) 多处使用模糊建议而非明确指令 -3 分/处。
+
+    - id: insightDepth
+      name: 见解深度
+      maxScore: 25
+      description: |
+        评估重点：检查文章是否提供了超越文档的个人认知——为什么这样做、踩了什么坑、怎么判断适用场景。注意：这个维度不检查代码对不对（那是技术准确性），也不检查能不能照做（那是可操作性），只看"有没有独到见解"。
+        高分标准（≥80%）：清楚解释了"为什么选这个方案而不选另一个"，有具体的踩坑场景（写了什么→出了什么错→怎么定位的→怎么改的），给出了判断框架（什么场景用什么策略），总结了有规律性的经验而非零散技巧。
+        低分标准（≤40%）：只是功能的罗列或文档的复述，没有"为什么"只有"怎么做"，踩坑描述只有结论没有过程，建议泛泛而谈没有适用场景限定。
+        扣分点：(1) 小节只有功能描述没有个人分析 -3 分/处；(2) 踩坑只有"别这样"没有解释原因 -3 分/处；(3) 建议没有说明适用场景导致读者误用 -5 分/处。
+
+    - id: structure
+      name: 结构可读性
+      maxScore: 15
+      description: |
+        评估重点：检查文章的组织逻辑、段落节奏和信息密度，确保读者能顺畅读完。
+        高分标准（≥80%）：有引言说明文章解决什么问题，正文按逻辑分组且每节长度均衡，小标题能准确预告该节内容，有总结或下一步引导，段落不过长（无超过 300 字的连续段落）。
+        低分标准（≤40%）：缺少引言直接进入正文，小节之间逻辑混乱或重复，某节占比过大失衡，缺少总结读者不知道接下来做什么，存在大段文字墙。
+        扣分点：(1) 缺少引言或总结 -3 分；(2) 小标题与内容不匹配 -3 分/处；(3) 段落超过 300 字未分段 -2 分/处；(4) 相邻小节内容重复 -3 分/处。
+
+pass:
+  threshold: 70
+  maxIterations: 3
+
+source:
+  instruction: "阅读文章现有内容，基于文章主题和已有内容制定改进计划。不需要 WebFetch，重点关注：增强具体场景描述、补充可操作的代码/命令示例、消除空洞内容、优化结构和可读性。如果文章已有 sourceHighlights，直接使用。"

@@ -52,7 +52,8 @@ function parseArticle(filePath) {
 function parseFrontMatterFields(fmText) {
   const fields = new Set();
   for (const line of fmText.split('\n')) {
-    const m = line.match(/^(\w[\w_-]*):\s*\S/);
+    // 匹配 key: value 或 key: (空值/数组/对象的开始)
+    const m = line.match(/^(\w[\w_-]*):/);
     if (m) fields.add(m[1]);
   }
   return fields;
