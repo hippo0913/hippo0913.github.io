@@ -227,7 +227,7 @@ quantitative:
       threshold: 1000
       score: 20
     - id: platitudes      # 空话数量 <= 0，15 分
-      patterns: ['实践出真知', '让我们一起.*吧']
+      patterns: ['空话模式A', '空话模式B']  # 示例：实际使用时替换为要检测的空话模式
       score: 15
 qualitative:
   weight: 0.7
