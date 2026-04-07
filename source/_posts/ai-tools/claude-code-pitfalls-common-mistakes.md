@@ -8,118 +8,226 @@ categories:
   - AI 工具系列
 series: claude-code-advanced
 series_index: 1
-description: 6 个 Claude Code 使用中的真实翻车场景，每个都附上原因分析和防范措施。看完这篇，你可以少踩一半的坑。
+description: 6 个 Claude Code 使用中的真实翻车场景，每个都附上原因分析、可复制的防范配置和救急命令。看完这篇，你可以少踩一半的坑。
 cover: https://picsum.photos/seed/claude-code-pitfalls/1920/1080
 ---
 
 # Claude Code 翻车现场：那些让我抓狂的时刻
 
-用了几个月 Claude Code，我犯过各种离谱的错误。有些是我操作不当，有些是 Claude 自作主张，还有些是两者叠加的结果。
+用了几个月 Claude Code，我踩过 6 类典型翻车：删错文件、改错文件、密钥泄露、无限循环、批量任务崩盘、干错项目。每一类都不是个例，而是反复出现的模式。
 
-这篇文章记录 6 个让我印象深刻的翻车现场。每个都有原因分析和防范措施，希望你看完能少踩一半的坑。
+这篇文章逐个还原场景，分析原因，给出**可以直接复制执行的防范配置**。目标：你看完后能把这些防护措施直接加到自己项目里，少踩一半的坑。
 
 <!-- more -->
 
 ---
 
-## 翻车 1：Claude 删了不该删的东西
+## 一、文件操作翻车：删错文件 + 干错项目
 
-**场景**：让 Claude 清理项目中"没用的文件"，它执行了 `rm -rf` 删掉了一个配置目录。虽然目录本身确实是旧配置，但里面有一个我手动维护过的本地覆盖文件。
+### 翻车 1：Claude 删了不该删的东西
 
-**原因**：Claude 只看了文件名和内容，没有理解"这个目录虽然旧，但里面有个文件我还在用"。它的判断逻辑是"这个目录名包含 deprecated，可以删"。
+让 Claude 清理项目中"没用的文件"，它执行了 `rm -rf` 删掉了一个配置目录。目录名包含 `deprecated`，Claude 的判断是"可以删"，但里面有一个我手动维护过的本地覆盖文件。
 
-**防范**：
+**救急**：还好之前 commit 过，一条命令捞回来：
 
-- 在 CLAUDE.md 里明确写"删除文件前必须确认"
-- 配置 PreToolUse Hook 拦截 `rm -rf` 等危险命令
-- 重要文件及时 git commit，让 `git restore` 能救回来
+```bash
+# 恢复被误删的文件或目录
+git restore path/to/deleted-file
+# 或者恢复整个目录
+git restore path/to/deprecated-config/
+```
 
----
+**预防**：用 PreToolUse Hook 拦截危险命令。在 `.claude/settings.json` 里配置：
 
-## 翻车 2：上下文溢出导致"幽灵编辑"
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat /dev/stdin | jq -r '.tool_input.command' | grep -P 'rm\\s+(-[a-zA-Z]*f[a-zA-Z]*\\s+|.*--recursive)' && echo 'BLOCKED: dangerous rm command detected' >&2 && exit 1; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
-**场景**：在一个长会话里，Claude 修改了错误的文件。它把文件 A 的改动写到了文件 B，因为会话已经进行了几十轮，它"忘了"当前应该在处理哪个文件。
+这样 Claude 执行 `rm -rf` 时会被拦截，需要你确认才能继续。
 
-**原因**：上下文窗口接近饱和时，Claude 对早期对话的记忆会模糊。它记得"要改一个配置文件"，但分不清是 A 还是 B 了。
+同时在 CLAUDE.md 里加一条硬规则：
 
-**防范**：
+```yaml
+# CLAUDE.md 中加入：
+- 不可逆操作必须确认（删除、覆写不可恢复的内容）
+```
 
-- 用 `/compact` 定期压缩上下文
-- 上下文超过 70% 时主动 `/clear` 开新会话
-- 在 prompt 里带上完整文件路径，不要只说"改那个配置文件"
+### 翻车 6：在错误的项目目录里干活
 
----
+同时开了两个终端，一个是博客项目，一个是工作项目。在错误的窗口启动 Claude，它乖乖地在工作项目里创建了博客相关的文件。
 
-## 翻车 3：把密钥推到了 GitHub
+**预防**：在 CLAUDE.md 顶部写明项目名称，Claude 启动时会读取并反复提及：
 
-**场景**：让 Claude 写一个飞书通知脚本，它把 webhook 地址硬编码在代码里，然后 `git push`。虽然 `.gitignore` 配了 `.env`，但密钥直接写在 `.js` 文件里，`.gitignore` 拦不住。
+```yaml
+# CLAUDE.md 开头：
+# 项目名称：小河马的博客（hippo0913.github.io）
+# 本地路径：~/hippo/blog/hippo0913.github.io
+```
 
-**原因**：Claude 的默认行为是"让代码能跑"，安全意识需要你主动教。它知道不应该明文存密钥，但在"快速完成任务"的惯性下会忽略这个原则。
+另外，启动 Claude 前养成确认目录的习惯：
 
-**防范**：
-
-- CLAUDE.md 里写"所有密钥、token、webhook URL 必须放在环境变量中"
-- 配置 PreToolUse Hook，在 `git commit` 前扫描敏感词
-- 推送前看一眼 `git diff`
-
----
-
-## 翻车 4：Claude 陷入无限循环
-
-**场景**：让 Claude 修复一个测试失败。它搜索文件 → 发现问题 → 编辑 → 运行测试 → 还是失败 → 搜索文件 → 发现"另一个问题" → 编辑 → 运行测试 → 又失败……循环了 8 轮，每轮都在修不同的小问题，但根本原因没找到。
-
-**原因**：Claude 倾向于"快速修复眼前的问题"，而不是停下来分析根因。当修一个地方导致另一个地方坏掉时，它会继续修那个地方，形成循环。
-
-**防范**：
-
-- 设置 `max-turns` 限制（比如 10 轮）
-- 在 prompt 里加"如果连续 3 次修复失败，停下来分析根因"
-- 发现循环时用 `Esc` 打断，给 Claude 更具体的方向
-
----
-
-## 翻车 5：Subagent 批量任务翻车
-
-**场景**：用 Subagent 并行处理 20 篇文章的重写。跑了 5 分钟后，部分 agent 因为 API 速率限制（429 错误）失败，但编排器没有正确处理错误，导致一半文章是旧版本一半是新版本，状态不一致。
-
-**原因**：批量任务对错误处理的要求很高。单次任务的容错逻辑和批量任务完全不同，我当时没在编排 prompt 里写"失败时怎么处理"。
-
-**防范**：
-
-- 批量任务必须有进度文件，记录每个子任务的状态
-- 编排 prompt 里写清楚失败策略（重试 / 跳过 / 全部中止）
-- 分批执行，每批 3-5 个，避免触发速率限制
+```bash
+# 确认当前目录再启动 claude
+pwd && ls package.json _config.yml 2>/dev/null && claude
+```
 
 ---
 
-## 翻车 6：在错误的项目目录里干活
+## 二、会话管理翻车：上下文溢出 + 无限循环
 
-**场景**：同时开了两个终端窗口，一个是博客项目，一个是工作项目。在错误的窗口里让 Claude 执行任务，它乖乖地在工作项目里创建了博客相关的文件和目录。
+### 翻车 2：上下文溢出导致"幽灵编辑"
 
-**原因**：Claude Code 的工作目录取决于你在哪个终端启动它。它没有办法（也不应该有）判断"你是不是找错项目了"。
+长会话里让 Claude 改配置文件 A，它把改动写到了文件 B。会话已经几十轮，它"忘了"当前该处理哪个文件。
 
-**防范**：
+**怎么判断上下文快满了**：Claude Code 状态栏会显示上下文占用百分比。超过 70% 时，就该压缩或开新会话了。
 
-- 开始任务前看一眼终端的当前目录
-- 在 CLAUDE.md 里写项目名称，Claude 会在回复中提到项目名，帮你确认
-- 不同项目用不同的终端标签页/窗口标题区分
+**关键操作**：
+
+```bash
+# 上下文 50-70%：压缩，保留关键信息
+/compact
+
+# 上下文超过 70%：直接清空，开新会话
+/clear
+```
+
+另一个实用的习惯：**在 prompt 里带完整文件路径**。对比例子：
+
+```bash
+# 容易出错：只说"改那个配置文件"
+"把配置文件里的端口改成 8080"
+
+# 不容易出错：带完整路径
+"修改 /home/yy/hippo/blog/hippo0913.github.io/_config.yml，把 port 从 4000 改成 8080"
+```
+
+### 翻车 4：Claude 陷入无限循环
+
+让 Claude 修复测试失败，它搜索 → 编辑 → 测试 → 失败 → 搜索 → 编辑另一个地方 → 测试 → 又失败……循环了 8 轮，每轮修不同的小问题，根因始终没碰。
+
+**预防**：启动时设置轮次上限：
+
+```bash
+# 限制单次会话最多 10 轮工具调用
+claude --max-turns 10 "修复 src/auth.test.ts 的测试失败"
+```
+
+同时在 prompt 里引导它先分析再动手：
+
+```
+修复 src/auth.test.ts 的测试失败。注意：
+1. 先读测试文件和被测代码，分析失败根因
+2. 如果连续 3 次修复后测试仍然失败，停下来输出你的分析，等我确认
+3. 不要修症状，要修根因
+```
 
 ---
 
-## 总结：翻车速查表
+## 三、安全翻车：密钥泄露
 
-| 翻车 | 根因 | 救急措施 | 预防手段 |
+### 翻车 3：把密钥推到了 GitHub
+
+让 Claude 写飞书通知脚本，它把 webhook 地址硬编码在代码里然后 `git push`。`.gitignore` 只拦了 `.env`，密钥写在 `.js` 文件里拦不住。
+
+**反面 vs 正面对比**：
+
+```javascript
+// 错误：硬编码 webhook 地址
+const FEISHU_WEBHOOK = "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxx";
+
+// 正确：从环境变量读取
+const FEISHU_WEBHOOK = process.env.FEISHU_WEBHOOK_URL;
+if (!FEISHU_WEBHOOK) {
+  console.error("缺少环境变量 FEISHU_WEBHOOK_URL");
+  process.exit(1);
+}
+```
+
+**CLAUDE.md 里的安全规则**，写清楚比指望 Claude 自己记得靠谱：
+
+```yaml
+## 安全规则
+- 所有密钥、token、webhook URL 必须放在环境变量中，禁止硬编码
+- 禁止将 .env、credentials.json 等文件加入 git
+- 推送前必须检查 git diff，确认没有敏感信息
+```
+
+**推送前的检查命令**：
+
+```bash
+# 推送前检查最近的改动是否包含敏感信息
+git --no-pager diff HEAD~1 | grep -iE '(api_key|secret|token|password|webhook)' && echo "WARNING: 可能包含敏感信息！" || echo "OK"
+```
+
+---
+
+## 四、编排翻车：Subagent 批量任务
+
+### 翻车 5：批量任务状态不一致
+
+用 Subagent 并行处理 20 篇文章重写，部分 agent 因 API 速率限制（429 错误）失败，编排器没正确处理，导致一半旧版一半新版。
+
+**预防方案一：进度文件**。用 JSON 记录每个子任务的状态：
+
+```json
+{
+  "tasks": [
+    {"file": "article-01.md", "status": "completed", "score": 85},
+    {"file": "article-02.md", "status": "failed", "error": "429 rate limit", "retry_count": 0},
+    {"file": "article-03.md", "status": "pending"}
+  ],
+  "updated_at": "2026-04-07T10:30:00Z"
+}
+```
+
+**预防方案二：编排 prompt 里写清楚失败策略**：
+
+```
+执行批量文章重写。规则：
+- 每批最多 3 篇，一批完成后再开始下一批
+- 单篇失败：标记为 failed，继续处理下一篇，不要重试
+- 整批失败（如 429）：等待 30 秒后重试一次，仍失败则中止
+- 每篇完成后更新进度文件 .claude/progress.json
+```
+
+**预防方案三：分批执行**：
+
+```bash
+# 分批执行，每批 3 个，避免速率限制
+for i in {1..7}; do
+  claude --max-turns 15 "处理第 $i 批文章重写，参考 .claude/progress.json"
+  sleep 60
+done
+```
+
+---
+
+## 五、总结：翻车防范速查表
+
+| 翻车 | 根因 | 救急命令 | 预防配置 |
 |------|------|----------|----------|
-| 删错文件 | 理解不够深 | `git restore` | Hook 拦截 + CLAUDE.md 规则 |
-| 幽灵编辑 | 上下文溢出 | 手动修正错误文件 | `/compact` + 带完整路径 |
-| 密钥泄露 | 安全意识缺失 | 立即轮换密钥 | 环境变量 + 推送前检查 |
-| 无限循环 | 修症状不修根因 | `Esc` 打断 | `max-turns` + prompt 引导 |
-| 批量翻车 | 缺少错误处理 | 进度文件回滚 | 分批执行 + 失败策略 |
-| 干错项目 | 工作目录搞混 | 删掉错误文件 | 看目录 + CLAUDE.md 项目名 |
+| 删错文件 | 理解不够深 | `git restore <path>` | PreToolUse Hook 拦截 `rm -rf` |
+| 幽灵编辑 | 上下文溢出 | 手动修正错误文件 | `/compact` + prompt 带完整路径 |
+| 密钥泄露 | 安全意识缺失 | 立即轮换密钥 + `git filter-branch` | 环境变量 + `git diff` 检查 |
+| 无限循环 | 修症状不修根因 | `Esc` 打断 | `--max-turns 10` + prompt 引导分析 |
+| 批量翻车 | 缺少错误处理 | 进度文件回滚 | 分批 3 篇 + JSON 进度文件 |
+| 干错项目 | 工作目录搞混 | 删掉错误文件 | CLAUDE.md 写项目名 + `pwd` 确认 |
 
-回头看这些翻车，大部分都有一个共同点：**不是 Claude 不行，是我给的约束不够**。Claude 会忠实地执行你的指令，但你的指令如果含糊，结果也会含糊。
-
-下一篇我们聊聊怎么给 Claude Code 下指令才能避免这些问题。
+这些翻车的共同点：**不是 Claude 不行，是约束没到位**。下一篇讲怎么写好 CLAUDE.md 和 prompt，让 Claude Code 在你画的圈子里高效干活。
 
 ---
 
