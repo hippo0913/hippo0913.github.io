@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Hooks 参考
 date: 2026-03-27 11:00:00
-updated: 2026-03-31 15:00:00
+updated: 2026-04-08 10:00:00
 tags: [Claude Code, 扩展定制]
 categories: [AI 工具系列]
 series: claude-code
@@ -49,6 +49,7 @@ Hooks 定义在 JSON 设置文件中。配置有三个嵌套层级：**选事件
 | `.claude/settings.local.json` | 单个项目 | 否，已被 gitignore |
 | 托管策略设置 | 组织范围 | 是，管理员控制 |
 | Plugin `hooks/hooks.json` | 启用插件时 | 是，与插件捆绑 |
+| Skill 或代理 frontmatter | 组件活跃时 | 是，在组件文件中定义 |
 
 一个完整的 settings.json hooks 配置示例：
 
@@ -84,35 +85,77 @@ Hooks 定义在 JSON 设置文件中。配置有三个嵌套层级：**选事件
 
 **配置参数说明：**
 
+通用字段（所有 hook 类型都有）：
+
 | 字段 | 类型 | 必需 | 说明 |
 |------|------|------|------|
 | `type` | string | 是 | 处理程序类型：`command`、`http`、`prompt`、`agent` |
-| `command` | string | 是（command 类型） | 要执行的 shell 命令 |
+| `if` | string | 否 | 权限规则语法过滤，如 `"Bash(git *)"` 仅匹配 git 命令。仅工具事件有效 |
 | `matcher` | string | 否 | 正则表达式，过滤何时触发。`"*"` 或空匹配所有 |
 | `timeout` | number | 否 | 超时秒数。命令默认 600，提示默认 30，代理默认 60 |
-| `async` | boolean | 否 | `true` 则后台运行不阻塞（仅 command 类型） |
 | `statusMessage` | string | 否 | hook 运行时显示的自定义加载消息 |
+| `once` | boolean | 否 | `true` 则每个会话只运行一次（仅 Skills） |
+
+命令 hook 专有字段：
+
+| 字段 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| `command` | string | 是 | 要执行的 shell 命令 |
+| `async` | boolean | 否 | `true` 则后台运行不阻塞 |
+| `shell` | string | 否 | 指定 shell：`"bash"`（默认）或 `"powershell"` |
 
 **matcher 匹配规则：** matcher 是正则表达式字符串。`"Bash"` 精确匹配 Bash 工具，`"Edit|Write"` 匹配编辑或写入，`"mcp__.*"` 匹配所有 MCP 工具，`"*"` 或留空匹配一切。
+
+不同事件的 matcher 匹配目标不同：
+
+| 事件类型 | matcher 匹配的内容 |
+|---------|------------------|
+| PreToolUse / PostToolUse / PostToolUseFailure | 工具名（如 `Bash`、`Edit`、`mcp__memory__create_entities`） |
+| PermissionRequest / PermissionDenied | 工具名 |
+| SubagentStart / SubagentStop | 代理类型名（如 `Explore`、自定义代理名） |
+| Notification | 通知类型（如 `permission_prompt`、`idle_prompt`） |
+| PreCompact / PostCompact | 触发方式（`manual` 或 `auto`） |
+| SessionStart | 启动原因（`startup`、`resume`、`clear`、`compact`） |
+| SessionEnd | 结束原因（`clear`、`resume`、`logout` 等） |
+| ConfigChange | 配置源（`user_settings`、`project_settings` 等） |
+| FileChanged | 文件名（如 `.envrc`） |
+| StopFailure | 错误类型 |
+| Stop / UserPromptSubmit / TaskCreated / TaskCompleted / TeammateIdle / WorktreeCreate / WorktreeRemove | 不支持 matcher |
 
 用 `$CLAUDE_PROJECT_DIR` 环境变量引用项目根目录的脚本，这样不管工作目录怎么变，路径都不会出错。
 
 ### 2.2 Hook 事件详解
 
-Claude Code 支持 20+ 种 Hook 事件，覆盖从会话启动到结束的完整生命周期。下面是最常用的事件：
+Claude Code 支持 **26 种 Hook 事件**，覆盖从会话启动到结束的完整生命周期。下面按生命周期顺序列出所有事件：
 
-| 事件 | 触发时机 | 需要 matcher | 可阻止 | 典型用途 |
-|------|---------|-------------|--------|---------|
-| `SessionStart` | 会话开始或恢复 | 否（可选：startup/resume） | 否 | 注入上下文、设置环境变量 |
-| `PreToolUse` | 工具执行前 | 是（工具名） | 是 | 拦截危险命令、自动审批 |
-| `PostToolUse` | 工具执行后 | 是（工具名） | 否（可反馈） | 运行测试、日志记录 |
-| `Notification` | 需要用户注意时 | 否（可选：通知类型） | 否 | 发送桌面/飞书通知 |
-| `Stop` | 主 agent 完成时 | 否 | 是 | 任务完成通知、质量检查 |
-| `SubagentStop` | 子 agent 完成时 | 否（可选：代理类型） | 是 | 子任务完成检查 |
-| `UserPromptSubmit` | 用户提交 prompt 前 | 否 | 是 | 注入上下文、过滤敏感词 |
-| `PreCompact` | 压缩上下文前 | 否（可选：manual/auto） | 否 | 保存重要上下文 |
-| `SessionEnd` | 会话结束时 | 否 | 否 | 清理、保存统计 |
-| `PermissionRequest` | 权限对话框弹出时 | 是（工具名） | 是 | 自动批准/拒绝权限 |
+| 事件 | 触发时机 | matcher 过滤内容 | 可阻止 | 典型用途 |
+|------|---------|-----------------|--------|---------|
+| `SessionStart` | 会话开始或恢复 | startup/resume/clear/compact | 否 | 注入上下文、设置环境变量 |
+| `InstructionsLoaded` | CLAUDE.md 或规则文件加载时 | session_start/nested_traversal 等 | 否 | 审计日志、合规追踪 |
+| `UserPromptSubmit` | 用户提交 prompt 前 | 不支持 matcher | 是 | 注入上下文、过滤敏感词 |
+| `PreToolUse` | 工具执行前 | 工具名 | 是 | 拦截危险命令、自动审批 |
+| `PermissionRequest` | 权限对话框弹出时 | 工具名 | 是 | 自动批准/拒绝权限 |
+| `PermissionDenied` | auto 模式拒绝工具时 | 工具名 | 否（可 retry） | 重试被拒的工具调用 |
+| `PostToolUse` | 工具成功执行后 | 工具名 | 否（可反馈） | 运行测试、日志记录 |
+| `PostToolUseFailure` | 工具执行失败后 | 工具名 | 否（可反馈） | 错误告警、纠正反馈 |
+| `Notification` | 需要用户注意时 | permission_prompt/idle_prompt 等 | 否 | 发送桌面/飞书通知 |
+| `SubagentStart` | 子 agent 启动时 | 代理类型名 | 否 | 注入上下文到子 agent |
+| `SubagentStop` | 子 agent 完成时 | 代理类型名 | 是 | 子任务完成检查 |
+| `TaskCreated` | TaskCreate 创建任务时 | 不支持 matcher | 是 | 强制命名规范 |
+| `TaskCompleted` | 任务标记完成时 | 不支持 matcher | 是 | 强制通过测试才能关闭 |
+| `Stop` | 主 agent 完成时 | 不支持 matcher | 是 | 任务完成通知、质量检查 |
+| `StopFailure` | API 错误导致回合结束 | 错误类型 | 否（忽略输出） | 记录失败、发送告警 |
+| `TeammateIdle` | agent 团队队友即将空闲 | 不支持 matcher | 是 | 强制质量门检查 |
+| `ConfigChange` | 配置文件变更时 | user_settings/project_settings 等 | 是 | 审计设置变更 |
+| `CwdChanged` | 工作目录切换时 | 不支持 matcher | 否 | 自动加载 direnv 环境 |
+| `FileChanged` | 监视文件在磁盘变更时 | 文件名（如 .envrc） | 否 | 环境变量热重载 |
+| `WorktreeCreate` | 创建 worktree 时 | 不支持 matcher | 是（路径返回） | 自定义 VCS 工作副本 |
+| `WorktreeRemove` | 移除 worktree 时 | 不支持 matcher | 否 | 清理版本控制状态 |
+| `PreCompact` | 压缩上下文前 | manual/auto | 否 | 保存重要上下文 |
+| `PostCompact` | 压缩完成后 | manual/auto | 否 | 记录压缩摘要 |
+| `Elicitation` | MCP 服务器请求用户输入时 | MCP 服务器名 | 是 | 自动响应 MCP 表单 |
+| `ElicitationResult` | 用户响应 MCP 询问后 | MCP 服务器名 | 是 | 修改或阻止响应 |
+| `SessionEnd` | 会话结束时 | clear/resume/logout 等 | 否 | 清理、保存统计 |
 
 不需要 matcher 的事件（如 Stop、SessionEnd）会在**每次出现时都触发**。如果你给它们加了 matcher，会被静默忽略。
 
@@ -127,7 +170,10 @@ Claude Code 支持 20+ 种 Hook 事件，覆盖从会话启动到结束的完整
 | `session_id` | 当前会话标识符 |
 | `transcript_path` | 对话 JSON 的路径 |
 | `cwd` | 当前工作目录 |
+| `permission_mode` | 当前权限模式：`default`、`plan`、`acceptEdits`、`auto`、`dontAsk`、`bypassPermissions` |
 | `hook_event_name` | 触发的事件名称 |
+| `agent_id` | 子 agent 唯一标识（仅在子 agent 内触发时存在） |
+| `agent_type` | 代理名称，如 `"Explore"` 或自定义代理名 |
 
 不同事件还有各自的额外字段。以 `PreToolUse` 为例：
 
@@ -177,16 +223,32 @@ Hook 的输出方式决定了你能多精细地控制 Claude Code 的行为。
 
 退出码 2 在不同事件中的行为不同，这是必须搞清楚的：
 
-| Hook 事件 | 退出 2 效果 |
-|-----------|------------|
-| `PreToolUse` | **阻止工具调用**，不执行 |
-| `UserPromptSubmit` | **阻止 prompt 处理**，从上下文删除 |
-| `Stop` | **阻止停止**，Claude 继续工作 |
-| `SubagentStop` | **阻止子 agent 停止** |
-| `PermissionRequest` | **拒绝权限** |
-| `PostToolUse` | 仅向 Claude 显示 stderr（工具已运行，无法阻止） |
-| `Notification` | 仅向用户显示 stderr（通知已发送） |
-| `SessionEnd` | 仅向用户显示 stderr（会话已结束） |
+| Hook 事件 | 可阻止？ | 退出 2 时发生什么 |
+|-----------|---------|----------------|
+| `PreToolUse` | 是 | 阻止工具调用 |
+| `PermissionRequest` | 是 | 拒绝权限 |
+| `UserPromptSubmit` | 是 | 阻止 prompt 并从上下文删除 |
+| `Stop` | 是 | 阻止停止，Claude 继续工作 |
+| `SubagentStop` | 是 | 阻止子 agent 停止 |
+| `TeammateIdle` | 是 | 阻止队友空闲，继续工作 |
+| `TaskCreated` | 是 | 回滚任务创建 |
+| `TaskCompleted` | 是 | 阻止任务标记为完成 |
+| `ConfigChange` | 是 | 阻止配置变更生效（policy_settings 除外） |
+| `Elicitation` | 是 | 拒绝 MCP 询问 |
+| `ElicitationResult` | 是 | 阻止响应（操作变为 decline） |
+| `WorktreeCreate` | 是 | 任何非零退出导致创建失败 |
+| `PostToolUse` | 否 | 向 Claude 显示 stderr |
+| `PostToolUseFailure` | 否 | 向 Claude 显示 stderr |
+| `PermissionDenied` | 否 | 退出码和 stderr 被忽略（用 JSON `retry: true` 重试） |
+| `Notification` | 否 | 仅向用户显示 stderr |
+| `SubagentStart` | 否 | 仅向用户显示 stderr |
+| `SessionStart` | 否 | 仅向用户显示 stderr |
+| `SessionEnd` | 否 | 仅向用户显示 stderr |
+| `CwdChanged` / `FileChanged` | 否 | 仅向用户显示 stderr |
+| `PreCompact` / `PostCompact` | 否 | 仅向用户显示 stderr |
+| `StopFailure` | 否 | 输出和退出码被忽略 |
+| `WorktreeRemove` | 否 | 失败仅在调试模式记录 |
+| `InstructionsLoaded` | 否 | 退出码被忽略 |
 
 **高级方式：JSON 输出**
 
@@ -220,9 +282,40 @@ JSON 输出的通用字段：
 | `suppressOutput` | false | `true` 则从详细模式输出中隐藏 stdout |
 | `systemMessage` | 无 | 向用户显示的警告消息 |
 
-不同事件使用不同的决定字段。`PreToolUse` 用 `hookSpecificOutput.permissionDecision`（allow/deny/ask），`Stop` 用顶级 `decision: "block"`，`PostToolUse` 用顶级 `decision: "block"` + `reason`。
+不同事件使用不同的决定字段。`PreToolUse` 用 `hookSpecificOutput.permissionDecision`（allow/deny/ask/defer），`Stop` 用顶级 `decision: "block"`，`PostToolUse` 用顶级 `decision: "block"` + `reason`。
 
-### 2.5 MCP 工具的 Hook 配置
+**输出字符上限**：Hook 输出注入到上下文中（additionalContext、systemMessage 或纯 stdout）的上限为 **10,000 字符**。超过此限制的输出被保存到文件并替换为预览和文件路径。
+
+### 2.5 if 字段：权限规则语法过滤
+
+除了 `matcher` 按工具名过滤外，还可以用 `if` 字段做更精细的二次过滤。`if` 使用**权限规则语法**来匹配工具名称和参数：
+
+- `"Bash(git *)"` 仅匹配 git 命令
+- `"Edit(*.ts)"` 仅匹配 TypeScript 文件编辑
+- `"Bash(rm *)"` 仅匹配 rm 开头的命令
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(rm *)",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-rm.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`if` 仅在工具事件上有效（PreToolUse、PostToolUse、PostToolUseFailure、PermissionRequest、PermissionDenied），其他事件上设置了 `if` 的 hook 永远不会运行。
+
+### 2.6 MCP 工具的 Hook 配置
 
 MCP（一种让 AI 连接外部工具的标准协议）服务器的工具在 Hook 中被视为普通工具，命名格式是 `mcp__<server>__<tool>`。
 
@@ -256,6 +349,34 @@ MCP（一种让 AI 连接外部工具的标准协议）服务器的工具在 Hoo
 - `mcp__memory__.*` 匹配 Memory 服务器的所有工具
 - `mcp__.*__write.*` 匹配任何服务器中包含 "write" 的工具
 - 配置方式与内置工具完全一致，matcher 依然是正则表达式
+
+### 2.7 Elicitation：MCP 服务器主动询问用户
+
+当 MCP 服务器在工具执行中途需要用户输入时（比如填写表单、确认身份验证），Claude Code 默认弹出交互式对话框。通过 `Elicitation` 和 `ElicitationResult` 两个事件，你的 hook 可以**以编程方式自动响应**，完全跳过对话框。
+
+- `Elicitation` 事件：MCP 服务器发起询问时触发，hook 可返回 `accept/decline/cancel`
+- `ElicitationResult` 事件：用户响应后、结果发回 MCP 服务器前触发，hook 可修改或阻止响应
+
+matcher 匹配 MCP 服务器名称。form 模式下 `requested_schema` 字段包含表单结构，URL 模式下提供 `url` 字段用于浏览器认证。
+
+### 2.8 Skills 和代理中的 Hooks
+
+除了在 settings.json 中定义 hooks，还可以**直接在 Skills 和 subagents 的 frontmatter 中定义 hooks**。这些 hooks 的作用范围限于组件的生命周期——组件活跃时运行，完成后自动清理。
+
+对于 subagents，`Stop` hooks 会自动转换为 `SubagentStop`，因为这才是子代理完成时触发的事件。
+
+```yaml
+---
+name: secure-operations
+description: Perform operations with security checks
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "./scripts/security-check.sh"
+---
+```
 
 ---
 
@@ -398,7 +519,7 @@ Hooks 执行任意 shell 命令，使用风险自担。官方文档给出了 5 �
 
 ## 六、小结
 
-Hooks 是 Claude Code 的确定性守卫机制——写在 CLAUDE.md 里的规则 Claude 可能忘记，但 Hook 是 100% 执行的。掌握 10+ 种事件类型、2 种输出方式（退出码和 JSON）、以及配置结构，你就拥有了让 Claude Code "聪明又安全" 的能力。
+Hooks 是 Claude Code 的确定性守卫机制——写在 CLAUDE.md 里的规则 Claude 可能忘记，但 Hook 是 100% 执行的。掌握 26 种事件类型、4 种 hook 类型（command/http/prompt/agent）、2 种输出方式（退出码和 JSON）、if 字段的二次过滤、以及配置结构，你就拥有了让 Claude Code "聪明又安全" 的能力。
 
 **下一篇**：[创建自定义 subagents](/2026/03/19/ai-tools/official-docs/sub-agents/) -- 如何创建独立上下文的子代理。
 
@@ -412,4 +533,4 @@ Hooks 是 Claude Code 的确定性守卫机制——写在 CLAUDE.md 里的规�
 
 *本文精读自 [Hooks 参考 - Claude Code Docs](https://code.claude.com/docs/zh-CN/hooks)*
 
-*最后更新：2026-03-31*
+*最后更新：2026-04-08*
