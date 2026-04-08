@@ -1,7 +1,7 @@
 {
   "type": "doc-update",
-  "lastUpdated": "2026-04-08T03:00:00Z",
-  "summary": { "completed": 1, "needsManual": 0, "pending": 7, "skipped": 0 },
+  "lastUpdated": "2026-04-08T03:45:00Z",
+  "summary": { "completed": 2, "needsManual": 0, "pending": 6, "skipped": 0 },
   "articles": [
     {
       "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
@@ -24,12 +24,13 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/hooks.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 14,
+      "patchesTotal": 14,
+      "score": 100,
+      "lastAttempt": "2026-04-08T03:45:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/settings.md",
