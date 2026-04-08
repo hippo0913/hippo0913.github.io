@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Scheduled Tasks - 按计划运行提示词
 date: 2026-03-27 14:40:00
-updated: 2026-03-31 10:00:00
+updated: 2026-04-08 10:00:00
 tags: [Claude Code, 扩展定制]
 categories: [AI 工具系列]
 series: claude-code
@@ -28,9 +28,25 @@ Scheduled Tasks 就是 Claude Code 内置的定时任务功能。如果你用过
 - **检查长时间构建**：跑一个耗时的编译任务，让 Claude 帮你盯着
 - **设置一次性提醒**：下午 3 点有个会议，让 Claude 提前提醒你
 
+> **hippo 补充：** 如果你需要的是"部署失败时通知我"这种场景，官方还推荐了 [Channels](https://docs.anthropic.com/en/docs/claude-code/channels) 功能——你的 CI 可以直接把失败信息推送到会话中，不需要轮询。轮询适合没有主动推送能力的场景。
+
 **关键限制：任务是会话范围的**。也就是说，任务活在当前 Claude Code 进程里，你退出终端，任务就没了。这和传统的 crontab 不一样——crontab 是系统级的，重启还在；GitHub Actions 的 schedule 触发器也是持久化的。Scheduled Tasks 是轻量级、会话内的临时调度，定位更像是"我在干活的时候，顺便让 Claude 帮我盯着点"。
 
-官方文档还提供了一张对比表，把 Cloud Scheduled Tasks、Desktop Scheduled Tasks 和 `/loop` 三种方式做了横向比较，核心区别在于：Cloud 不需要你的电脑开着，Desktop 需要电脑但不需要会话，`/loop` 需要会话在线。
+官方文档提供了三种调度方式的详细对比表，一目了然：
+
+| 特性 | Cloud | Desktop | `/loop` |
+| --- | --- | --- | --- |
+| 运行位置 | Anthropic 云端 | 你的电脑 | 你的电脑 |
+| 需要电脑开机 | 否 | 是 | 是 |
+| 需要会话打开 | 否 | 否 | 是 |
+| 跨重启持久化 | 是 | 是 | 否（会话范围） |
+| 访问本地文件 | 否（全新克隆） | 是 | 是 |
+| MCP 服务器 | 每个任务独立配置的连接器 | 配置文件和连接器 | 继承当前会话 |
+| 权限提示 | 否（自主运行） | 每个任务可配置 | 继承当前会话 |
+| 自定义计划 | 通过 CLI 的 `/schedule` | 是 | 是 |
+| 最小间隔 | 1 小时 | 1 分钟 | 1 分钟 |
+
+核心区别：Cloud 不需要你的电脑开着（在 Anthropic 云端跑），Desktop 需要电脑但不需要会话，`/loop` 需要会话在线。
 
 <!-- more -->
 
@@ -120,7 +136,7 @@ CronCreate with cron: "7 9 * * *" prompt: "check CI status" recurring: true
 
 每个任务都有一个 **8 字符的 ID**，传递给 `CronDelete` 用来取消任务。单个会话最多可以同时保存 **50 个** 计划任务。
 
-### 2.4 调度机制详解：抖动、时区与过期
+### 2.4 任务如何运行：触发时机、抖动、时区与过期
 
 这部分是理解 Scheduled Tasks 行为的关键。
 
@@ -138,7 +154,7 @@ CronCreate with cron: "7 9 * * *" prompt: "check CI status" recurring: true
 
 如果你需要精确时间，选一个不是 `:00` 或 `:30` 的分钟数就行了，比如 `3 9 * * *` 而不是 `0 9 * * *`。
 
-**三天过期：** 重复任务在创建后 3 天自动过期，过期时最后触发一次然后自我删除。这是为了防止"忘了的循环"无限运行。如果需要更长时间的任务，在过期前取消并重新创建，或者使用 Cloud/Desktop Scheduled Tasks。
+**七天过期：** 重复任务在创建后 **7 天** 自动过期，过期时最后触发一次然后自我删除。这是为了防止"忘了的循环"无限运行。如果需要更长时间的任务，在过期前取消并重新创建，或者使用 Cloud Scheduled Tasks 或 Desktop Scheduled Tasks。
 
 ### 2.5 Cron 表达式参考
 
@@ -212,9 +228,9 @@ remind me 15 minutes before 3pm to commit and push my current changes
 
 有一次我设了每 1 分钟检查一次任务，但发现 Claude 有时好几分钟后才响应。后来才理解了——调度器是以低优先级排队的，如果你正在让 Claude 做别的事情（比如让它分析代码），定时任务会等到当前回合结束才触发。这不是 bug，是设计如此。如果你的任务频率很高（比如每分钟），而 Claude 经常在处理复杂请求，实际上触发间隔会远大于你设的值。
 
-### 踩坑二：周五设的任务，周一没了
+### 踩坑二：忘了取消的循环任务不知不觉过期了
 
-我周五下午设了一个每天检查的任务，想让它持续跑一周。结果周一回来发现任务已经不在了——重复任务 3 天自动过期。这之后我的做法是：长期任务用 GitHub Actions 的 schedule 触发器，短期轮询才用 `/loop`。
+我设了一个每天检查的任务，想让持续跑更久。结果发现任务已经不在了——重复任务 **7 天** 自动过期。虽然 7 天比之前长了不少，但如果需要更长周期的调度，还是得用持久化方案。这之后我的做法是：长期任务用 GitHub Actions 的 schedule 触发器，短期轮询才用 `/loop`。
 
 ---
 
@@ -239,10 +255,10 @@ A: 假设你设了每 5 分钟检查一次，但 Claude 在处理一个耗时 20
 
 ## 五、小结
 
-Scheduled Tasks 是 Claude Code 会话内的轻量定时任务系统——用 `/loop` 做重复轮询，用自然语言做一次性提醒，用 `CronCreate/CronList/CronDelete` 精细管理。记住三个关键点：任务是会话范围的（退出即消失）、重复任务 3 天自动过期、避开整点可以绕过抖动。需要无人值守的持久调度，请用 GitHub Actions 或 Cloud Scheduled Tasks。
+Scheduled Tasks 是 Claude Code 会话内的轻量定时任务系统——用 `/loop` 做重复轮询，用自然语言做一次性提醒，用 `CronCreate/CronList/CronDelete` 精细管理。记住三个关键点：任务是会话范围的（退出即消失）、重复任务 7 天自动过期、避开整点可以绕过抖动。需要无人值守的持久调度，请用 GitHub Actions 或 Cloud Scheduled Tasks。
 
 ---
 
 *本文精读自 [Run prompts on a schedule](https://docs.anthropic.com/en/docs/claude-code/scheduled-tasks)*
 
-*最后更新：2026-03-31*
+*最后更新：2026-04-08*

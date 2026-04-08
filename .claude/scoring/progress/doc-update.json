@@ -1,0 +1,80 @@
+{
+  "type": "doc-update",
+  "lastUpdated": "2026-04-08T03:00:00Z",
+  "summary": { "completed": 1, "needsManual": 0, "pending": 7, "skipped": 0 },
+  "articles": [
+    {
+      "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 9,
+      "patchesTotal": 9,
+      "score": 100,
+      "lastAttempt": "2026-04-08T03:00:00Z"
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/cli-reference.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/hooks.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/settings.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/common-workflows.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/sub-agents.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/claude-setup.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    },
+    {
+      "file": "source/_posts/ai-tools/official-docs/how-claude-code-works.md",
+      "status": "pending",
+      "changeLevel": null,
+      "iterations": 0,
+      "patchesApplied": 0,
+      "patchesTotal": 0,
+      "lastAttempt": null
+    }
+  ]
+}
