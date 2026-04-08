@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：CLI 参考
 date: 2026-03-04 23:00:00
-updated: 2026-03-31 10:00:00
+updated: 2026-04-09 01:00:00
 tags: [Claude Code, 扩展定制]
 categories: [AI 工具系列]
 series: claude-code
@@ -40,13 +40,14 @@ CLI（Command Line Interface，命令行界面）是 Claude Code 的核心入口
 | `claude -p "query"` | 非交互式查询，执行完退出 | `claude -p "explain this function"` |
 | `cat file \| claude -p "query"` | 管道输入，处理文件内容 | `cat logs.txt \| claude -p "explain"` |
 | `claude -c` | 继续当前目录最近的对话 | `claude -c` |
-| `claude -r "<session>" "query"` | 按 ID 或名称恢复会话 | `claude -r "auth-refactor" "Finish"` |
+| `claude -c -p "query"` | 通过 SDK 方式继续对话 | `claude -c -p "Check for type errors"` |
+| `claude -r "<session>" "query"` | 按 ID 或名称恢复会话 | `claude -r "auth-refactor" "Finish this PR"` |
 | `claude update` | 更新到最新版本 | `claude update` |
-| `claude auth login` | 登录账户（支持 `--console`、`--sso`、`--email`） | `claude auth login --console` |
+| `claude auth login` | 登录账户。`--email` 预填邮箱，`--sso` 强制 SSO 认证，`--console` 通过 Anthropic Console 按 API 用量计费 | `claude auth login --console` |
 | `claude auth logout` | 登出账户 | `claude auth logout` |
 | `claude auth status` | 显示认证状态（JSON），已登录退出码 0，未登录退出码 1 | `claude auth status` |
 | `claude agents` | 列出已配置的 subagents（子代理） | `claude agents` |
-| `claude auto-mode defaults` | 打印内置 auto mode 分类器规则（JSON） | `claude auto-mode defaults > rules.json` |
+| `claude auto-mode defaults` | 打印内置 auto mode 分类器规则（JSON）。用 `claude auto-mode config` 查看应用了 settings 后的有效配置 | `claude auto-mode defaults > rules.json` |
 | `claude mcp` | 配置 MCP 服务器 | 见 MCP 文档 |
 | `claude plugin` | 管理插件（别名 `plugins`） | `claude plugin install xxx@marketplace` |
 | `claude remote-control` | 启动远程控制服务器，从 claude.ai 控制 | `claude remote-control --name "My Project"` |
@@ -72,7 +73,7 @@ claude -r "auth-refactor" "继续完成认证模块"
 
 ### 2.2 打印模式（Print Mode）
 
-`-p` / `--print` 是非交互式的核心标志，执行完直接退出，适合脚本和 CI/CD：
+`-p` / `--print` 通过 SDK 执行查询后退出，是非交互式模式的核心标志，适合脚本和 CI/CD：
 
 ```bash
 # 纯文本输出
@@ -98,6 +99,7 @@ claude -p --max-budget-usd 2.00 "review this code"
 | `text` | 终端直接显示 | 人类可读 |
 | `json` | 程序解析 | 结构化，可用 jq 提取 |
 | `stream-json` | 实时流式处理 | 边生成边处理，适合长输出 |
+| `--json-schema` | 按 JSON Schema 约束输出 | 确保输出格式严格符合 schema（仅 print mode） |
 
 ### 2.3 系统提示标志
 
@@ -110,7 +112,7 @@ claude -p --max-budget-usd 2.00 "review this code"
 | `--append-system-prompt` | 追加到默认提示末尾 |
 | `--append-system-prompt-file` | 从文件加载追加内容 |
 
-**关键规则：** `--system-prompt` 和 `--system-prompt-file` 互斥；追加标志可以和替换标志组合。大多数场景用追加就行，它保留 Claude Code 的内置能力。
+**关键规则：** 这四个标志在交互式和非交互模式下都能用。`--system-prompt` 和 `--system-prompt-file` 互斥；追加标志可以和替换标志组合。大多数场景用追加就行——它保留 Claude Code 的内置能力。只有需要完全控制系统提示时才用替换。
 
 ```bash
 # 追加自定义规则（推荐）
@@ -165,8 +167,29 @@ claude --disallowedTools "Edit" "Write"
 | `--plugin-dir` | 从指定目录加载插件 | 测试本地开发的插件 |
 | `--permission-prompt-tool` | 指定 MCP 工具处理权限提示 | 非交互模式的权限管理 |
 | `--no-session-persistence` | 禁用会话持久化 | 敏感场景不留痕迹 |
-| `--bare` | 最小模式，跳过 hooks/plugins/MCP/CLAUDE.md | 快速脚本调用 |
+| `--bare` | 最小模式：跳过 hooks、skills、plugins、MCP、auto memory 和 CLAUDE.md，只保留 Bash/文件读/文件写工具，设置 `CLAUDE_CODE_SIMPLE` 环境变量 | 快速脚本调用 |
 | `--effort` | 设置工作量级别：low/medium/high/max | 控制思考深度 |
+| `--model` | 指定模型，支持别名（`sonnet`/`opus`）或全名 | 切换模型 |
+| `--agent` | 指定 agent 运行（覆盖 settings 中的 agent 设置） | 自定义 agent |
+| `--agents` | 通过 JSON 动态定义子代理 | 临时创建 subagent |
+| `--remote` | 在 claude.ai 上创建远程 Web 会话 | 远程协作 |
+| `--teleport` | 将 claude.ai 的 Web 会话恢复到本地终端 | 远程接续 |
+| `--fork-session` | 恢复会话时创建新会话 ID（配合 `--resume`/`--continue`） | 分叉会话 |
+| `--debug` | 启用调试模式，支持分类过滤（如 `"api,mcp"`） | 问题排查 |
+| `--debug-file <path>` | 将调试日志写入指定文件 | 日志收集 |
+| `--chrome` / `--no-chrome` | 启用/禁用 Chrome 浏览器集成 | Web 自动化 |
+| `--json-schema` | 指定 JSON Schema 约束输出格式（仅 print mode） | 结构化输出 |
+| `--tmux` | 为 worktree 创建 tmux 会话（需配合 `--worktree`） | 并行开发 |
+| `--settings` | 加载额外 settings JSON 文件或字符串 | 临时配置 |
+| `--setting-sources` | 指定加载的 settings 来源（user/project/local） | 配置隔离 |
+| `--input-format` | 指定输入格式（text/stream-json），仅 print mode | 程序集成 |
+| `--include-hook-events` | 在流式输出中包含 hook 生命周期事件 | Hook 调试 |
+| `--disable-slash-commands` | 禁用所有技能和命令 | 最小化环境 |
+| `--permission-mode` | 指定权限模式启动（default/acceptEdits/plan/auto/dontAsk/bypassPermissions） | 精细权限 |
+| `--allow-dangerously-skip-permissions` | 将 bypassPermissions 加入 Shift+Tab 循环但不默认启用 | 安全降级 |
+| `--betas` | 指定 API 请求的 beta headers（仅 API key 用户） | 实验性功能 |
+| `--channels` | 指定监听的 MCP 通道通知（研究预览） | 插件通知 |
+| `--ide` | 启动时自动连接 IDE | IDE 集成 |
 
 **worktree 隔离开发示例：**
 
@@ -217,7 +240,7 @@ claude -p \
 **更严格的隔离场景用 bare mode：**
 
 ```bash
-# bare mode：跳过 hooks、plugins、MCP，只保留基础工具
+# bare mode：跳过 hooks、skills、plugins、MCP、auto memory、CLAUDE.md，只保留 Bash/文件读/文件写
 claude --bare -p --max-turns 1 "生成 commit message"
 ```
 
@@ -278,16 +301,30 @@ claude -p --fallback-model sonnet "review this code"
 **Q: `--effort` 标志有什么限制？**
 A: `max` 级别仅限 Opus 4.6 模型使用。这个标志只在当前会话有效，不会持久化。
 
+**Q: `--enable-auto-mode` 有什么前提条件？**
+A: 需要 Team、Enterprise 或 API 计划，且使用 Claude Sonnet 4.6 或 Opus 4.6 模型。
+
+**Q: `--remote` 和 `--teleport` 是什么？**
+A: `--remote` 在 claude.ai 上创建一个远程 Web 会话，适合远程协作。`--teleport` 做相反的事——把 claude.ai 上的 Web 会话拉回本地终端继续操作。
+
+**Q: 如何获取结构化 JSON 输出？**
+A: 用 `--json-schema` 指定 JSON Schema，确保输出严格符合格式要求（仅 print mode）：
+
+```bash
+claude -p --json-schema '{"type":"object","properties":{"summary":{"type":"string"}}}' "总结这段代码"
+```
+
 ---
 
 ## 五、小结
 
 CLI 是 Claude Code 的万能入口。掌握关键命令和标志后，你能：
-- 高效管理会话（`-c` 继续、`-r` 恢复、`-n` 命名）
-- 集成自动化脚本（`-p` 打印模式、`--bare` 最小模式、`--output-format json`）
-- 精细控制权限（`--allowedTools` 预授权、`--disallowedTools` 禁用）
-- 在 CI 中稳定运行（`--max-turns` 限轮次、`--max-budget-usd` 限预算、`--fallback-model` 降级）
-- 隔离开发（`-w` worktree、`--strict-mcp-config`）
+- 高效管理会话（`-c` 继续、`-r` 恢复、`-n` 命名、`--fork-session` 分叉）
+- 集成自动化脚本（`-p` 打印模式、`--bare` 最小模式、`--output-format json`、`--json-schema` 结构化输出）
+- 精细控制权限（`--allowedTools` 预授权、`--disallowedTools` 禁用、`--permission-mode` 权限模式）
+- 在 CI 中稳定运行（`--max-turns` 限轮次、`--max-budget-usd` 限预算、`--fallback-model` 降级、`--model` 指定模型）
+- 隔离开发（`-w` worktree、`--tmux` tmux 会话、`--strict-mcp-config`）
+- 远程协作（`--remote` 远程会话、`--teleport` 接续本地、`--remote-control` 远程控制）
 
 **下一篇**：[MCP 配置](/2026/03/18/ai-tools/official-docs/mcp/) - 了解如何通过 MCP 协议扩展 Claude Code 的能力边界。
 
@@ -295,4 +332,4 @@ CLI 是 Claude Code 的万能入口。掌握关键命令和标志后，你能：
 
 *本文精读自 [CLI 参考 - Claude Code Docs](https://code.claude.com/docs/zh-CN/cli-reference)*
 
-*最后更新：2026-03-31*
+*最后更新：2026-04-09*
