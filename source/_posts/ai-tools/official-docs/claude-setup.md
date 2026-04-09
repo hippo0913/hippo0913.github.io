@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：安装和设置 Claude Code
 date: 2026-03-27 23:00:00
-updated: 2026-03-31 12:00:00
+updated: 2026-04-09 02:00:00
 tags: [Claude Code, 入门]
 categories: [AI 工具系列]
 series: claude-code
@@ -33,8 +33,8 @@ source_url: https://code.claude.com/docs/zh-CN/setup
 
 | 类型 | 要求 |
 |------|------|
-| 操作系统 | macOS 13.0+、Windows 10 1809+、Ubuntu 20.04+、Debian 10+、Alpine 3.19+ |
-| 硬件 | 4 GB+ RAM |
+| 操作系统 | macOS 13.0+、Windows 10 1809+ 或 Windows Server 2019+、Ubuntu 20.04+、Debian 10+、Alpine 3.19+ |
+| 硬件 | 4 GB+ RAM，x64 或 ARM64 处理器 |
 | 网络 | 需要互联网连接（Anthropic 支持的国家/地区） |
 | Shell | Bash、Zsh、PowerShell 或 CMD |
 
@@ -61,7 +61,7 @@ macOS 用户还可以用 Homebrew：`brew install --cask claude-code`；Windows 
 
 ### 2.2 平台特殊配置
 
-**Windows 用户有两条路：**
+**Windows 用户有三条路：**
 
 - **原生 Windows + Git Bash**：先装 [Git for Windows](https://gitforwindows.org/)，然后正常安装。如果 Claude Code 找不到 Git Bash，需要手动指定路径：
 
@@ -74,7 +74,9 @@ macOS 用户还可以用 Homebrew：`brew install --cask claude-code`；Windows 
 }
 ```
 
-- **WSL2**：在 WSL2 里跑 Linux 版 Claude Code。优势是支持沙箱（一种隔离机制，限制程序能访问的系统资源），WSL1 不支持沙箱。
+- **WSL2**：在 WSL2 里跑 Linux 版 Claude Code。优势是支持沙箱（一种隔离机制，限制程序能访问的系统资源）。**WSL 1 和 WSL 2 都支持**，但 WSL 1 不支持沙箱。
+
+另外，Claude Code 在 Windows 上还**支持 PowerShell 原生运行**（预览功能），可以在 Git Bash 之外直接用 PowerShell 执行命令。详见 PowerShell tool 文档。
 
 **Alpine / musl 发行版**需要额外处理。Alpine 用的是 musl libc（一个轻量级 C 标准库），不是主流的 glibc，所以需要手动补依赖：
 
@@ -140,6 +142,12 @@ curl -fsSL https://claude.ai/install.sh | bash -s stable   # 安装 stable 渠�
 curl -fsSL https://claude.ai/install.sh | bash -s 1.0.58   # 安装指定版本号
 ```
 
+**二进制完整性验证：** 每个版本发布时会附带 `manifest.json`，包含所有平台二进制的 SHA256 校验和。该 manifest 用 Anthropic 的 GPG 密钥签名，验证签名即可间接验证所有二进制的完整性。各平台还支持原生代码签名验证：
+
+- **macOS**：由 "Anthropic PBC" 签名并通过 Apple 公证。用 `codesign --verify --verbose ./claude` 验证。
+- **Windows**：由 "Anthropic, PBC" 签名。用 `Get-AuthenticodeSignature .\claude.exe` 验证。
+- **Linux**：通过 manifest 签名验证，二进制本身不做代码签名。
+
 **卸载：**
 
 ```bash
@@ -193,7 +201,9 @@ which claude   # 应该输出 ~/.local/bin/claude
 claude --version
 ```
 
-另一个坑是卸载 npm 版本后，`node_modules` 里残留了旧版本的缓存目录，占了 200 多 MB。手动 `rm -rf ~/.npm/_npx/` 清理掉才干净。这里给一个完整的迁移检查清单：
+另一个坑是卸载 npm 版本后，`node_modules` 里残留了旧版本的缓存目录，占了 200 多 MB。手动 `rm -rf ~/.npm/_npx/` 清理掉才干净。
+
+**快捷迁移方法**：官方新增了 `claude install` 命令，可以在已有 npm 安装的情况下直接安装原生二进制（并存），之后再移除 npm 版本即可。这里给一个完整的迁移检查清单：
 
 ```bash
 # 完整迁移步骤
@@ -275,4 +285,4 @@ A: 用安装脚本指定版本号：`curl -fsSL https://claude.ai/install.sh | b
 
 *本文精读自 [安装和设置](https://code.claude.com/docs/zh-CN/setup)*
 
-*最后更新：2026-03-31*
+*最后更新：2026-04-09*
