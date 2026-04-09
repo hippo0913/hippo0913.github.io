@@ -11,3 +11,6 @@ state/
 TASKS.md
 TASKS (1).md
 public/
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock
+.claude/plans/
