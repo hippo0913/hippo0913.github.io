@@ -1,7 +1,7 @@
 {
   "type": "doc-update",
-  "lastUpdated": "2026-04-08T03:45:00Z",
-  "summary": { "completed": 2, "needsManual": 0, "pending": 6, "skipped": 0 },
+  "lastUpdated": "2026-04-09T02:40:00Z",
+  "summary": { "completed": 8, "needsManual": 0, "pending": 0, "skipped": 0 },
   "articles": [
     {
       "file": "source/_posts/ai-tools/official-docs/scheduled-tasks.md",
@@ -15,12 +15,13 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/cli-reference.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 13,
+      "patchesTotal": 13,
+      "score": 100,
+      "lastAttempt": "2026-04-09T01:10:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/hooks.md",
@@ -34,48 +35,53 @@
     },
     {
       "file": "source/_posts/ai-tools/official-docs/settings.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 15,
+      "patchesTotal": 15,
+      "score": 100,
+      "lastAttempt": "2026-04-09T01:30:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/common-workflows.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 15,
+      "patchesTotal": 15,
+      "score": 100,
+      "lastAttempt": "2026-04-09T02:00:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/sub-agents.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 13,
+      "patchesTotal": 13,
+      "score": 100,
+      "lastAttempt": "2026-04-09T02:15:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/claude-setup.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "minor",
+      "iterations": 1,
+      "patchesApplied": 6,
+      "patchesTotal": 6,
+      "score": 100,
+      "lastAttempt": "2026-04-09T02:25:00Z"
     },
     {
       "file": "source/_posts/ai-tools/official-docs/how-claude-code-works.md",
-      "status": "pending",
-      "changeLevel": null,
-      "iterations": 0,
-      "patchesApplied": 0,
-      "patchesTotal": 0,
-      "lastAttempt": null
+      "status": "completed",
+      "changeLevel": "major",
+      "iterations": 1,
+      "patchesApplied": 15,
+      "patchesTotal": 15,
+      "score": 100,
+      "lastAttempt": "2026-04-09T02:40:00Z"
     }
   ]
 }
