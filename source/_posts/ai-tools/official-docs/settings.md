@@ -155,7 +155,7 @@ Claude Code 使用四种作用域来确定配置的应用范围和共享策略�
 | 规则 | 效果 |
 |---|---|
 | `Bash` | 匹配所有 Bash 命令 |
-| `Bash(npm run:*)` | 匹配以 `npm run` 开头的命令 |
+| `Bash(npm run *)` | 匹配以 `npm run` 开头的命令 |
 | `Read(./.env)` | 匹配读取 `.env` 文件 |
 | `WebFetch(domain:example.com)` | 匹配对 example.com 的请求 |
 
