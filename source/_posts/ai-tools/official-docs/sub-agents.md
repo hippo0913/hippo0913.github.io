@@ -1,7 +1,7 @@
 ---
 title: 精读官方文档：Subagents（子代理）
 date: 2026-03-19 23:00:00
-updated: 2026-03-31 10:00:00
+updated: 2026-04-09 01:45:00
 tags: [Claude Code, 扩展定制]
 categories: [AI 工具系列]
 series: claude-code
@@ -38,15 +38,26 @@ source_url: https://code.claude.com/docs/zh-CN/sub-agents
 | **Explore** | Haiku | 只读（拒绝 Write/Edit） | 快速只读探索代码库，彻底度有 quick/medium/very thorough 三档 |
 | **Plan** | 继承父对话 | 只读（拒绝 Write/Edit） | Plan 模式下自动调用，收集规划所需的上下文 |
 | **General-purpose** | 继承父对话 | 全部 | 处理复杂多步骤任务 |
-| **Bash** | 继承 | — | 在独立上下文中运行终端命令 |
-| **statusline-setup** | Sonnet | — | 运行 `/statusline` 时配置状态行 |
-| **Claude Code Guide** | Haiku | — | 回答关于 Claude Code 功能的问题 |
+| **statusline-setup** | Sonnet | 运行 `/statusline` 时 | 配置状态行 |
+| **Claude Code Guide** | Haiku | 询问 Claude Code 功能时 | 回答关于 Claude Code 功能的问题 |
 
 <!-- more -->
 
 ---
 
 ## 二、官方教程精读
+
+### 2.1 快速入门：/agents 命令
+
+官方新增了交互式管理命令 `/agents`，可以：
+
+- 查看所有可用 subagent（内置、用户、项目、插件）
+- 引导式创建新 subagent 或让 Claude 自动生成
+- 编辑现有 subagent 的配置和工具访问
+- 删除自定义 subagent
+- 查看同名 subagent 的优先级覆盖情况
+
+也可以用非交互命令 `claude agents` 在命令行列出所有 subagent，按来源分组并标注优先级覆盖情况。这是官方推荐的 subagent 创建和管理方式。
 
 ### 2.1 配置文件格式与工具控制
 
@@ -72,10 +83,11 @@ conventions, and recurring issues you discover.
 
 | 位置 | 作用范围 | 优先级 | 说明 |
 |------|----------|--------|------|
-| CLI `--agents` 标志 | 当前会话 | 1（最高） | JSON 格式，启动时传递 |
-| 项目 `.claude/agents/` | 当前项目 | 2 | 建议纳入版本控制，团队共享 |
-| 用户 `~/.claude/agents/` | 所有项目 | 3 | 个人配置，跨项目生效 |
-| Plugin 的 `agents/` 目录 | 启用 plugin 的项目 | 4（最低） | 随 plugin 安装 |
+| Managed settings | 组织级 | 1（最高） | 由组织管理员通过 managed settings 部署 |
+| CLI `--agents` 标志 | 当前会话 | 2 | JSON 格式，启动时传递 |
+| 项目 `.claude/agents/` | 当前项目 | 3 | 建议纳入版本控制，团队共享 |
+| 用户 `~/.claude/agents/` | 所有项目 | 4 | 个人配置，跨项目生效 |
+| Plugin 的 `agents/` 目录 | 启用 plugin 的项目 | 5（最低） | 随 plugin 安装 |
 
 #### 工具控制三种方式
 
@@ -137,17 +149,18 @@ You are a database analyst with read-only access.
 | `memory` | 否 | 持久内存作用域：user/project/local，启用后自动加载 MEMORY.md 前 200 行 |
 | `skills` | 否 | 启动时注入完整技能内容（subagent 不继承父对话技能，必须显式列出） |
 | `mcpServers` | 否 | MCP 服务器列表，支持内联定义（限定 subagent）和字符串引用（共享父连接） |
-| `permissionMode` | 否 | 权限模式：default/acceptEdits/dontAsk/bypassPermissions/plan |
+| `permissionMode` | 否 | 权限模式：default/acceptEdits/auto/dontAsk/bypassPermissions/plan |
 | `maxTurns` | 否 | subagent 停止前的最大代理轮数 |
 | `effort` | 否 | 努力级别：low/medium/high/max（仅 Opus 4.6 支持 max） |
 | `isolation` | 否 | 设为 worktree 在临时 git worktree 中运行，无修改则自动清理 |
 | `background` | 否 | 设为 true 始终后台运行 |
 | `initialPrompt` | 否 | 作为主会话代理（`--agent`）运行时自动提交的首个用户轮次 |
+| `color` | 否 | 任务列表和转录中的显示颜色：red/blue/green/yellow/purple/orange/pink/cyan |
 | `hooks` | 否 | 限定于此 subagent 的生命周期 hooks（PreToolUse/PostToolUse/Stop） |
 
 **model 解析的 4 级优先级链**：`CLAUDE_CODE_SUBAGENT_MODEL` 环境变量 > 每次调用的 `model` 参数 > frontmatter 的 `model` 字段 > 主对话的模型。
 
-**permissionMode 的优先级规则**：如果父级设置了 `bypassPermissions`，子代理不可覆盖；如果父级是 `auto` 模式，subagent 的 `permissionMode` 会被忽略。
+**permissionMode 的优先级规则**：如果父级设置了 `bypassPermissions`，子代理不可覆盖；如果父级使用 `auto` 模式，subagent 继承 auto 模式且其 `permissionMode` 字段被忽略——分类器会以和父会话相同的 block/allow 规则评估 subagent 的工具调用。
 
 **memory 三级作用域**：
 
@@ -157,7 +170,7 @@ You are a database analyst with read-only access.
 | `project` | `.claude/agent-memory/<name>/` | 可版本控制，团队共享 |
 | `local` | `.claude/agent-memory-local/<name>/` | 不提交到 git，个人本地使用 |
 
-启用 memory 后，subagent 自动获得 Read/Write/Edit 工具，并自动加载 MEMORY.md 前 200 行作为上下文。这让 subagent 可以在多次会话中积累知识。
+启用 memory 后，subagent 自动获得 Read/Write/Edit 工具，并自动加载 MEMORY.md 前 200 行或 25KB（取先到者）作为上下文，附带指令要求在超出限制时整理 MEMORY.md。这让 subagent 可以在多次会话中积累知识。官方推荐默认使用 `project` 作用域，方便通过版本控制分享。
 
 **mcpServers 两种形式**：
 
@@ -186,11 +199,13 @@ mcpServers:
 Use the test-runner subagent to fix failing tests
 ```
 
-**2. @-mention（保证执行）**：用 `@agent-<name>` 格式确保特定 subagent 运行。
+**2. @-mention（保证执行）**：输入 `@` 后从自动补全中选择 subagent，确保特定 subagent 运行。
 
 ```
-@agent-code-reviewer look at the auth changes
+@"code-reviewer (agent)" look at the auth changes
 ```
+
+也可以手动输入：`@agent-<name>` 引用本地 subagent，`@agent-<plugin-name>:<agent-name>` 引用插件 subagent。插件的 subagent 在自动补全中显示为 `<plugin-name>:<agent-name>`。
 
 **3. `--agent` 标志（会话范围替换）**：subagent 的系统提示完全替换默认 Claude Code 系统提示，整个会话都在该 subagent 的上下文中运行。
 
@@ -238,7 +253,7 @@ tools: Agent(worker, researcher), Read, Bash
 ---
 ```
 
-这里的 `Agent(worker, researcher)` 语法限制了 coordinator 只能生成 `worker` 和 `researcher` 两种子代理。
+这里的 `Agent(worker, researcher)` 语法限制了 coordinator 只能生成 `worker` 和 `researcher` 两种子代理。使用 `Agent` 不带括号则允许生成任何类型的子代理。如果 `tools` 中完全省略 `Agent`，则该代理不能生成任何子代理。注意：此限制只适用于通过 `claude --agent` 作为主线程运行的代理；subagent 本身不能再生成子代理，所以 `Agent(agent_type)` 在 subagent 定义中无效。
 
 #### Hooks 配置
 
@@ -274,7 +289,7 @@ subagent 的 hooks 有两个层级：
 }
 ```
 
-禁用特定 subagent，在 settings.json 中用 `permissions.deny` + `Agent(name)`：
+禁用特定 subagent，在 settings.json 中用 `permissions.deny` + `Agent(name)`，或通过 CLI 标志：
 
 ```json
 {
@@ -282,6 +297,10 @@ subagent 的 hooks 有两个层级：
     "deny": ["Agent(Explore)", "Agent(my-custom-agent)"]
   }
 }
+```
+
+```bash
+claude --disallowedTools "Agent(Explore)"
 ```
 
 #### 与 Skills 和 /btw 的区别
@@ -296,7 +315,13 @@ subagent 不继承父对话的 skills，必须在 frontmatter 中显式列出。
 
 #### 可恢复 subagent
 
-每次执行分配唯一 `agentId`，可以通过 agentId 恢复完整上下文继续工作。subagent 的转录（transcript）独立于主对话持久化，主对话压缩不影响 subagent。自动压缩默认在约 95% 容量时触发。
+每次执行创建新实例和全新上下文。要继续已有的 subagent 工作而非重新开始，可以让 Claude 恢复它。恢复的 subagent 保留完整对话历史，从上次停止处继续。
+
+subagent 完成后，Claude 获得 agent ID。通过 `SendMessage` 工具（需启用 `CLAUDE_CODE_SUBAGENT_MODEL` 环境变量和 agent teams）以 agent ID 作为 `to` 字段来恢复。已停止的 subagent 收到 `SendMessage` 时会在后台自动恢复，无需新的 `Agent` 调用。
+
+转录（transcript）独立于主对话持久化：主对话压缩不影响 subagent；会话重启后可通过恢复同一会话继续；自动清理周期由 `cleanupPeriodDays` 设置控制（默认 30 天）。转录文件路径：`~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl`。
+
+自动压缩默认在约 95% 容量时触发。可通过 `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 环境变量设更低百分比（如 `50`）提前触发。压缩事件记录在转录文件中，`preTokens` 字段显示压缩前的 token 用量。
 
 ### 2.3 官方示例精讲
 
@@ -351,20 +376,27 @@ Focus on fixing the underlying issue, not the symptoms.
 
 对比 code-reviewer，debugger 多了 `Edit` 工具——它需要修改代码来修复 bug。工作流也是完整的：诊断→定位→修复→验证。
 
-#### 数据科学家：非编码场景 + model 路由
+#### 数据科学家：领域专用 + model 路由
 
 ```yaml
 ---
 name: data-scientist
-description: Analyze datasets and generate statistical insights
+description: Data analysis expert for SQL queries, BigQuery operations, and data insights. Use proactively for data analysis tasks and queries.
 tools: Bash, Read, Write
 model: sonnet
 ---
 
-You are a data scientist specializing in statistical analysis and visualization.
+You are a data scientist specializing in SQL and BigQuery analysis.
+
+When invoked:
+1. Understand the data analysis requirement
+2. Write efficient SQL queries
+3. Use BigQuery command line tools (bq) when appropriate
+4. Analyze and summarize results
+5. Present findings clearly
 ```
 
-这里用 `model: sonnet` 把任务路由到 Sonnet 模型，适合数据分析这种不需要最强推理的场景来控制成本。工具组合是 Bash（执行 Python/R 脚本）、Read（读取数据文件）、Write（输出分析结果）。
+这里用 `model: sonnet` 把任务路由到 Sonnet 模型，适合数据分析这种不需要最强推理的场景来控制成本。官方更新后的描述更具体：聚焦 SQL 和 BigQuery 场景，强调查询效率和成本控制。
 
 #### 数据库查询验证器：Hook 实现条件控制
 
@@ -437,4 +469,4 @@ exit 0
 
 *本文精读自 [Subagents - Claude Code Docs](https://code.claude.com/docs/zh-CN/sub-agents)*
 
-*最后更新：2026-03-31*
+*最后更新：2026-04-09*
