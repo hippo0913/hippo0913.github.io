@@ -2,7 +2,7 @@
 /* 首页的 #body-wrap 没有 #post，不受影响 */
 
 #body-wrap:has(#post) > .layout {
-  max-width: 1400px !important;
+  max-width: min(90vw, 1600px) !important;
 }
 
 #body-wrap:has(#post) #article-container {
