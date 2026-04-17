@@ -1,0 +1,10 @@
+/* 文章页宽屏——仅当 #body-wrap 内包含 #post 时生效 */
+/* 首页的 #body-wrap 没有 #post，不受影响 */
+
+#body-wrap:has(#post) > .layout {
+  max-width: 1400px !important;
+}
+
+#body-wrap:has(#post) #article-container {
+  max-width: 100% !important;
+}
