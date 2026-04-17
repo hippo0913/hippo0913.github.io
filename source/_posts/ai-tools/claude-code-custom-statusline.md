@@ -216,12 +216,12 @@ if [ -n "$used" ]; then
     done
     bar="${bar}${RESET}"
 
-    if [ "$used_int" -ge 80 ]; then emoji="🚨"
+    if [ "$used_int" -ge 84 ]; then emoji="🚨"
     elif [ "$used_int" -ge 60 ]; then emoji="🔥"
     elif [ "$used_int" -ge 20 ]; then emoji="⚡"
     else emoji="🟢"; fi
 
-    if [ "$used_int" -ge 80 ]; then pct_color="$RED"
+    if [ "$used_int" -ge 84 ]; then pct_color="$RED"
     elif [ "$used_int" -ge 60 ]; then pct_color="$YELLOW"
     else pct_color="$GREEN"; fi
 
@@ -239,10 +239,12 @@ if [ -n "$used" ]; then
     elif [ "$api_pct" -ge 30 ]; then api_part=" ${DIM}|${RESET} ⏳${YELLOW}${api_pct}%${RESET}"
     else api_part=" ${DIM}|${RESET} ⏳${GREEN}${api_pct}%${RESET}"; fi
 
-    if [ "$used_int" -ge 80 ]; then
-        warn="${RED}[!!请立即/compact]${RESET}"
+    if [ "$used_int" -ge 84 ]; then
+        warn="${RED}[危险 → 立即 /compact 保留当前任务进度和关键决策]${RESET}"
+    elif [ "$used_int" -ge 75 ]; then
+        warn="${YELLOW}[较高 → /compact 保留当前任务进度和关键决策]${RESET}"
     elif [ "$used_int" -ge 60 ]; then
-        warn="${YELLOW}[!建议/compact]${RESET}"
+        warn="${YELLOW}[偏高 → /compact 保留当前任务进度和关键决策]${RESET}"
     else
         warn="${GREEN}[正常]${RESET}"
     fi
@@ -299,7 +301,7 @@ Git 缓存和缓存命中率累加都往 `/tmp` 写文件，时间一长会堆�
 | 信息 | 作用 | 信号 |
 |------|------|------|
 | Git 暂存/修改/Stash | 工作区状态 | 有未提交改动时注意 |
-| 上下文进度条 | 资源余量 | >60% 建议 compact，>80% 必须 compact |
+| 上下文进度条 | 资源余量 | >60% 建议 compact，>84% 必须 compact |
 | Token 速度 | 消耗速率 | 突然飙升可能是在做重复操作 |
 | 缓存命中率 | 提示词缓存效率 | <50% 说明缓存没命中，成本偏高 |
 | API 等待占比 | 性能瓶颈 | >60% 说明大部分时间在等 API |
