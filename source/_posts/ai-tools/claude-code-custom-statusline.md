@@ -29,13 +29,13 @@ Claude Code 支持自定义状态栏：写一个脚本，放到指定位置，�
 两行，信息密度拉满：
 
 ```
-[GLM-5.1] my-project (main) +2 ~3 📌1 | 5m 12s | +156 -23
+[GLM-5.1] my-project (main) +2 ~3 ?1 📌1 | 5m 12s | +156 -23
 ⚡ ██████████████░░░░░░ 47% [200K] [正常] ⚡2.3k/m | 📦85% | ⏳12%
 ```
 
 | 行 | 内容 | 解决什么问题 |
 |---|------|------------|
-| 第一行 | 模型 · 仓库(分支) 暂存/修改数 Stash · 时长 · 代码增删 | "我在哪、做了什么" |
+| 第一行 | 模型 · 仓库(分支) 暂存/修改/未跟踪 Stash · 时长 · diff 增删行数 | "我在哪、做了什么" |
 | 第二行 | emoji · RGB 进度条 占比[容量] · 状态 · Token 速度 · 缓存命中 · API 等待 | "还能撑多久、慢在哪" |
 
 ---
@@ -153,17 +153,21 @@ else
     cache_age=$((CACHE_TTL + 1))
 fi
 if [ "$cache_age" -gt "$CACHE_TTL" ]; then
-    branch="" repo="" remote_url="" staged=0 modified=0 stash=0
+    branch="" repo="" remote_url="" staged=0 modified=0 stash=0 diff_add=0 diff_del=0 untracked=0
     if [ -n "$cwd" ]; then
         branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null)
         repo=$(basename "$(git -C "$cwd" --no-optional-locks rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null)
         staged=$(git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
         modified=$(git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null | wc -l | tr -d ' ')
         stash=$(git -C "$cwd" --no-optional-locks stash list 2>/dev/null | wc -l | tr -d ' ')
+        untracked=$(git -C "$cwd" --no-optional-locks ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
         remote_url=$(git -C "$cwd" --no-optional-locks remote get-url origin 2>/dev/null \
             | sed -E 's|git@([^:]+):(.+)\.git$|https://\1/\2|; s|\.git$||')
+        # git diff 累计增删行数（暂存 + 未暂存）
+        diff_add=$( ( git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null; git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null ) | awk '{s+=$1} END {print s+0}')
+        diff_del=$( ( git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null; git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null ) | awk '{s+=$2} END {print s+0}')
     fi
-    printf '%s' "${branch}|${repo}|${remote_url}|${staged}|${modified}|${stash}" > "$CACHE_FILE" 2>/dev/null
+    printf '%s' "${branch}|${repo}|${remote_url}|${staged}|${modified}|${stash}|${diff_add}|${diff_del}|${untracked}" > "$CACHE_FILE" 2>/dev/null
 else
     cache_line=$(cat "$CACHE_FILE" 2>/dev/null)
     branch=$(echo "$cache_line" | cut -d'|' -f1)
@@ -172,6 +176,9 @@ else
     staged=$(echo "$cache_line" | cut -d'|' -f4)
     modified=$(echo "$cache_line" | cut -d'|' -f5)
     stash=$(echo "$cache_line" | cut -d'|' -f6)
+    diff_add=$(echo "$cache_line" | cut -d'|' -f7)
+    diff_del=$(echo "$cache_line" | cut -d'|' -f8)
+    untracked=$(echo "$cache_line" | cut -d'|' -f9)
 fi
 
 # --- 第一行：模型 + Git + 时长 + 代码变更 ---
@@ -188,12 +195,13 @@ fi
 git_status=""
 [ "${staged:-0}" -gt 0 ] && git_status="${GREEN}+${staged}${RESET}"
 [ "${modified:-0}" -gt 0 ] && git_status="${git_status}${git_status:+ }${YELLOW}~${modified}${RESET}"
+[ "${untracked:-0}" -gt 0 ] && git_status="${git_status}${git_status:+ }${MAGENTA}?${untracked}${RESET}"
 [ -n "$git_status" ] && line1="${line1} ${git_status}"
 [ "${stash:-0}" -gt 0 ] && line1="${line1} ${YELLOW}📌${stash}${RESET}"
 line1="${line1} ${DIM}|${RESET}"
 [ -n "$session_name" ] && line1="${line1} ${MAGENTA}${session_name}${RESET} ${DIM}|${RESET}"
 line1="${line1} ${time_str} ${DIM}|${RESET}"
-line1="${line1} ${GREEN}+${lines_add}${RESET} ${RED}-${lines_del}${RESET}"
+line1="${line1} ${GREEN}+${diff_add}${RESET} ${RED}-${diff_del}${RESET}"
 
 # --- 第二行：进度条 + 指标 + 警告 ---
 BAR_WIDTH=20
@@ -300,7 +308,7 @@ Git 缓存和缓存命中率累加都往 `/tmp` 写文件，时间一长会堆�
 
 | 信息 | 作用 | 信号 |
 |------|------|------|
-| Git 暂存/修改/Stash | 工作区状态 | 有未提交改动时注意 |
+| Git 暂存/修改/未跟踪/Stash | 工作区状态 | 有未提交改动或新文件时注意 |
 | 上下文进度条 | 资源余量 | >60% 建议 compact，>84% 必须 compact |
 | Token 速度 | 消耗速率 | 突然飙升可能是在做重复操作 |
 | 缓存命中率 | 提示词缓存效率 | <50% 说明缓存没命中，成本偏高 |
