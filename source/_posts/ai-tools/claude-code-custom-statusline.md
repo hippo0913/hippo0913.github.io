@@ -122,16 +122,17 @@ else
 fi
 
 # --- 缓存命中率（累加机制，跨整个会话） ---
+# 用 total_tokens 变化判断是否有新请求，变化则累加 current_usage 的缓存数据
 CACHE_ACC_FILE="/tmp/claude_statusline_cache_${session_id}"
 if [ -f "$CACHE_ACC_FILE" ]; then
-    IFS='|' read -r acc_read acc_creation last_read last_creation < "$CACHE_ACC_FILE"
+    IFS='|' read -r acc_read acc_creation last_total < "$CACHE_ACC_FILE"
 else
-    acc_read=0; acc_creation=0; last_read=0; last_creation=0
+    acc_read=0; acc_creation=0; last_total=0
 fi
-if [ "$cache_read" != "$last_read" ] || [ "$cache_creation" != "$last_creation" ]; then
+if [ "$total_tokens" != "$last_total" ] && [ "$total_tokens" -gt 0 ]; then
     acc_read=$((acc_read + cache_read))
     acc_creation=$((acc_creation + cache_creation))
-    printf '%s|%s|%s|%s' "$acc_read" "$acc_read" "$cache_read" "$cache_creation" > "$CACHE_ACC_FILE"
+    printf '%s|%s|%s' "$acc_read" "$acc_creation" "$total_tokens" > "$CACHE_ACC_FILE"
 fi
 cache_total=$((acc_read + acc_creation))
 [ "$cache_total" -gt 0 ] && cache_hit=$((acc_read * 100 / cache_total)) || cache_hit=-1
@@ -163,9 +164,12 @@ if [ "$cache_age" -gt "$CACHE_TTL" ]; then
         untracked=$(git -C "$cwd" --no-optional-locks ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
         remote_url=$(git -C "$cwd" --no-optional-locks remote get-url origin 2>/dev/null \
             | sed -E 's|git@([^:]+):(.+)\.git$|https://\1/\2|; s|\.git$||')
-        # git diff 累计增删行数（暂存 + 未暂存）
-        diff_add=$( ( git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null; git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null ) | awk '{s+=$1} END {print s+0}')
-        diff_del=$( ( git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null; git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null ) | awk '{s+=$2} END {print s+0}')
+        # git diff 累计增删行数（暂存 + 未暂存），一次 awk 同时统计
+        diff_stats=$( ( git -C "$cwd" --no-optional-locks diff --cached --numstat 2>/dev/null; \
+                        git -C "$cwd" --no-optional-locks diff --numstat 2>/dev/null ) | \
+                      awk '{add+=$1; del+=$2} END {print add+0"|"del+0}' )
+        diff_add=$(echo "$diff_stats" | cut -d'|' -f1)
+        diff_del=$(echo "$diff_stats" | cut -d'|' -f2)
     fi
     printf '%s' "${branch}|${repo}|${remote_url}|${staged}|${modified}|${stash}|${diff_add}|${diff_del}|${untracked}" > "$CACHE_FILE" 2>/dev/null
 else
