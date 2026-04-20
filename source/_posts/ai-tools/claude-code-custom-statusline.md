@@ -29,7 +29,7 @@ Claude Code 支持自定义状态栏：写一个脚本，放到指定位置，�
 两行，信息密度拉满：
 
 ```
-[GLM-5.1] my-project (main) +2 ~3 ?1 📌1 | 5m 12s | +156 -23
+[GLM-5.1 Opus] my-project (main) +2 ~3 ?1 📌1 | 5m 12s | +156 -23
 ⚡ ██████████████░░░░░░ 47% [200K] [正常] ⚡2.3k/m | 📦85% | ⏳12%
 ```
 
@@ -93,6 +93,16 @@ IFS=$'\001' read -r model session_id session_name cwd used ctx_size \
         .cost.total_lines_added // 0,
         .cost.total_lines_removed // 0
     ] | join("\u0001")')"
+
+# --- 读取模型槽位配置并判断 ---
+model_id=$(echo "$input" | jq -r '.model.id // ""')
+_haiku=$(jq -r '.env.ANTHROPIC_DEFAULT_HAIKU_MODEL // ""' ~/.claude/settings.json 2>/dev/null)
+_sonnet=$(jq -r '.env.ANTHROPIC_DEFAULT_SONNET_MODEL // ""' ~/.claude/settings.json 2>/dev/null)
+_opus=$(jq -r '.env.ANTHROPIC_DEFAULT_OPUS_MODEL // ""' ~/.claude/settings.json 2>/dev/null)
+slot=""
+[ "$model_id" = "$_opus" ] && slot="Opus"
+[ "$model_id" = "$_sonnet" ] && [ "$model_id" != "$_opus" ] && slot="Sonnet"
+[ "$model_id" = "$_haiku" ] && slot="Haiku"
 
 # --- 颜色定义 ---
 CYAN='\033[36m'; GREEN='\033[32m'; YELLOW='\033[33m'; RED='\033[31m'
@@ -186,7 +196,11 @@ else
 fi
 
 # --- 第一行：模型 + Git + 时长 + 代码变更 ---
-line1="${BOLD}[${model}]${RESET}"
+if [ -n "$slot" ]; then
+    line1="${BOLD}[${model} ${DIM}${slot}${RESET}${BOLD}]${RESET}"
+else
+    line1="${BOLD}[${model}]${RESET}"
+fi
 if [ -n "$repo" ]; then
     if [ -n "$remote_url" ]; then
         repo_part=$(printf '\e]8;;%s\a%s\e]8;;\a' "$remote_url" "$repo")
