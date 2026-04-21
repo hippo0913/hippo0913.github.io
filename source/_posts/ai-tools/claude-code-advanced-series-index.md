@@ -55,7 +55,8 @@ cover: https://picsum.photos/seed/claude-code-advanced/1920/1080
 | 7 | [用 Claude Code 从零搭建一个 Go 后端项目](/2026/04/07/ai-tools/claude-code-real-project-go-backend/) | 完整的项目搭建过程：从 CLAUDE.md 到 API 端点上线。 |
 | 8 | [Claude Code 写博客的完整工作流](/2026/04/07/ai-tools/claude-code-real-project-blog-workflow/) | 30+ 篇文章、Skills、Hooks、自动部署——我是怎么管理这个博客的。 |
 | 9 | [打造你的 Claude Code 状态栏](/2026/04/17/ai-tools/claude-code-custom-statusline/) | 自定义状态栏脚本，实时显示 Git 状态、上下文用量、Token 速度等信息，附完整代码解读。 |
+| 10 | [用 Hooks 保卫你的 Claude Code 工作流](/2026/04/21/ai-tools/claude-code-hooks-guard-workflow/) | 四个真实 Hook 案例：Agent 拦截、自动格式化、截图验证、构建检查。 |
 
 ---
 
-*最后更新：2026-04-17*
+*最后更新：2026-04-21*
